@@ -34,7 +34,7 @@ exports.uploadPatt = async (file_name, body) => {
 };
 
 // オブジェクトファイルのアップロード
-exports.uploadObject = (file_name, body) => {
+exports.uploadObject = async (file_name, body) => {
 
   const upload_file = bucket.file(`object_images/${file_name}`);
 

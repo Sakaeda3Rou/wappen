@@ -15,7 +15,7 @@
     <header class="header">
         <a class="header__cancel" href="<%= cancel_link_url %>">キャンセル</a> <!-- header__cancel-btn-->
         <div class="header__title">Profile setting</div>
-        <a class="header__save header__save-btn" href="#">保存</a> <!-- header__save-btn-->
+        <a class="header__save header__save-btn" onclick="return sendPost()">保存</a> <!-- header__save-btn-->
     </header>
 
     <main>
@@ -28,7 +28,7 @@
 
             <div class="bottom-page">
 
-                <form class="my-user" action="/login" method="post">
+                <form class="my-user" name="my_user_form" action="/resist_user" method="post">
                     <div class="my-user__name">ユーザー名:　
                         <input type="text" name="_name">
                     </div>
@@ -37,7 +37,7 @@
                         <input type="date" name="_date">
                     </div>
                     <div class="my-user__profile-btn">
-                        <input type="submit" class="save-btn main-btn" value="保存"></input>
+                        <input type="submit" name="my_user_submit_button" class="save-btn main-btn" value="保存" onclick="return formCheck()"></input>
                         <a class="cancel-btn main-btn" href="<%= cancel_link_url %>">キャンセル</a>
                     </div>
                 </from>
@@ -45,7 +45,28 @@
         </div>
     </main>
     <footer id="footer"></footer>
-    <script src="js/include.js"></script>
+    <script src="views/js/include.js"></script>
+    <script>
+      function sendPost() {
+        console.log(document.forms.my_user_form.my_user_submit_button);
+
+        let result = document.forms.my_user_form.my_user_submit_button.click();
+
+        return result
+      }
+
+      // 入力されているかチェック
+      function formCheck() {
+        let name = document.forms.my_user_form._name.value;
+        let date = document.forms.my_user_form._date.value;
+
+        if(name == "" || date == "") {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    </script>
 </body>
 
 </html>

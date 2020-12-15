@@ -12,11 +12,12 @@ exports.saveWithId = async(collectionName, id, data) => {
   // save collection with ID
   try{
     const res = await db.collection(collectionName).doc(id).set(data);
+
+    return res;
   }catch(err){
     return {err: err};
   }
 
-  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -25,11 +26,12 @@ exports.saveWithoutId = async(collectionName, data) => {
   // save collection without ID
   try{
     const res = await db.collection(collectionName).add(data);
+    
+    return res;
   }catch(err){
     return {err: err};
   }
 
-  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -60,21 +62,24 @@ exports.deleteDoc = async(collectionName, id) => {
 
 // need collection's name as 'collectionName',
 //      column's name as 'columnName',
-exports.selectDocById = (collectionName, id) => {
+exports.selectDocById = async (collectionName, id) => {
   // get document
-  const res = db.collection(collectionName).doc(id).get().then(doc => {
+  const res = await db.collection(collectionName).doc(id).get().then(doc => {
     if(!doc.exists){
       // no document
       return null;
     }else{
       // return result
-      return doc;
+      return doc.data();
     }
   }).catch(err => {
     // error
     // NB: if(xxx.hasOwnProperty(err)){}
     return {err: err};
   });
+
+  // return to controller
+  return res
 }
 
 // need collection's name as 'collectionName',

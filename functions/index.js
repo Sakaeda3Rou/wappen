@@ -39,6 +39,7 @@ app.post('/login', async(req, res) => {
 
   // uidパラメータを取得
   const uid = req.body.uid;
+  // const user = {uid: uid};
   const user = {uid: uid};
 
   console.log(`uid => ${uid}`)
@@ -47,10 +48,10 @@ app.post('/login', async(req, res) => {
   req.session.user = user;
 
   // NB: insert userId at userId from session
-  const result = await dao.selectDocOneColumn('user_detail', 'userId', '==', uid);
+  const result = await dao.selectDocById('user_detail', uid);
   console.log(`result => ${result}`)
 
-  if(result == null){
+  if(!result){
     // no document
 
     // TODO: 確認
@@ -60,9 +61,11 @@ app.post('/login', async(req, res) => {
     const orient = require('./static/model/orient_devil.js');
     marker_url = await orient.createImage(uid);
 
+    // marker_urlをfirestoreに保存
+    dao.saveWithoutId('my_pattern', {userId: uid, patternURL: marker_url});
 
-    // TODO: 確認
-    console.log(`marker media url => ${marker_url}`);
+    // marker_urlをセッションに保存
+    req.session.user.marker_url = marker_url;
 
     res.render('profile', {
       // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
@@ -72,9 +75,16 @@ app.post('/login', async(req, res) => {
   }else{
     // not first login
 
+    // ユーザー情報をセッションに追加
+    req.session.user.userName = result.userName;
+    req.session.user.birthday = result.birthday;
+
     // TODO: 確認
     console.log('not first login');
-    res.render('my-page');
+    res.render('my-page', {
+      userName: result.userName,
+      birthday: result.birthday,
+    });
   }
 })
 
@@ -96,24 +106,41 @@ app.get('/resist_user', (req, res) => {
 app.post('/resist_user', (req, res) => {
   // パラメータを取得
   // FIXME: userName : {adana: 'UNC_Saikyouman'}
-  let userName = req.body._userName;
-  let birthday = req.body._birthday;
+  let userName = req.body._name;
+  let birthday = req.body._date.split('-');
+  birthday = `${birthday[0]}年 ${birthday[1]}月 ${birthday[2]}日`;
+  let marker_url = req.session.user.marker_url;
 
   // userDetailをfirestoreに格納
-  const result = dao.savewithId('user_detail', user_id, {userName:userName , birthday:birthday});
+  const result = dao.saveWithId('user_detail', req.session.user.uid, {userName:userName , birthday:birthday, markerURL: marker_url});
 
-  if(result.hasOwnProperty(err)){
+  // ユーザー情報をセッションに追加
+  req.session.user.userName = userName;
+  req.session.user.birthday = birthday;
+
+  if(result.hasOwnProperty('err')){
     // has error
-    console.log(`hasOwnProperty error: ${err}`);
+    console.log(`hasOwnProperty error: ${result.err}`);
   }
 
   // マイページへの遷移
-  res.render('my-page');
+  res.render('my-page', {
+    userName: userName,
+    birthday: birthday,
+  });
 });
 
 // get my page
 app.get('/my_page', (req, res) => {
-  res.render('my-page');
+  // TODO: セッションにあったらセッションのを使うなかったらデータベースのを使う
+  if(req.session.user.userName == undefined || req.session.user.birthday == undefined || req.session.user.marker_url != undefined) {
+    // TODO: daoに問い合わせ
+  }
+
+  res.render('my-page', {
+    userName: userName,
+    birthday: birthday,
+  });
 });
 
 // get profile
@@ -124,13 +151,16 @@ app.get('/profile', (req, res) => {
   // const userName = result.userName;
   // const birthday = result.birthday;
 
+  const userName = req.session.user.userName;
+  const birthday = req.session.user.birthday;
+
   // TODO: insert to html's textbox by ejs
 
   const marker_url = '';
 
   res.render('profile', {
     // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
-    cancel_link_url: '/my-page',
+    cancel_link_url: '/my_page',
     marker_url: `${marker_url}`,
   });
 });
@@ -406,6 +436,14 @@ exports.style = functions.https.onRequest((req, res) => {
 exports.reset = functions.https.onRequest((req, res) => {
   fs.readFile('static/views/css/reset.css', 'utf-8', (err, data) => {
     res.writeHead(200, {'Content-Type': 'text/css'});
+    res.write(data);
+    res.end();
+  });
+});
+
+exports.home = functions.https.onRequest((req, res) => {
+  fs.readFile('static/views/js/home.js', 'utf-8', (err, data) => {
+    res.writeHead(200, {'Content-type': 'text/javascript'});
     res.write(data);
     res.end();
   });
