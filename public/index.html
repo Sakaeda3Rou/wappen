@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://us-central1-wappen-3876c.cloudfunctions.net/reset" type="text/css">
+    <link rel="stylesheet" href="https://us-central1-wappen-3876c.cloudfunctions.net/style" type="text/css">
+
+    <!-- update the version number as needed -->
+    <script src="/__/firebase/8.0.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script src="/__/firebase/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-database.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-functions.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-storage.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-analytics.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-remote-config.js"></script>
+    <script defer src="/__/firebase/8.0.1/firebase-performance.js"></script>
+    <!--
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+</head>
+
+<body>
+    <nav id="set-hamburger" style="display: none;"></nav>
+    <header class="home-header">
+        <div class="home-header__title">WAPPEN</div>
+    </header>
+    <main>
+        <div class="switch-btn">
+            <div class="switch-btn__line switch-btn__line--now"></div>
+            <div class="switch-btn__line"></div>
+            <div class="switch-btn__line"></div>
+        </div>
+        <div class="home">
+            <div class="contents home__title show" style="transform: translateY(0) scale(1);">
+                <div class="title-iamge"></div>
+                <div class="title-phrase">
+                    <p>
+                        Paste<br />your<br />imagination!!
+                    </p>
+                    <!-- テキストアニメーションを表示する要素 -->
+                    <span id="ityped"></span>
+
+                </div>
+                <button type="button" class="blob-btn title-btn__login--btn" onclick="startButtonAction()">
+                    start
+                    <span class="blob-btn__inner">
+                        <span class="blob-btn__blobs">
+                            <span class="blob-btn__blob"></span>
+                            <span class="blob-btn__blob"></span>
+                            <span class="blob-btn__blob"></span>
+                            <span class="blob-btn__blob"></span>
+                        </span>
+                    </span>
+                </button>
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+                    <defs>
+                        <filter id="goo">
+                            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10"></feGaussianBlur>
+                            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 21 -7"
+                                result="goo"></feColorMatrix>
+                            <feBlend in2="goo" in="SourceGraphic" result="mix"></feBlend>
+                        </filter>
+                    </defs>
+                </svg>
+            </div>
+            <div class="contents home__tutorial">
+                <div class="tutorial">
+                    <div class="tutorial__title">
+                        <h2>tutorial</h2>
+                    </div>
+                    <div class="tutorial__mov">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/WT94M69hqro" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="contents home__aboutme">
+                <div class="aboutme">
+                    <div class="aboutme__title">
+                        <h2>about me</h2>
+                    </div>
+                    <div class="aboutme__content">
+                        何でもできるオールインワン。あなたが思い描くことは、
+                        どんなことでもiMacで実現できるでしょう。目を奪う
+                        デザイン。操作は限りなくシンプルで思いのまま。そして、あらゆるアイデアを次のレベルへ引き上げるパワフルなツールがたっぷり。新しい27インチモデルは、より高速なプロセッサとグラフィックス、より大きくなったメモリとストレージ、強化されたオーディオとビデオ機能、これまで
+                        以上に美しいRetina 5Kディスプレイを搭載。何でもできるデスクトップコンピュータが、かつてない速さと性能を
+                        手に入れました。iMacで体験できることすべてが、
+                        また一つ進化します。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <footer id="footer" style="display: none;"></footer>
+    <!-- <script src="js/include.js"></script> -->
+    <script src="js/home.js"></script>
+    <script src="https://unpkg.com/ityped@1.0.3"></script>
+    <script>
+        ityped.init(document.querySelector("#ityped"), {
+            strings: ['Welcome to Wappen!', 'Free your creativity!!']
+        })
+    </script>
+    <script>
+      function startButtonAction() {
+
+        var provider = new firebase.auth.GoogleAuthProvider();
+
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+          console.log('login success')
+
+          var user = result.user;
+
+          var form = document.createElement('form');
+          var request = document.createElement('input');
+
+          form.method = 'post';
+          form.action = '/login';
+
+          request.type = 'hidden';
+          request.name = 'uid';
+          request.value = user.uid;
+
+          form.appendChild(request);
+          document.body.appendChild(form);
+
+          form.submit();
+        })
+      }
+    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth',
+            'database',
+            'firestore',
+            'functions',
+            'messaging',
+            'storage',
+            'analytics',
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          console.log(`Firebase SDK loaded with ${features.join(', ')}`);
+        } catch (e) {
+          console.error(e);
+          console.log('Error loading the Firebase SDK, check the console.');
+        }
+      });
+    </script>
+</body>
+
+</html>
