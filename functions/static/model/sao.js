@@ -4,52 +4,46 @@ const functions = require('firebase-functions');
 const bucket = admin.storage().bucket();
 
 // マーカーファイルのアップロード
-exports.uploadMarker = (file_name, body) => {
-  return new Promise((resolve, reject) => {
+exports.uploadMarker = async (file_name, body) => {
 
-    // 整形
-    body = body.replace(/.+,/, '');
-    body = new Buffer(body, 'base64');
+  // 整形
+  body = body.replace(/.+,/, '');
+  body = new Buffer(body, 'base64');
 
-    const upload_file = bucket.file(`marker_images/${file_name}`);
+  const upload_file = bucket.file(`marker_images/${file_name}`);
 
-    upload_file.save(body, {
-      predefinedAcl: 'publicRead',
-      metadata: {
-        contentType: 'image/png',
-      },
-    });
+  await upload_file.save(body, {
+    predefinedAcl: 'publicRead',
+    metadata: {
+      contentType: 'image/png',
+    },
   });
 };
 
 // パターンファイルのアップロード
-exports.uploadPatt = (file_name, body) => {
-  return new Promise((resolve, reject) => {
+exports.uploadPatt = async (file_name, body) => {
 
-    const upload_file = bucket.file(`patterns/${file_name}`);
+  const upload_file = bucket.file(`patterns/${file_name}`);
 
-    upload_file.save(body, {
-      predefinedAcl: 'publicRead',
-      metadata: {
-        contentType: 'application/octet-stream',
-      },
-    });
+  await upload_file.save(body, {
+    predefinedAcl: 'publicRead',
+    metadata: {
+      contentType: 'application/octet-stream',
+    },
   });
 };
 
 // オブジェクトファイルのアップロード
 exports.uploadObject = (file_name, body) => {
-  return new Promise((resolve, reject) => {
 
-    const upload_file = bucket.file(`object_images/${file_name}`);
+  const upload_file = bucket.file(`object_images/${file_name}`);
 
-    upload_file.ave(body, {
-      predefinedAcl: 'publicRead',
-      metadata: {
-        // TODO: contentTypeを設定
-        contentType: 'application/octet-stream',
-      },
-    });
+  await upload_file.save(body, {
+    predefinedAcl: 'publicRead',
+    metadata: {
+      // TODO: contentTypeを設定
+      contentType: 'application/octet-stream',
+    },
   });
 };
 

@@ -23,6 +23,7 @@ exports.createImage = async(uid) => {
 
   // マーカーパターンをストレージに保存
   await sao.uploadPatt(`${uid}.patt`, pattFileString)
+  // TODO: 確認
 
   // マーカーをストレージに保存
   await sao.uploadMarker(`${uid}.png`, image.src)

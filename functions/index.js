@@ -58,7 +58,7 @@ app.post('/login', async(req, res) => {
 
     // make and save ARmarkerf
     const orient = require('./static/model/orient_devil.js');
-    marker_url = orient.createImage(uid);
+    marker_url = await orient.createImage(uid);
 
 
     // TODO: 確認
@@ -117,11 +117,7 @@ app.post('/resist_user', (req, res) => {
 
 // get my page
 app.get('/my_page', (req, res) => {
-  fs.readFile('views/my_page.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('my-page');
 });
 
 // get profile
@@ -134,13 +130,13 @@ app.get('/profile', (req, res) => {
 
   // TODO: insert to html's textbox by ejs
 
-  res.render('profile')
+  const marker_url = '';
 
-  // fs.readFile('views/profile.html', 'utf-8', (err, data) => {
-  //   res.writeHead(200, {'Content-Type': 'text/html'});
-  //   res.write(data);
-  //   res.end();
-  // });
+  res.render('profile', {
+    // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
+    cancel_link_url: '/my-page',
+    marker_url: `${marker_url}`,
+  });
 });
 
 // update profile
