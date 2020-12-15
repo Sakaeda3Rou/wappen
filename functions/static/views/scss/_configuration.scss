@@ -1,0 +1,74 @@
+$breakpoints: (
+  'sm': 'screen and (min-width: 400px)',
+  'md': 'screen and (min-width: 768px)',
+  'lg': 'screen and (min-width: 1000px)',
+  'xl': 'screen and (min-width: 1200px)',
+) !default;
+
+@mixin mq($breakpoint: md) {
+    @media #{map-get($breakpoints, $breakpoint)} {
+      @content;
+    }
+};
+
+$primary-color: #ecd318;
+$sub-color: #c23a1e;
+
+
+// メインで使うボタンのスタイル
+.main-btn {
+  display: inline-block;
+  padding: 0.3em 1em;
+  text-decoration: none;
+  color: $sub-color;
+  background-color: #fff;
+  border: solid 2px $sub-color;
+  border-radius: 3px;
+  transition: all .4s;
+  cursor: pointer;
+}
+
+.main-btn:hover {
+  background: $sub-color;
+  color: white;
+}
+
+// サブで使うボタンのスタイル
+.sub-btn {
+  display: inline-block;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  background: $primary-color;
+  color: #FFF;
+  border-radius: 4px;
+  box-shadow: 0px 0px 0px 5px $primary-color;
+  border: dashed 1px #FFF;
+  transition: all .4s;
+  cursor: pointer;
+}
+
+.sub-btn:hover {
+  background: $sub-color;
+  box-shadow: 0px 0px 0px 5px $sub-color;
+}
+
+
+// スクロールバーのスタイル
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6ps rgba( 0, 0, 0, 0.1 );
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 140, 95,.4);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba( 255, 255, 255, .3);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 140, 95,1);
+}

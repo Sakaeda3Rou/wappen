@@ -1,0 +1,124 @@
+@import "_object-modal.scss";
+
+.search__icon{
+    transition: all .4s;
+}
+.active {
+    &__i{
+        transform: rotate(-90deg);
+    }
+}
+
+.category {
+    &__search{
+        display: flex;
+        justify-content: center;
+        flex-wrap :wrap;
+    }
+
+    &__my-object{
+        overflow: auto;
+        height: 0;
+        justify-content: center;
+        align-items: center;
+        transition: all .4s;
+    }
+}
+
+
+.ranking {
+    width: 100%;
+
+    &__buttons{
+        display: flex;
+        justify-content: space-around;
+        flex-wrap :wrap;
+    }
+
+    &__button{
+        cursor: pointer;
+        margin-bottom: 1rem;
+
+            @include mq(lg){
+                width: 30%;
+                display: flex;
+                justify-content: center;
+                flex-wrap :wrap;
+        }
+    }
+}
+
+.my-object-list{
+    width: 90%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem 0;
+
+    &__title{
+        display: flex;
+        justify-content: center;
+        flex-wrap :wrap;
+    }
+
+    &__select{
+        max-width: 100%;
+        height: 50%;
+        max-height: 50%;
+        background-color: gray;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1rem;
+    }
+
+    &__checks {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    &__check {
+        width:24%;
+
+        label {
+            cursor: pointer;
+        }
+    }
+    
+    &__items{
+        display: flex;
+        flex-wrap :wrap;
+        justify-content: space-between;
+        overflow: auto;
+        height: 80%;
+        transition: all .4s;
+    }
+
+    &__item{
+        width: 47%;
+        height: 6rem;
+        margin-top: 1rem;
+        background-color: gray;
+        cursor: pointer;
+
+        @include mq(sm){
+            width: 31%;
+            height: 8rem;
+        }
+    }
+
+    &__decision{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    &__submit{
+        margin: 1rem 0;
+        width: 13rem;
+    }
+    &__cansel{
+        margin-bottom: 1rem;
+        width: 12.5rem;
+
+    }
+}

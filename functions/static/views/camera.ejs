@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
+</head>
+<body class="camera-page">
+    <nav id="set-hamburger"></nav>
+    <main>
+        <section class="camera">ここにカメラ</section>
+        <div class="btns">
+            <!-- クラン選択を表示するmodalを表示するボタン -->
+            <div class="btns__btn btns__btn--clan js-btn">
+                <i class="fas fa-users fa-lg"></i>
+                <p>クランを選択</p>
+            </div>
+            <!-- マイオブジェクトからカメラで映したいオブジェクトを選択するmodalを表示するボタン -->
+            <div class="btns__btn btns__btn--my-object js-btn">
+                <i class="fas fa-image fa-lg"></i>
+                <p>オブジェクトを選択</p>
+            </div>
+        </div>
+
+        <!-- 上のbtnを押したら表示される -->
+        <div class="modal js-modal">
+            <div class="modal__bg js-bg"></div>
+            <div class="modal__main">
+                <h3 id="modal__title"></h3>
+                <div class="modal__form">
+                    <!-- modal__listにクランかオブジェクトの一覧を表示 -->
+                    <ul id="modal__list"></ul>
+                    <input type="button" value="決定" class="main-btn">                    
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer id="footer" style="display: none;"></footer>
+    <script src="js/include.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/cameraBtn.js"></script>
+</body>
+</html>

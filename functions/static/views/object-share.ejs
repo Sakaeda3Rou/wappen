@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="views/css/reset.css" type="text/css">
+    <link rel="stylesheet" href="views/css/style.css" type="text/css">
+    <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav id="set-hamburger"></nav>
+    <header class="header">
+        <div class="header__title">Object Share</div>
+    </header>
+    <main>
+        <!-- マイオブジェクトから共有するmodalを表示するボタン -->
+        <div class="add-btn js-btn" id="js-add-btn">
+            <span class="add-btn__line add-btn__line--1"></span>
+            <span class="add-btn__line add-btn__line--2"></span>
+        </div>
+
+        <!-- マイオブジェクトから共有するmodalのコード -->
+        <div class="modal js-modal">
+            <div class="modal__bg js-bg"></div>
+            <div class="modal__main">
+                <div class="my-object-list">
+                    <h2 class="my-object-list__title">マイオブジェクト一覧</h2>
+
+                    <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
+                    <div class="category__my-object">
+                        <!-- 選択中の画像を表示 -->
+                        <div class="my-object-list__select">
+
+                        </div>
+
+                        <div class="my-object-list__checks">
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox" checked="checked">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                            <div class="my-object-list__check">
+                                <label><input type="checkbox">カテゴリ</label>
+                            </div>
+                        </div>
+                        <!-- 共有するボタン -->
+                        <div class="my-object-list__decision">
+                            <input type="submit" value="マイオブジェクトを共有する" class="main-btn my-object-list__submit">
+                            <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel" id="js-category-cansel">
+                        </div>
+                    </div>
+
+                    <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
+                    <ul class="my-object-list__items">
+                        <li class="my-object-list__item" id="my-object-list__item1"></li>
+                        <li class="my-object-list__item" id="my-object-list__item2"></li>
+                        <li class="my-object-list__item" id="my-object-list__item3"></li>
+                        <li class="my-object-list__item" id="my-object-list__item4"></li>
+                        <li class="my-object-list__item" id="my-object-list__item5"></li>
+                        <li class="my-object-list__item" id="my-object-list__item6"></li>
+                        <li class="my-object-list__item" id="my-object-list__item7"></li>
+                        <li class="my-object-list__item" id="my-object-list__item8"></li>
+                        <li class="my-object-list__item" id="my-object-list__item9"></li>
+                        <li class="my-object-list__item" id="my-object-list__item10"></li>
+                        <li class="my-object-list__item" id="my-object-list__item11"></li>
+                        <li class="my-object-list__item" id="my-object-list__item12"></li>
+                        <li class="my-object-list__item" id="my-object-list__item13"></li>
+                        <li class="my-object-list__item" id="my-object-list__item14"></li>
+                        <li class="my-object-list__item" id="my-object-list__item15"></li>
+                        <li class="my-object-list__item" id="my-object-list__item16"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 共有オブジェクトをダウンロードするmodalのコード -->
+        <div class="object-modal js-modal">
+            <div class="object-modal__bg js-bg"></div>
+            <div class="object-modal__main">
+                <div class="object-modal__batu-btn">×</div>
+                <div class="object-modal__container">
+                    <!-- 選択中の画像を表示 -->
+                    <div class="object-modal__select"></div>
+                    <!-- 共有オブジェクトをマイオブジェクトに追加するボタン -->
+                    <div class="object-modal__btn">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 検索コンテナ -->
+        <div class="inner">
+            <div class="search">
+                <div class="search__container">
+                    <div class="search__area">:ここに検索のカテゴリ</div>
+                    <div class="search__btn"><i class="fas fa-angle-left fa-lg search__icon"></i></div>
+                </div>
+                <div class="search__category">
+                    <div class="category">
+                        <h3 class="category__title">
+                            カテゴリ検索
+                        </h3>
+                        <form action="#">
+                            <div class="category__checks">
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                            </div>
+                            <div class="category__search">
+                                <input type="submit" value="検索" class="main-btn">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="ranking">
+                        <h3 class="ranking__title">
+                            ランキング
+                        </h3>
+                        <div class="ranking__buttons">
+                            <div class="ranking__button sub-btn">
+                                日間ダウンロード数
+                            </div>
+                            <div class="ranking__button sub-btn">
+                                週間ダウンロード数
+                            </div>
+                            <div class="ranking__button sub-btn">
+                                月間ダウンロード数
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- サーバーから取得した検索後のオブジェクト一覧を表示 -->
+            <ul class="thumbnails">
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+            </ul>
+        </div>
+    </main>
+    <footer id="footer"></footer>
+    <script src="js/include.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/objectShaer.js"></script>
+    <script>
+
+//マイオブジェクト一覧を表示するボタンの変化
+        const add_btn = document.getElementById('js-add-btn');
+        const share_bg = document.querySelector('.js-bg');
+        const line1 = document.querySelector('.add-btn__line--1');
+        const line2 = document.querySelector('.add-btn__line--2');
+
+        add_btn.addEventListener('click', function () {
+            line1.classList.toggle('active__line1');
+            line2.classList.toggle('active__line2');
+        });
+
+        share_bg.addEventListener('click', function () {
+            line1.classList.toggle('active__line1');
+            line2.classList.toggle('active__line2');
+        });
+
+//マイオブジェクト一覧を表示
+        const items = document.querySelectorAll('.my-object-list__item');
+        const categoryMyObject = document.querySelector('.category__my-object');
+        const myObjectListItems = document.querySelector('.my-object-list__items');
+        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const categorySubmit= document.querySelector('.my-object-list__submit');
+    //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                categoryMyObject.classList.toggle('category-open');
+                myObjectListItems.classList.toggle('my-object-list__items--close');
+
+                if (categoryMyObject.classList.contains('category-open')) {
+                    categoryMyObject.style.height = '90%';
+                } else {
+                    categoryMyObject.style.height = 0;
+                }
+
+                if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                    myObjectListItems.style.height = 0;
+                } else {
+                    myObjectListItems.style.height = '90%';
+                }
+            });
+        });
+    //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
+        categoryCansel.addEventListener('click', () => {
+            categoryMyObject.classList.toggle('category-open');
+            myObjectListItems.classList.toggle('my-object-list__items--close');
+
+            if (categoryMyObject.classList.contains('category-open')) {
+                categoryMyObject.style.height = '90%';
+            } else {
+                categoryMyObject.style.height = 0;
+            }
+
+            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                myObjectListItems.style.height = 0;
+            } else {
+                myObjectListItems.style.height = '90%';
+            }
+        });
+    //マイオブジェクト一覧の"マイオブジェクトを共有する"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
+        categorySubmit.addEventListener('click', () => {
+            modal.classList.remove('open');
+            line1.classList.toggle('active__line1');
+            line2.classList.toggle('active__line2');
+            categoryCansel.click();
+        });
+
+    //modalを閉じる
+        objectModalBg.addEventListener('click', () => {
+            objectModal.classList.remove('object-modal__open');
+            objectModalBtn.innerHTML = "";
+            objectModalBtn.classList.remove('object-modal__btn--circle');
+
+        });
+        batuBtn.addEventListener('click', () => {
+            objectModal.classList.remove('object-modal__open');
+            objectModalBtn.innerHTML = "";
+            objectModalBtn.classList.remove('object-modal__btn--circle');
+        });
+
+    </script>
+</body>
+</html>

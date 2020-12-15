@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="views/css/reset.css" type="text/css">
+    <link rel="stylesheet" href="views/css/style.css" type="text/css">
+    <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav id="set-hamburger"></nav>
+    <header class="header">
+        <div class="header__title">My Object</div>
+    </header>
+    <main>
+        <div class="add-btn js-btn" id="js-add-btn">
+            <span class="add-btn__line add-btn__line--1"></span>
+            <span class="add-btn__line add-btn__line--2"></span>
+        </div>
+        <div class="modal js-modal">
+            <div class="modal__bg js-bg"></div>
+            <div class="modal__main">
+                <form action="" style="height: 100%; display: flex; flex-direction: column;">
+                    <div class="drop">
+                        <div id="preview" class="drop__preview"></div>
+                        <div id="drop-zone" class="drop__zone">　<!-- ここに画像のドロップエリア -->
+                            <p class="drop__title">画像をドラッグ＆ドロップもしくは</p>
+                            <label class="drop__btn sub-btn"><input type="file" name="file" id="file-input" style="display: none;">画像を選択</label>
+                        </div>
+                    </div>
+                    <!-- アップロードするオブジェクトのカテゴリ選択 -->
+                    <ul class="modal__category">
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                    </ul>
+                    <input type="submit" class="main-btn" value="マイオブジェクトへ登録" style="margin: auto;">
+                </form>
+            </div>
+        </div>
+        <div class="inner">
+            <div class="search">
+                <div class="search__container">
+                    <!-- 現在選択中のカテゴリをsearch-areaに並べる -->
+                    <div class="search__area">:ここに検索のカテゴリ</div>
+                    <div class="search__btn"><i class="fas fa-lg fa-angle-left search__icon"></i></div>
+                </div>
+                <div class="search__category">
+                    <div class="category">
+                        <h3 class="category__title">
+                            カテゴリ検索
+                        </h3>
+                        <form action="#" style="display: flex; flex-direction: column;">
+                            <div class="category__checks">
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                                <div class="category__check">
+                                    <label><input type="checkbox">カテゴリ</label>
+                                </div>
+                            </div>
+                            <input type="submit" value="検索" class="category__search main-btn">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- 現在ユーザが登録しているオブジェクトを取得して一覧表示 -->
+            <ul class="thumbnails">
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li>
+            </ul>
+        </div>
+    </main>
+    <footer id="footer"></footer>
+    <script src="js/include.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/myObjectUpload.js"></script>
+    <script>
+        // 検索コンテキストのアコーディオンを表示
+        const search = document.querySelector('.search__btn');
+        const category = document.querySelector('.search__category');
+        let i = document.querySelector('i');
+
+        search.addEventListener('click', () => {
+            category.classList.toggle('search-open');
+            i.classList.toggle('active__i');
+
+
+            if(category.classList.contains('search-open')){
+                category.style.height = category.scrollHeight + 'px';
+            }else{
+                category.style.height = 0;
+            }
+        });
+
+        //ここからオブジェクト追加ボタンのモーション設定
+        const add_btn = document.getElementById('js-add-btn');
+        const line1 = document.querySelector('.add-btn__line--1');
+        const line2 = document.querySelector('.add-btn__line--2');
+        const modalBg = document.querySelector('.js-bg');
+
+        add_btn.addEventListener('click', function() {
+            line1.classList.toggle('active__line1');
+            line2.classList.toggle('active__line2');
+        });
+
+        modalBg.addEventListener('click', function() {
+            line1.classList.remove('active__line1');
+            line2.classList.remove('active__line2');
+        })
+    </script>
+</body>
+</html>
