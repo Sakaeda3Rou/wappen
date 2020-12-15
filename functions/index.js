@@ -74,7 +74,7 @@ app.post('/login', async(req, res) => {
 
     // TODO: 確認
     console.log('not first login');
-    res.render('my-page')
+    res.render('my-page');
   }
 })
 
@@ -108,11 +108,7 @@ app.post('/resist_user', (req, res) => {
   }
 
   // マイページへの遷移
-  fs.readFile('views/my_page.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('my-page');
 });
 
 // get my page
@@ -155,29 +151,17 @@ app.post('/profile', (req, res) => {
     // has error
   }
 
-  fs.readFile('views/my_page.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  })
+  res.render('my-page');
 })
 
 // get help
 app.get('/help', (req, res) => {
-  fs.readFile('views/help.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  })
+  res.render('help');
 })
 
 // get camera
 app.get('/camera', (req, res) => {
-  fs.readFile('views/camera.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('camera');
 });
 
 // post camera
@@ -186,11 +170,7 @@ app.post('/camera', (req, res) => {
   const camera = require('./static/model/camera.js');
 
   // return camera
-  fs.readFile('views/camera.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('camera');
 })
 
 // get object_selected
@@ -246,11 +226,7 @@ app.post('/clan_selected', (req, res) => {
 
 // get my_object
 app.get('/my_object', (req, res) => {
-  fs.readFile('views/my-object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('my-object');
 });
 
 // post my_object
@@ -259,11 +235,7 @@ app.post('/my_object', (req, res) => {
   // and sort about 'numberOfAdd'
 
   // return my_object
-  fs.readFile('views/my_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('my-object');
 })
 
 // get add_object
@@ -306,11 +278,7 @@ app.post('/add_object', (req, res) => {
 
 // get share_object
 app.get('/share_object', (req, res) => {
-  fs.readFile('views/share_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('object-share');
 });
 
 // post share_object
@@ -319,11 +287,7 @@ app.post('/share_object', (req, res) => {
   //       and do search, return result
 
   // return share_object
-  fs.readFile('views/share_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('object-share');
 })
 
 // get share_my_object
