@@ -1,8 +1,8 @@
 const includeHamburger = () => {
     let xhr = new XMLHttpRequest(),
         method = "GET",
-        url = "include/hamburger.html";
-    
+        url = "views/partials/hamburger.ejs";
+
     let hamburger = document.getElementById('set-hamburger');
 
     xhr.open(method, url, true);
@@ -14,15 +14,15 @@ const includeHamburger = () => {
     };
     xhr.send();
     let script = document.createElement('script');
-    script.src = 'js/hamburger.js';
+    script.src = 'views/js/hamburger.js';
     hamburger.appendChild(script);
 }
 
 const includeFooter = () => {
     let xhr = new XMLHttpRequest(),
         method = "GET",
-        url = "include/footer.html";
-    
+        url = "views/partials/footer.ejs";
+
     let footer = document.getElementById('footer');
 
     xhr.open(method, url, true);

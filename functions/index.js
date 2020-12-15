@@ -70,6 +70,7 @@ app.post('/login', async(req, res) => {
     res.render('profile', {
       // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
       cancel_link_url: '/',
+      form_action_url: '/resist_user',
       marker_url: `${marker_url}`,
     });
   }else{
@@ -78,6 +79,7 @@ app.post('/login', async(req, res) => {
     // ユーザー情報をセッションに追加
     req.session.user.userName = result.userName;
     req.session.user.birthday = result.birthday;
+    req.session.user.marker_url = result.markerURL;
 
     // TODO: 確認
     console.log('not first login');
@@ -132,8 +134,12 @@ app.post('/resist_user', (req, res) => {
 
 // get my page
 app.get('/my_page', (req, res) => {
-  // TODO: セッションにあったらセッションのを使うなかったらデータベースのを使う
-  if(req.session.user.userName == undefined || req.session.user.birthday == undefined || req.session.user.marker_url != undefined) {
+  const userName = req.session.user.userName;
+  const birthday = req.session.user.birthday;
+  const marker_url = req.session.user.marker_url;
+
+  // ユーザー情報に欠損があればデータベースから取得する
+  if(userName == undefined || birthday == undefined || marker_url == undefined) {
     // TODO: daoに問い合わせ
   }
 
@@ -153,14 +159,14 @@ app.get('/profile', (req, res) => {
 
   const userName = req.session.user.userName;
   const birthday = req.session.user.birthday;
+  const marker_url = req.session.user.marker_url;
 
   // TODO: insert to html's textbox by ejs
 
-  const marker_url = '';
-
   res.render('profile', {
-    // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
+    // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
     cancel_link_url: '/my_page',
+    form_action_url: '/profile',
     marker_url: `${marker_url}`,
   });
 });
@@ -168,12 +174,14 @@ app.get('/profile', (req, res) => {
 // update profile
 app.post('/profile', (req, res) => {
   // get req.body
-  let userName = req.body._userName;
-  let birthday = req.body._birthday;
+  let userName = req.body._name;
+  let birthday = req.body._date;
+  birthday = `${birthday[0]}年 ${birthday[1]}月 ${birthday[2]}日`;
+  let marker_url = req.session.user.marker_url;
 
   // TODO: throw datas for update
   const userDetail = require('./static/model/user_detail.js');
-  userDetail.setUserDetail(userName, birthday);
+  userDetail.setUserDetail(userName, birthday, marker_url);
 
   const result = dao.updateDoc('user_detail', req.session.user.uid, userDetail.getUserDetail());
 
@@ -181,7 +189,10 @@ app.post('/profile', (req, res) => {
     // has error
   }
 
-  res.render('my-page');
+  res.render('my-page', {
+    userName: userName,
+    birthday: birthday,
+  });
 })
 
 // get help
