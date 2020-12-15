@@ -175,7 +175,7 @@ app.get('/profile', (req, res) => {
 app.post('/profile', (req, res) => {
   // get req.body
   let userName = req.body._name;
-  let birthday = req.body._date;
+  let birthday = req.body._date.split('-');
   birthday = `${birthday[0]}年 ${birthday[1]}月 ${birthday[2]}日`;
   let marker_url = req.session.user.marker_url;
 
@@ -185,7 +185,7 @@ app.post('/profile', (req, res) => {
 
   const result = dao.updateDoc('user_detail', req.session.user.uid, userDetail.getUserDetail());
 
-  if(result.hasOwnProperty(err)){
+  if(result.hasOwnProperty('err')){
     // has error
   }
 
@@ -383,11 +383,7 @@ app.put('/share_my_object', (req, res) => {
 //get clan
 app.get('/clan', (req, res) => {
   // return clan page
-  fs.readFile('views/clan.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('clan');
 })
 
 // post clan
@@ -396,11 +392,7 @@ app.post('/clan', (req, res) => {
   //       and sort by 'numberOfAdd'
 
   // return clan page
-  fs.readFile('views/clan.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
+  res.render('clan');
 })
 
 // get clan_make
@@ -434,7 +426,21 @@ app.post('/clan_make', (req, res) => {
     res.write(data);
     res.end();
   });
-})
+});
+
+app.post('/clan_search', (req, res) => {
+  // TODO: 確認
+  console.log(`search_word => ${req.body}`);
+  const search_word = req.body;
+
+  // データベースでクランを検索
+
+
+  // 取得したリストを返す
+  // res.write(`[{"clanName": "${search_word}", "numberOfMember": 0, "official": false}]`);
+  res.write(`[]`);
+  res.end();
+});
 
 exports.style = functions.https.onRequest((req, res) => {
   fs.readFile('static/views/css/style.css', 'utf-8', (err, data) => {

@@ -26,7 +26,7 @@ exports.saveWithoutId = async(collectionName, data) => {
   // save collection without ID
   try{
     const res = await db.collection(collectionName).add(data);
-    
+
     return res;
   }catch(err){
     return {err: err};
@@ -41,10 +41,11 @@ exports.updateDoc = async(collectionName, id, data) => {
   // update document
   try{
     const res = await db.collection(collectionName).doc(id).update(data);
+    
+    return res;
   }catch(err){
     return {err: err};
   }
-  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -53,11 +54,12 @@ exports.deleteDoc = async(collectionName, id) => {
   // delete document
   try{
     const res = await db.collection(collectionName).doc(id).delete();
+
+    return res;
   }catch(err){
     return {err: err};
   }
 
-  return res;
 }
 
 // need collection's name as 'collectionName',

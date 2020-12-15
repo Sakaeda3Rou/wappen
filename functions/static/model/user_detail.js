@@ -2,7 +2,7 @@ const userId = null;
 const userDetail = {
   userName : null,
   birthday : null,
-  marker_url : null
+  markerURL : null
 }
 
 //getter
@@ -22,7 +22,7 @@ exports.setUserId = (userId) => {
 exports.setUserDetail = (userName, birthday, marker_url) => {
   userDetail.userName = userName;
   userDetail.birthday = birthday;
-  userDetail.marker_url = marker_url;
+  userDetail.markerURL = marker_url;
 //   console.log('userDetail["userName"] : ' + userDetail['userName']);
 //   console.log('userDetail["birthday"] : ' + userDetail['birthday']);
 

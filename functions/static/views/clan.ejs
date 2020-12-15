@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="views/css/reset.css">
+    <link rel="stylesheet" href="views/css/style.css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
 
 </head>
@@ -22,8 +22,8 @@
 
             <div class="clan-search">
                     <form action="#" method="POST">
-                        <input type="text" class="clan-search__text" name="clan-search__text" placeholder="クラン名を入力" size="28">
-                        <input class="main-btn clan-search_btn" type="submit" value="検索">
+                        <input id="search_word" type="text" class="clan-search__text" name="clan-search__text" placeholder="クラン名を入力" size="28">
+                        <input id="search_btn" class="main-btn clan-search_btn" type="button" value="検索">
                     </form>
             </div>
 
@@ -50,6 +50,37 @@
 
     </main>
     <footer id="footer"></footer>
-    <script src="js/include.js"></script>
+    <script src="views/js/include.js"></script>
+    <script>
+    // 検索ボタンにクリックイベントを追加
+    let search_btn = document.getElementById('search_btn');
+
+    search_btn.addEventListener('click', () => {
+
+      // 検索するワードを取得
+      let search_word = document.getElementById('search_word').value;
+
+      // XMLHttpRequestを作成
+      let xhr = new XMLHttpRequest();
+
+      xhr.open('post', '/clan_search');
+      xhr.send(search_word);
+
+      // サーバーの応答を検知
+      xhr.onreadystatechange = function () {
+          if(xhr.readyState === 4 && xhr.status === 200){
+              // clanリストを取得
+              let restxt = xhr.responseText;
+              console.log(`restxt => ${restxt}`);
+
+              // string => jsonに変換
+              let clanList = JSON.parse(restxt);
+              console.log(`clanList => ${clanList}`);
+              console.dir(clanList)
+          }
+      };
+    }, false);
+
+    </script>
 </body>
 </html>
