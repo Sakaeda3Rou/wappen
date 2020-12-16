@@ -22,6 +22,7 @@ app.use(express.static('static'));
 
 // セッションの設定
 app.use(session({
+  // name: '__session',
   secret: 'secret',
   resave: false,
   saveUninitialized: false,
@@ -39,13 +40,15 @@ app.post('/login', async(req, res) => {
 
   // uidパラメータを取得
   const uid = req.body.uid;
-  // const user = {uid: uid};
   const user = {uid: uid};
 
   console.log(`uid => ${uid}`)
 
   // ユーザーをセッションに保存
   req.session.user = user;
+  // console.log(`session store => ${req.session.store}`)
+  console.log(`session => ${req.session.user.uid}`);
+  // res.cookie('__session', user);
 
   // NB: insert userId at userId from session
   const result = await dao.selectDocById('user_detail', uid);
@@ -81,8 +84,9 @@ app.post('/login', async(req, res) => {
     req.session.user.birthday = result.birthday;
     req.session.user.marker_url = result.markerURL;
 
-    // TODO: 確認
-    console.log('not first login');
+    // console.log(`req.session => ${req.session}`);
+    // console.dir(req.session)
+
     res.render('my-page', {
       userName: result.userName,
       birthday: result.birthday,
@@ -134,9 +138,14 @@ app.post('/resist_user', (req, res) => {
 
 // get my page
 app.get('/my_page', (req, res) => {
+  console.log(`__session => ${req.session}`);
+  console.dir(req.session)
+
+
   const userName = req.session.user.userName;
   const birthday = req.session.user.birthday;
   const marker_url = req.session.user.marker_url;
+
 
   // ユーザー情報に欠損があればデータベースから取得する
   if(userName == undefined || birthday == undefined || marker_url == undefined) {
@@ -197,6 +206,9 @@ app.post('/profile', (req, res) => {
 
 // get help
 app.get('/help', (req, res) => {
+  // TODO: cookieの確認
+  console.log(`cookies => ${req.cookies}`)
+
   res.render('help');
 })
 
