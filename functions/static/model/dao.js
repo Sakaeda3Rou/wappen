@@ -41,7 +41,7 @@ exports.updateDoc = async(collectionName, id, data) => {
   // update document
   try{
     const res = await db.collection(collectionName).doc(id).update(data);
-    
+
     return res;
   }catch(err){
     return {err: err};
@@ -91,9 +91,10 @@ exports.selectDocById = async (collectionName, id) => {
 // NB: when select shared object
 //     operator = 'array-contains-any'
 //     word is array ex:['kawaii', 'kimoi']
-exports.selectDocOneColumn = (collectionName, columnName, operator, word) => {
+exports.selectDocOneColumn = async(collectionName, columnName, operator, word) => {
   // get document with select
-  const res = db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
+  const res = await db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
+    let resultArray = [];
     if(snapshot.empty){
       // no document
       console.log('empty');
@@ -101,13 +102,18 @@ exports.selectDocOneColumn = (collectionName, columnName, operator, word) => {
     }else{
       // return result
       console.log(`snapshot => ${snapshot}`);
-      return snapshot;
+      snapshot.forEach(doc => {
+        resultArray.push(doc.data());
+      })
+      return resultArray;
     }
   }).catch(err => {
     // error
     // NB: if(xxx.hasOwnProperty(err)){}
     return {err: err};
   });
+
+  return res;
 }
 
 // when you use : select double table (ex: my_object and object)
@@ -129,18 +135,18 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
       return null;
     }
     // NB: three pattern i think
-    if(idName == 'clanId'){
+    if(idName == 'userId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.clanId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
       })
-    }else if(idName == 'userId'){
+    }else if(idName == 'clanId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.userId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
@@ -148,16 +154,18 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else{
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.objectId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
       })
     }
-    return returnArray;
   }).catch(err => {
     return {err: err};
   });
+
+  //return to controller
+  return returnArray;
 }
 
 // when you use : change status 'isSelected'
