@@ -13,11 +13,12 @@ exports.saveWithId = async(collectionName, id, data) => {
   try{
     const res = await db.collection(collectionName).doc(id).set(data);
 
-    return res;
   }catch(err){
     return {err: err};
   }
-
+  
+  // return to controller
+  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -27,11 +28,12 @@ exports.saveWithoutId = async(collectionName, data) => {
   try{
     const res = await db.collection(collectionName).add(data);
 
-    return res;
   }catch(err){
     return {err: err};
   }
-
+  
+  // return to controller
+  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -42,10 +44,12 @@ exports.updateDoc = async(collectionName, id, data) => {
   try{
     const res = await db.collection(collectionName).doc(id).update(data);
 
-    return res;
   }catch(err){
     return {err: err};
   }
+
+  // return to controller
+  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -55,11 +59,12 @@ exports.deleteDoc = async(collectionName, id) => {
   try{
     const res = await db.collection(collectionName).doc(id).delete();
 
-    return res;
   }catch(err){
     return {err: err};
   }
-
+  
+  // return to controller
+  return res;
 }
 
 // need collection's name as 'collectionName',
@@ -130,7 +135,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
   let returnArray = [];
 
   // first sellection
-  const first = firstRef.where(idName, '==', id).get().then(snapshot => {
+  const first = await firstRef.where(idName, '==', id).get().then(snapshot => {
     if(snapshot.empty){
       return null;
     }
@@ -160,22 +165,25 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
         })
       })
     }
+
+    // return to first
+    return returnArray;
   }).catch(err => {
     return {err: err};
   });
 
   //return to controller
-  return returnArray;
+  return first;
 }
 
 // when you use : change status 'isSelected'
 // need user's id as userId
 //      object's id what you want to change status to true as 'newObjectId'
-exports.changeSelected = (userId, newObjectId) => {
+exports.changeSelected = async(userId, newObjectId) => {
   const myObjectRef = db.collection('my_object');
 
   // select object's id what you want to change status to false
-  const first = myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+  const first = await myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     if(snapshot.empty){
       return null;
     }
@@ -185,8 +193,6 @@ exports.changeSelected = (userId, newObjectId) => {
       if(second.hasOwnProperty(err)){
         return {err: second.err};
       }
-    }).catch(err => {
-      return {err: err};
     })
     const third = myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
       snapshot.forEach(doc => {
@@ -195,14 +201,19 @@ exports.changeSelected = (userId, newObjectId) => {
         if(four.hasOwnProperty(err)){
           return {err: four.err};
         }
-      }).catch(err => {
-        return {err: err};
       })
     }).catch(err => {
       return {err: err};
     })
+
+    // return to first
     return {result: success};
+  }).catch(err => {
+    return {err: err};
   })
+
+  // return to controller
+  return first;
 }
 
 // when you use : for increment numberOfAdd
