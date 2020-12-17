@@ -67,8 +67,33 @@ exports.deleteDoc = async(collectionName, id) => {
 
 }
 
+// when you use : select all document in collection
+// need collection's name as 'collectionName'
+exports.selectAll = async (collectionName) => {
+  const result = await db.collection(collectionName).get().then(snapshot => {
+    let resultArray = [];
+    if(snapshot.empty){
+      // no document
+      return null;
+    }else{
+      snapshot.forEach(doc => {
+        resultArray.push(doc.data());
+      })
+
+      // return to result
+      return resultArray;
+    }
+  }).catch(err => {
+    // has error
+    return {err: err};
+  })
+
+  // return to controller
+  return result;
+}
+
 // need collection's name as 'collectionName',
-//      column's name as 'columnName',
+//      docuentId as 'id',
 exports.selectDocById = async (collectionName, id) => {
   // get document
   const res = await db.collection(collectionName).doc(id).get().then(doc => {
@@ -214,6 +239,12 @@ exports.changeSelected = async(userId, newObjectId) => {
 
   // return to controller
   return first;
+}
+
+// when you use : for search clan
+// need word for use to search as 'searchword'
+exports.searchClan = async(searchWord) => {
+  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20')
 }
 
 // when you use : for increment numberOfAdd
