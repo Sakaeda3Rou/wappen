@@ -91,7 +91,12 @@
         // 「検索結果」を生成
         const result_div_element_header = document.createElement('h2');
         result_div_element_header.setAttribute('class', 'result__title');
-        result_div_element_header.innerHTML = '検索結果';
+        if (!clanList) {
+          var num = 0;
+        } else {
+          var num = clanList.length;
+        }
+        result_div_element_header.innerHTML = `検索結果 ${num}件`;
         result_div_element.appendChild(result_div_element_header);
 
         // リストを表示する領域を生成
@@ -106,6 +111,7 @@
           clan_create_button_element.setAttribute('type', 'button');
           clan_create_button_element.setAttribute('value', '新規作成');
           clan_create_button_element.setAttribute('class', 'main-btn new-btn');
+          result_div_element.appendChild(clan_create_button_element);
 
         } else {
           // クランリストを表示
@@ -122,7 +128,7 @@
             input_button_element.setAttribute('class', 'main-btn in-btn');
             input_button_element.setAttribute('type', 'submit');
             input_button_element.setAttribute('value', '加入');
-            input_button_element.setAttribute('onclick', `containment(${})`);
+            input_button_element.setAttribute('onclick', `containment()`);
 
             // クランリストに要素を追加
             clan_div_element.appendChild(input_button_element);
