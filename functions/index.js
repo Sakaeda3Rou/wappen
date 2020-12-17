@@ -419,15 +419,6 @@ app.get('/clan', (req, res) => {
   res.render('clan');
 })
 
-// post clan
-app.post('/clan', (req, res) => {
-  // TODO: search clan by category
-  //       and sort by 'numberOfAdd'
-
-  // return clan page
-  res.render('clan');
-})
-
 // get clan_make
 app.get('/clan_make', (req, res) => {
   // return make clan page

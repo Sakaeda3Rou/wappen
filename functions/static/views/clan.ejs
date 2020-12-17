@@ -21,29 +21,14 @@
         <div class="inner">
 
             <div class="clan-search">
-                    <form action="#" method="POST">
+                    <form>
                         <input id="search_word" type="text" class="clan-search__text" name="clan-search__text" placeholder="クラン名を入力" size="28">
                         <input id="search_btn" class="main-btn clan-search_btn" type="button" value="検索">
                     </form>
             </div>
 
-            <div class="result">
-                <h2 class="result__title">検索結果</h2>
-                <div class="result__list">
-                   <div class="result__list--item">クラン１　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン２　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン３　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン４　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン５　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン６　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン７　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン８　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン９　<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン１０<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン１１<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="result__list--item">クラン１２<input class="main-btn in-btn" type="submit" value="加入"></div>
-                   <div class="main-btn new-btn">新規作成</div>
-                </div>
+            <div id="search_result" class="result">
+                <!-- 検索結果を表示する -->
             </div>
 
         </div>
@@ -77,10 +62,69 @@
               let clanList = JSON.parse(restxt);
               console.log(`clanList => ${clanList}`);
               console.dir(clanList)
+
+              // 検索結果を表示する
+              searchResult(clanList);
           }
       };
     }, false);
 
+    </script>
+    <script>
+    // 検索結果を表示する
+    function searchResult(clanList) {
+      // 検索結果を表示するdiv領域を取得
+      const result_div_element = document.getElementById('search_result');
+
+      // 以前の検索結果が存在していた場合、削除する
+      if (result_div_element.hasChildNodes) {
+        // 子要素を削除
+        while (result_div_element.firstChild) {
+          result_div_element.removeChild(result_div_element.firstChild);
+        }
+      }
+
+      // 「検索結果」を生成
+      const result_div_element_header = document.createElement('h2');
+      result_div_element_header.setAttribute('class', 'result__title');
+      result_div_element_header.innerHTML = '検索結果';
+      result_div_element.appendChild(result_div_element_header);
+
+      // リストを表示する領域を生成
+      const result_list_div_element = document.createElement('div');
+      result_list_div_element.setAttribute('class', 'result__list');
+      result_div_element.appendChild(result_list_div_element);
+
+      if(!clanList) {
+        // 検索結果がnullのとき
+        // 新規作成ボタンを生成
+        const clan_create_button_element = document.createElement('input');
+        clan_create_button_element.setAttribute('type', 'button');
+        clan_create_button_element.setAttribute('value', '新規作成');
+        clan_create_button_element.setAttribute('class', 'main-btn new-btn');
+
+      } else {
+        // クランリストを表示
+        for(let clan of clanList) {
+          // クラン名を取得
+          let clanName = clan['clanName'];
+
+          // 行を追加
+          const clan_div_element = document.createElement('div');
+          clan_div_element.setAttribute('class', 'result__list--item');
+          clan_div_element.innerHTML = clanName;
+
+          const input_button_element = document.createElement('input');
+          input_button_element.setAttribute('class', 'main-btn in-btn');
+          input_button_element.setAttribute('type', 'submit');
+          input_button_element.setAttribute('value', '加入');
+
+          // クランリストに要素を追加
+          clan_div_element.appendChild(input_button_element);
+          result_list_div_element.appendChild(clan_div_element);
+        }
+      }
+    }
     </script>
 </body>
 </html>
