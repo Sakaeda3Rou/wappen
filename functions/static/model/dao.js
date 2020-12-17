@@ -86,7 +86,7 @@ exports.selectAll = async (collectionName) => {
   }).catch(err => {
     // has error
     return {err: err};
-  })
+  });
 
   // return to controller
   return result;
@@ -243,10 +243,60 @@ exports.changeSelected = async(userId, newObjectId) => {
 
 // when you use : for search clan
 // need word for use to search as 'searchword'
-exports.searchClan = async(searchWord) => {
-  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20').get().then(snapshot => {
+//      user's id as 'userId'
+exports.searchClan = async(searchWord, userId) => {
+  const userClan = await db.collection('containment_to_clan').where('userId', '==', userId).get().then(snapshot => {
+    // create array
+    let resultArray = [];
 
-  })
+    if(snapshot.empty){
+      // no document
+      return null;
+    }
+
+    snapshot.forEach(doc => {
+      resultArray.push(doc.clanId);
+    })
+
+    //return to userClan
+    return resultArray;
+  }).catch(err => {
+    // has error
+    return {err : err};
+  });
+  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20').get().then(snapshot => {
+    // create array
+    let resultArray = [];
+
+    if(snapshot.empty){
+      // no document
+      return null;
+    }
+
+    snapshot.forEach(doc => {
+      // judge containment
+      var flag = false;
+
+      for(var i = 0; i < userClan.length && flag == false; i++){
+        if(doc.id == userClan[i]){
+          flag = true;
+        }
+      }
+
+      if(flag != true){
+        resultArray.push(doc.data());
+      }
+    })
+
+    // return to clan
+    return resultArray;
+  }).catch(err => {
+    // has error
+    return {err : err};
+  });
+
+  // return to controller
+  return clan;
 }
 
 // when you use : for increment numberOfAdd
