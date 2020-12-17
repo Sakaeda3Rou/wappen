@@ -31,7 +31,7 @@
                     </div>
                     <!-- アップロードするオブジェクトのカテゴリ選択 -->
                     <ul class="modal__category">
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                        <li class="category-select"><label><input type="checkbox" value="ほのお">ほのお</label></li>
                         <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
                         <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
                         <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
@@ -46,7 +46,7 @@
             <div class="search">
                 <div class="search__container">
                     <!-- 現在選択中のカテゴリをsearch-areaに並べる -->
-                    <div class="search__area">:ここに検索のカテゴリ</div>
+                    <div id="text_area" class="search__area">:ここに検索のカテゴリ</div>
                     <div class="search__btn"><i class="fas fa-lg fa-angle-left search__icon"></i></div>
                 </div>
                 <div class="search__category">
@@ -57,7 +57,7 @@
                         <form action="#" style="display: flex; flex-direction: column;">
                             <div class="category__checks">
                                 <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
+                                    <label><input type="checkbox"　name="hono" value="ほのお" onchange="checkC(this.value)">ほのお</label>
                                 </div>
                                 <div class="category__check">
                                     <label><input type="checkbox">カテゴリ</label>
@@ -110,6 +110,11 @@
     <script src="views/js/modal.js"></script>
     <script src="views/js/myObjectUpload.js"></script>
     <script>
+
+        function checkC(value){
+          document.getElementById('text_area').innerHTML = "<p>value</p>";
+        }
+
         // 検索コンテキストのアコーディオンを表示
         const search = document.querySelector('.search__btn');
         const category = document.querySelector('.search__category');

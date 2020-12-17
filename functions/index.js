@@ -398,6 +398,8 @@ app.get('/clan', (req, res) => {
   res.render('clan');
 })
 
+app.listen(5001);
+
 // post clan
 app.post('/clan', (req, res) => {
   // TODO: search clan by category
