@@ -244,7 +244,9 @@ exports.changeSelected = async(userId, newObjectId) => {
 // when you use : for search clan
 // need word for use to search as 'searchword'
 exports.searchClan = async(searchWord) => {
-  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20')
+  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20').get().then(snapshot => {
+
+  })
 }
 
 // when you use : for increment numberOfAdd
