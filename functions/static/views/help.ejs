@@ -51,12 +51,24 @@
                 <div class="contact">
                     <h2 class="contact__title">お問い合わせ</h2>
                     <form action="#" method="POST">
-                        <textarea class="contact__textarea" name="contact__textarea" id="contact__textarea" cols="50" rows="5"></textarea>
-                        <br>
-                        <!-- お問い合わせに入力した文字を送信するボタン -->
-                        <div class="contact__send">
-                            <input class="main-btn" type="submit" value="送信">
-                        </div>
+                      <div>
+                          <h4 class="contact__text">E-mail <span class="contact__required">＊必須</span></h4>
+                          <input type='text' class="contact__email" placeholder="例) example@gmail.com">
+                      </div>
+                      <div>
+                          <h4 class="contact__text">確認用E-mail <span class="contact__required">＊必須</span></h4>
+                          <input type='text' class="contact__email" placeholder="例) example@gmail.com">
+                      </div>
+                      <div>
+                          <h4 class="contact__text">お問い合わせ内容</h4>
+                          <textarea class="contact__textarea" name="contact__textarea" cols="50" rows="5"
+                          placeholder="お問い合わせの内容を入力してください"></textarea>
+                      </div>
+                      </table>
+                      <!-- お問い合わせを送信するボタン -->
+                      <div class="contact__send">
+                          <input class="main-btn" type="submit" value="送信">
+                      </div>
                     </form>
                 </div>
             </div>

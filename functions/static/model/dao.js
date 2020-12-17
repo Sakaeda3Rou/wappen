@@ -13,6 +13,7 @@ exports.saveWithId = async(collectionName, id, data) => {
   try{
     const res = await db.collection(collectionName).doc(id).set(data);
 
+    // return to controller
     return res;
   }catch(err){
     return {err: err};
@@ -27,6 +28,7 @@ exports.saveWithoutId = async(collectionName, data) => {
   try{
     const res = await db.collection(collectionName).add(data);
 
+    // return to controller
     return res;
   }catch(err){
     return {err: err};
@@ -41,11 +43,13 @@ exports.updateDoc = async(collectionName, id, data) => {
   // update document
   try{
     const res = await db.collection(collectionName).doc(id).update(data);
-    
+
+    // return to controller
     return res;
   }catch(err){
     return {err: err};
   }
+
 }
 
 // need collection's name as 'collectionName',
@@ -55,6 +59,7 @@ exports.deleteDoc = async(collectionName, id) => {
   try{
     const res = await db.collection(collectionName).doc(id).delete();
 
+    // return to controller
     return res;
   }catch(err){
     return {err: err};
@@ -62,8 +67,33 @@ exports.deleteDoc = async(collectionName, id) => {
 
 }
 
+// when you use : select all document in collection
+// need collection's name as 'collectionName'
+exports.selectAll = async (collectionName) => {
+  const result = await db.collection(collectionName).get().then(snapshot => {
+    let resultArray = [];
+    if(snapshot.empty){
+      // no document
+      return null;
+    }else{
+      snapshot.forEach(doc => {
+        resultArray.push(doc.data());
+      })
+
+      // return to result
+      return resultArray;
+    }
+  }).catch(err => {
+    // has error
+    return {err: err};
+  })
+
+  // return to controller
+  return result;
+}
+
 // need collection's name as 'collectionName',
-//      column's name as 'columnName',
+//      docuentId as 'id',
 exports.selectDocById = async (collectionName, id) => {
   // get document
   const res = await db.collection(collectionName).doc(id).get().then(doc => {
@@ -91,9 +121,10 @@ exports.selectDocById = async (collectionName, id) => {
 // NB: when select shared object
 //     operator = 'array-contains-any'
 //     word is array ex:['kawaii', 'kimoi']
-exports.selectDocOneColumn = (collectionName, columnName, operator, word) => {
+exports.selectDocOneColumn = async(collectionName, columnName, operator, word) => {
   // get document with select
-  const res = db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
+  const res = await db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
+    let resultArray = [];
     if(snapshot.empty){
       // no document
       console.log('empty');
@@ -101,13 +132,18 @@ exports.selectDocOneColumn = (collectionName, columnName, operator, word) => {
     }else{
       // return result
       console.log(`snapshot => ${snapshot}`);
-      return snapshot;
+      snapshot.forEach(doc => {
+        resultArray.push(doc.data());
+      })
+      return resultArray;
     }
   }).catch(err => {
     // error
     // NB: if(xxx.hasOwnProperty(err)){}
     return {err: err};
   });
+
+  return res;
 }
 
 // when you use : select double table (ex: my_object and object)
@@ -124,23 +160,23 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
   let returnArray = [];
 
   // first sellection
-  const first = firstRef.where(idName, '==', id).get().then(snapshot => {
+  const first = await firstRef.where(idName, '==', id).get().then(snapshot => {
     if(snapshot.empty){
       return null;
     }
     // NB: three pattern i think
-    if(idName == 'clanId'){
+    if(idName == 'userId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.clanId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
       })
-    }else if(idName == 'userId'){
+    }else if(idName == 'clanId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.userId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
@@ -148,26 +184,31 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else{
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.objectId).get().then(doc => {
-          returnArray.push(doc);
+          returnArray.push(doc.data());
         }).catch(err => {
           return {err: err};
         })
       })
     }
+
+    // return to first
     return returnArray;
   }).catch(err => {
     return {err: err};
   });
+
+  //return to controller
+  return first;
 }
 
 // when you use : change status 'isSelected'
 // need user's id as userId
 //      object's id what you want to change status to true as 'newObjectId'
-exports.changeSelected = (userId, newObjectId) => {
+exports.changeSelected = async(userId, newObjectId) => {
   const myObjectRef = db.collection('my_object');
 
   // select object's id what you want to change status to false
-  const first = myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+  const first = await myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     if(snapshot.empty){
       return null;
     }
@@ -177,8 +218,6 @@ exports.changeSelected = (userId, newObjectId) => {
       if(second.hasOwnProperty(err)){
         return {err: second.err};
       }
-    }).catch(err => {
-      return {err: err};
     })
     const third = myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
       snapshot.forEach(doc => {
@@ -187,14 +226,25 @@ exports.changeSelected = (userId, newObjectId) => {
         if(four.hasOwnProperty(err)){
           return {err: four.err};
         }
-      }).catch(err => {
-        return {err: err};
       })
     }).catch(err => {
       return {err: err};
     })
+
+    // return to first
     return {result: success};
+  }).catch(err => {
+    return {err: err};
   })
+
+  // return to controller
+  return first;
+}
+
+// when you use : for search clan
+// need word for use to search as 'searchword'
+exports.searchClan = async(searchWord) => {
+  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20')
 }
 
 // when you use : for increment numberOfAdd
