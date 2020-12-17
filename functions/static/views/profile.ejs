@@ -22,13 +22,13 @@
         <div class="inner">
 
             <div class="my-qr">
-                <div class="my-qr__code"><i class="my-qr__code--icon fas fa-qrcode fa-8x"></i></div>
+                <div class="my-qr__code"><img src="<%= marker_url %>"></img></div>
                 <div class="my-qr__download"><i class="fas fa-download fa-2x"></i></div>
             </div>
 
             <div class="bottom-page">
 
-                <form class="my-user" name="my_user_form" action="<% form_action_url %>" method="post">
+                <form class="my-user" name="my_user_form" action="<%= form_action_url %>" method="post">
                     <div class="my-user__name">ユーザー名:　
                         <input type="text" name="_name">
                     </div>

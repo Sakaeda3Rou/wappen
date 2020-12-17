@@ -4,9 +4,9 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 const express = require('express');
-const session = require('cookie-session');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const cookie = require('cookie');
 const dao = require('./static/model/dao.js');
 
 const app = express();
@@ -20,19 +20,6 @@ app.set('views', 'static/views')
 // 静的ファイルのディレクトリを設定
 app.use(express.static('static'));
 
-// セッションの設定
-app.use(session({
-  // name: '__session',
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: false,
-    maxage: 1000 * 60 * 60 * 1
-  }
-}));
-
 exports.app = functions.https.onRequest(app);
 
 // post login
@@ -42,13 +29,8 @@ app.post('/login', async(req, res) => {
   const uid = req.body.uid;
   const user = {uid: uid};
 
-  console.log(`uid => ${uid}`)
-
-  // ユーザーをセッションに保存
-  req.session.user = user;
-  // console.log(`session store => ${req.session.store}`)
-  console.log(`session => ${req.session.user.uid}`);
-  // res.cookie('__session', user);
+  // cookieに保存する情報を生成
+  let __session = {user: user};
 
   // NB: insert userId at userId from session
   const result = await dao.selectDocById('user_detail', uid);
@@ -62,34 +44,44 @@ app.post('/login', async(req, res) => {
 
     // make and save ARmarkerf
     const orient = require('./static/model/orient_devil.js');
-    marker_url = await orient.createImage(uid);
+    markerURL = await orient.createImage(uid);
 
-    // marker_urlをfirestoreに保存
-    dao.saveWithoutId('my_pattern', {userId: uid, patternURL: marker_url});
+    // markerURLをfirestoreに保存
+    dao.saveWithoutId('my_pattern', {userId: uid, patternURL: markerURL});
 
-    // marker_urlをセッションに保存
-    req.session.user.marker_url = marker_url;
+    // markerURLをセッションに追加
+    __session.user.markerURL = markerURL;
+
+    // __sessionをJSONに変換
+    const json = JSON.stringify(__session);
+
+    // ユーザーをセッションに保存
+    res.cookie('__session', json);
 
     res.render('profile', {
       // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
       cancel_link_url: '/',
       form_action_url: '/resist_user',
-      marker_url: `${marker_url}`,
+      marker_url: `${markerURL}`,
     });
   }else{
     // not first login
 
     // ユーザー情報をセッションに追加
-    req.session.user.userName = result.userName;
-    req.session.user.birthday = result.birthday;
-    req.session.user.marker_url = result.markerURL;
+    __session.user.userName = result.userName;
+    __session.user.birthday = result.birthday;
+    __session.user_markerURL = result.markerURL;
 
-    // console.log(`req.session => ${req.session}`);
-    // console.dir(req.session)
+    // __sessionをJSONに変換
+    const json = JSON.stringify(__session);
+
+    // ユーザーをセッションに保存
+    res.cookie('__session', json);
 
     res.render('my-page', {
       userName: result.userName,
       birthday: result.birthday,
+      marker_url: result.markerURL,
     });
   }
 })
@@ -109,20 +101,31 @@ app.get('/resist_user', (req, res) => {
 });
 
 // post resist user
-app.post('/resist_user', (req, res) => {
+app.post('/resist_user', async (req, res) => {
   // パラメータを取得
   // FIXME: userName : {adana: 'UNC_Saikyouman'}
+
+  // cookieからユーザーを取得
+  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+
   let userName = req.body._name;
   let birthday = req.body._date.split('-');
   birthday = `${birthday[0]}年 ${birthday[1]}月 ${birthday[2]}日`;
-  let marker_url = req.session.user.marker_url;
+  let markerURL = user.markerURL;
 
   // userDetailをfirestoreに格納
-  const result = dao.saveWithId('user_detail', req.session.user.uid, {userName:userName , birthday:birthday, markerURL: marker_url});
+  const result = await dao.saveWithId('user_detail', user.uid, {userName:userName , birthday:birthday, markerURL: markerURL});
 
   // ユーザー情報をセッションに追加
-  req.session.user.userName = userName;
-  req.session.user.birthday = birthday;
+  user.userName = userName;
+  user.birthday = birthday;
+  const __session = {user: user}
+
+  // __sessionをJSONに変換
+  const json = JSON.stringify(__session);
+
+  // ユーザーをセッションに保存
+  res.cookie('__session', json);
 
   if(result.hasOwnProperty('err')){
     // has error
@@ -133,28 +136,30 @@ app.post('/resist_user', (req, res) => {
   res.render('my-page', {
     userName: userName,
     birthday: birthday,
+    marker_url: markerURL,
   });
 });
 
 // get my page
 app.get('/my_page', (req, res) => {
-  console.log(`__session => ${req.session}`);
-  console.dir(req.session)
 
+  // cookieからユーザーを取得
+  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+  console.log(`session => ${user}`);
 
-  const userName = req.session.user.userName;
-  const birthday = req.session.user.birthday;
-  const marker_url = req.session.user.marker_url;
-
+  const userName = user.userName;
+  const birthday = user.birthday;
+  const markerURL = user.markerURL;
 
   // ユーザー情報に欠損があればデータベースから取得する
-  if(userName == undefined || birthday == undefined || marker_url == undefined) {
+  if(userName == undefined || birthday == undefined || markerURL == undefined) {
     // TODO: daoに問い合わせ
   }
 
   res.render('my-page', {
     userName: userName,
     birthday: birthday,
+    marker_url: markerURL,
   });
 });
 
@@ -166,9 +171,12 @@ app.get('/profile', (req, res) => {
   // const userName = result.userName;
   // const birthday = result.birthday;
 
-  const userName = req.session.user.userName;
-  const birthday = req.session.user.birthday;
-  const marker_url = req.session.user.marker_url;
+  // cookieからユーザーを取得
+  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+
+  const userName = user.userName;
+  const birthday = user.birthday;
+  const markerURL = user.markerURL;
 
   // TODO: insert to html's textbox by ejs
 
@@ -176,27 +184,40 @@ app.get('/profile', (req, res) => {
     // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
     cancel_link_url: '/my_page',
     form_action_url: '/profile',
-    marker_url: `${marker_url}`,
+    marker_url: `${markerURL}`,
   });
 });
 
 // update profile
 app.post('/profile', (req, res) => {
-  // get req.body
+
+  // cookieからユーザーを取得
+  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+
   let userName = req.body._name;
   let birthday = req.body._date.split('-');
   birthday = `${birthday[0]}年 ${birthday[1]}月 ${birthday[2]}日`;
-  let marker_url = req.session.user.marker_url;
+  let markerURL = user.markerURL;
+
+  user.userName = userName;
+  user.birthday = birthday;
 
   // TODO: throw datas for update
-  const userDetail = require('./static/model/user_detail.js');
-  userDetail.setUserDetail(userName, birthday, marker_url);
 
-  const result = dao.updateDoc('user_detail', req.session.user.uid, userDetail.getUserDetail());
+  const result = dao.updateDoc('user_detail', user.uid, user);
 
   if(result.hasOwnProperty('err')){
     // has error
   }
+
+  const __session = {user: user}
+
+  // __sessionをJSONに変換
+  const json = JSON.stringify(__session);
+
+  // ユーザーをセッションに保存
+  res.cookie('__session', json);
+
 
   res.render('my-page', {
     userName: userName,
