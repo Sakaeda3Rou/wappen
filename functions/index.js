@@ -20,6 +20,39 @@ app.set('views', 'static/views')
 // 静的ファイルのディレクトリを設定
 app.use(express.static('static'));
 
+async function confirmUser(req) {
+  // cookieからユーザーを取得
+  // TODO: cookieになかった場合にデータベースから取得すべきか
+  try {
+    let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user;
+
+    // ユーザー情報に欠損がないか
+    if (user.userName == undefined || user.birthday == undefined || user.markerURL == undefined) {
+      // 欠損があった場合データベースから取得
+      const result = await dao.selectDocById('user_detail', uid)
+
+      // プロフィールをセット
+      user.userName = result.userName
+      user.birthday = result.birthday
+      user.markerURL = result.markerURL
+
+      // セッションに保存
+      __session.user = user;
+
+      // __sessionをJSONに変換
+      const json = JSON.stringify(__session);
+
+      // ユーザーをセッションに保存
+      res.cookie('__session', json);
+    }
+
+    return user;
+  } catch {
+    return null;
+  }
+
+}
+
 exports.app = functions.https.onRequest(app);
 
 // post login
@@ -86,20 +119,6 @@ app.post('/login', async(req, res) => {
   }
 })
 
-// get resist user
-app.get('/resist_user', (req, res) => {
-  // TODO: send official clan to ejs
-  const result = dao.selectDocOneColumn('clan', 'official', '==', true);
-
-  result.forEach(doc => {
-    // send to ejs
-  }).catch(err => {
-    // has error
-  })
-
-  res.render('profile');
-});
-
 // post resist user
 app.post('/resist_user', async (req, res) => {
   // パラメータを取得
@@ -141,26 +160,26 @@ app.post('/resist_user', async (req, res) => {
 });
 
 // get my page
-app.get('/my_page', (req, res) => {
+app.get('/my_page', async (req, res) => {
 
   // cookieからユーザーを取得
-  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
-  console.log(`session => ${user}`);
+  const user = await confirmUser(req);
 
-  const userName = user.userName;
-  const birthday = user.birthday;
-  const markerURL = user.markerURL;
+  console.log(`user => ${user}`);
 
-  // ユーザー情報に欠損があればデータベースから取得する
-  if(userName == undefined || birthday == undefined || markerURL == undefined) {
-    // TODO: daoに問い合わせ
+  if (!user) {
+    res.redirect('/');
+  } else {
+    const userName = user.userName;
+    const birthday = user.birthday;
+    const markerURL = user.markerURL;
+
+    res.render('my-page', {
+      userName: userName,
+      birthday: birthday,
+      marker_url: markerURL,
+    });
   }
-
-  res.render('my-page', {
-    userName: userName,
-    birthday: birthday,
-    marker_url: markerURL,
-  });
 });
 
 // get profile
@@ -226,12 +245,16 @@ app.post('/profile', (req, res) => {
 })
 
 // get help
-app.get('/help', (req, res) => {
+app.get('/help', async (req, res) => {
   // TODO: cookieの確認
-  console.log(`cookies => ${req.cookies}`)
+  const user = await confirmUser(res);
 
-  res.render('help');
-})
+  if (!user) {
+    res.redirect('/');
+  } else {
+    res.render('help');
+  }
+});
 
 // get camera
 app.get('/camera', (req, res) => {
@@ -299,8 +322,25 @@ app.post('/clan_selected', (req, res) => {
 })
 
 // get my_object
-app.get('/my_object', (req, res) => {
-  res.render('my-object');
+app.get('/my_object', async (req, res) => {
+  // userIdを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // カテゴリーリストを取得
+    const categoryList = JSON.stringify('[{"categoryId": "1", "categoryName": "a"}]');
+
+    // マイオブジェクトリストを取得
+    const myObjectList = JSON.stringify('[{"myObjectId": "1", "Name": "a"}]');
+
+    res.render('my-object', {
+      categoryList: categoryList,
+      myObjectList: myObjectList,
+    });
+  }
 });
 
 // post my_object
@@ -414,9 +454,16 @@ app.put('/share_my_object', (req, res) => {
 })
 
 //get clan
-app.get('/clan', (req, res) => {
-  // return clan page
-  res.render('clan');
+app.get('/clan', async (req, res) => {
+
+  // ユーザー認証
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+    res.render('clan');
+  }
 })
 
 // post clan
