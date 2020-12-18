@@ -91,7 +91,7 @@
         // 「検索結果」を生成
         const result_div_element_header = document.createElement('h2');
         result_div_element_header.setAttribute('class', 'result__title');
-        if (!clanList) {
+        if (!clanList || clanList == undefined) {
           var num = 0;
         } else {
           var num = clanList.length;
@@ -104,7 +104,7 @@
         result_list_div_element.setAttribute('class', 'result__list');
         result_div_element.appendChild(result_list_div_element);
 
-        if(!clanList) {
+        if(!clanList || clanList.length == 0) {
           // 検索結果がnullのとき
           // 新規作成ボタンを生成
           const clan_create_button_element = document.createElement('input');
@@ -126,9 +126,10 @@
 
             const input_button_element = document.createElement('input');
             input_button_element.setAttribute('class', 'main-btn in-btn');
-            input_button_element.setAttribute('type', 'submit');
+            input_button_element.setAttribute('type', 'button');
+            input_button_element.setAttribute('id', `${clan.id}`);
             input_button_element.setAttribute('value', '加入');
-            input_button_element.setAttribute('onclick', `containment()`);
+            input_button_element.setAttribute('onclick', `containment("${clan.id}")`);
 
             // クランリストに要素を追加
             clan_div_element.appendChild(input_button_element);
@@ -140,6 +141,27 @@
       // クラン加入
       function containment(clanId) {
         console.log(`containment ${clanId}`);
+
+        let xhr = new XMLHttpRequest();
+
+        // サーバーに送信
+        xhr.open('post', '/containment_clan');
+        xhr.send(clanId);
+
+        // 加入ボタンを削除
+        const button_element = document.getElementById(clanId);
+
+        button_element.remove();
+
+        // サーバーの応答を検知
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                // clanリストを取得
+                let restxt = xhr.responseText;
+                console.log(`restxt => ${restxt}`);
+
+            }
+        };
       }
 
       // クラン作成

@@ -103,7 +103,7 @@ app.post('/login', async(req, res) => {
     // ユーザー情報をセッションに追加
     __session.user.userName = result.userName;
     __session.user.birthday = result.birthday;
-    __session.user_markerURL = result.markerURL;
+    __session.user.markerURL = result.markerURL;
 
     // __sessionをJSONに変換
     const json = JSON.stringify(__session);
@@ -311,7 +311,7 @@ app.get('/clan_selected', (req, res) => {
 app.post('/clan_selected', (req, res) => {
   // TODO: send parameter about clan
   //       make data about clan for camera
-  const clanId = req.body._clanId;
+  // const clanId = req.body._clanId;
 
   // return camera
   fs.readFile('views/camera.html', 'utf-8', (err, data) => {
@@ -320,6 +320,24 @@ app.post('/clan_selected', (req, res) => {
     res.end();
   });
 })
+
+app.post('/containment_clan', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  // 加入するクランIDを取得
+  const clanId = req.body;
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+    // クランに加入
+    const result = await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: clanId});
+
+    res.write(result.toString());
+    res.end();
+  }
+});
 
 // get my_object
 app.get('/my_object', async (req, res) => {

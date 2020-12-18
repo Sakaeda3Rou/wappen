@@ -77,7 +77,12 @@ exports.selectAll = async (collectionName) => {
       return null;
     }else{
       snapshot.forEach(doc => {
-        resultArray.push(doc.data());
+        let data = {id : doc.id};
+        let document = doc.data();
+        for(const key in document){
+          data[key] = document[key];
+        }
+        resultArray.push(data);
       })
 
       // return to result
@@ -133,7 +138,12 @@ exports.selectDocOneColumn = async(collectionName, columnName, operator, word) =
       // return result
       console.log(`snapshot => ${snapshot}`);
       snapshot.forEach(doc => {
-        resultArray.push(doc.data());
+        let data = {id : doc.id};
+        let document = doc.data();
+        for(const key in document){
+          data[key] = document[key];
+        }
+        resultArray.push(data);
       })
       return resultArray;
     }
@@ -168,7 +178,12 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     if(idName == 'userId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.clanId).get().then(doc => {
-          returnArray.push(doc.data());
+          let data = {id : doc.id};
+          let document = doc.data();
+          for(const key in document){
+            data[key] = document[key];
+          }
+          returnArray.push(data);
         }).catch(err => {
           return {err: err};
         })
@@ -176,7 +191,12 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else if(idName == 'clanId'){
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.userId).get().then(doc => {
-          returnArray.push(doc.data());
+          let data = {id : doc.id};
+          let document = doc.data();
+          for(const key in document){
+            data[key] = document[key];
+          }
+          returnArray.push(data);
         }).catch(err => {
           return {err: err};
         })
@@ -184,7 +204,12 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else{
       snapshot.forEach(doc => {
         const second = secondRef.doc(doc.objectId).get().then(doc => {
-          returnArray.push(doc.data());
+          let data = {id : doc.id};
+          let document = doc.data();
+          for(const key in document){
+            data[key] = document[key];
+          }
+          returnArray.push(data);
         }).catch(err => {
           return {err: err};
         })
@@ -251,57 +276,69 @@ exports.searchClan = async(searchWord, userId) => {
 
     if(snapshot.empty){
       // no document
-      return null;
+      return resultArray;
     }
 
     snapshot.forEach(doc => {
-      console.log(`clanId => ${doc.data()}`);
+      // console.log(`clanId => ${doc.data()}`);
       const document = doc.data();
       resultArray.push(document.clanId);
     })
 
     //return to userClan
-    console.log(`userClan => ${resultArray}`);
+    // console.log(`userClan => ${resultArray}`);
     return resultArray;
   }).catch(err => {
     // has error
     return {err : err};
   });
-  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', 20).get().then(snapshot => {
-    // create array
-    let resultArray = [];
 
-    if(snapshot.empty){
-      // no document
-      return null;
-    }
+  if(Array.isArray(userClan)){
+    const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', 20).get().then(snapshot => {
+      // create array
+      let resultArray = [];
 
-    snapshot.forEach(doc => {
-      // judge containment
-      var flag = false;
+      if(snapshot.empty){
+        // no document
+        return resultArray;
+      }
 
-      for(var i = 0; i < userClan.length && flag == false; i++){
-        console.log(`userClan[${i}] => ${userClan[i]}`);
-        if(doc.id == userClan[i]){
-          flag = true;
+      snapshot.forEach(doc => {
+        // judge containment
+        var flag = false;
+
+        for(var i = 0; i < userClan.length && flag == false; i++){
+          // console.log(`userClan[${i}] => ${userClan[i]}`);
+          if(doc.id == userClan[i]){
+            flag = true;
+          }
         }
-      }
 
-      if(flag != true){
-        resultArray.push(doc.data());
-      }
-    })
+        if(flag != true){
+          let data = {id : doc.id};
+          let document = doc.data();
+          for(const key in document){
+            data[key] = document[key];
+          }
 
-    // return to clan
-    return resultArray;
-  }).catch(err => {
-    // has error
-    return {err : err};
-  });
+          resultArray.push(data);
+        }
+      })
 
-  // return to controller
-  console.log(`clan => ${clan}`);
-  return clan;
+      // return to clan
+      return resultArray;
+    }).catch(err => {
+      // has error
+      return {err : err};
+    });
+
+    // return to controller
+    // console.log(`clan => ${clan}`);
+    return clan;
+  }else{
+    return userClan;
+  }
+
 }
 
 // when you use : for increment numberOfAdd
