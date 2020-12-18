@@ -30,13 +30,10 @@
                         </div>
                     </div>
                     <!-- アップロードするオブジェクトのカテゴリ選択 -->
-                    <ul class="modal__category">
-                        <li class="category-select"><label><input type="checkbox" value="ほのお">ほのお</label></li>
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
-                        <li class="category-select"><label><input type="checkbox" value="カテゴリ">カテゴリ</label></li>
+                    <ul id="category_list" class="modal__category">
+
+                      <!-- カテゴリーリストを生成 -->
+
                     </ul>
                     <input type="submit" class="main-btn" value="マイオブジェクトへ登録" style="margin: auto;">
                 </form>
@@ -55,8 +52,11 @@
                             カテゴリ検索
                         </h3>
                         <form action="#" style="display: flex; flex-direction: column;">
-                            <div class="category__checks">
-                                <div class="category__check">
+                            <div id="category_search_form" class="category__checks">
+
+                              <!-- カテゴリーリストを生成 -->
+
+                                <!-- <div class="category__check">
                                     <label><input type="checkbox"　name="hono" value="ほのお" onchange="checkC(this.value)">ほのお</label>
                                 </div>
                                 <div class="category__check">
@@ -79,7 +79,7 @@
                                 </div>
                                 <div class="category__check">
                                     <label><input type="checkbox">カテゴリ</label>
-                                </div>
+                                </div> -->
                             </div>
                             <input type="submit" value="検索" class="category__search main-btn">
                         </form>
@@ -150,12 +150,91 @@
     </script>
 
     <script>
-      // カテゴリーリストを代入
-      let categoryList = <%= categoryList %>;
+      // カテゴリーリストを作成
+      let categoryList = []
 
-      // カテゴリーリストを取得
+      <% categoryList.forEach((category) => { %>
+        categoryList.push({
+          categoryId: "<%= category.categoryId %>",
+          categoryName: "<%= category.categoryName %>",
+          // カテゴリ検索の選択フラグ
+          isSearchSelected: false,
+          // オブジェクト登録時のカテゴリ選択フラグ
+          isAddObjectSelected: false
+        });
+      <% }); %>
+
+      console.dir(categoryList);
+
+      // カテゴリーをセット
+      setCategory();
+
+      // html documentにカテゴリーをセット
       function setCategory() {
+        // カテゴリーをセットするdiv領域を取得
+        const category_div_element = document.getElementById('category_list');
 
+        const category_form_div_element = document.getElementById('category_search_form');
+
+        for (let [index, category] of categoryList.entries()) {
+          // オブジェクト追加の領域
+          // liタグを作成
+          const category_element = document.createElement('li');
+          category_element.setAttribute('class', 'category-select');
+
+          // labelタグを作成
+          const label_element = document.createElement('label');
+
+          // inputタグを作成
+          const input_element = document.createElement('input');
+          input_element.setAttribute('type', 'checkbox');
+          input_element.setAttribute('value', `${category.categoryName}`);
+          input_element.setAttribute('onclick', `addObjectCategorySwitch(${index})`);
+
+          // category_div_elementに追加
+          label_element.appendChild(input_element);
+          label_element.insertAdjacentHTML('beforeend', `${category.categoryName}`);
+          category_element.appendChild(label_element);
+          category_div_element.appendChild(category_element);
+
+          // オブジェクト検索の領域
+          const category_check_div_element = document.createElement('div');
+          category_check_div_element.setAttribute('class', 'category__check');
+
+          // labelタグを作成
+          const check_label_element = document.createElement('label');
+
+          // inputタグを作成
+          check_input_element = document.createElement('input');
+          check_input_element.setAttribute('type', 'checkbox');
+          check_input_element.setAttribute('value', `${category.categoryName}`);
+          check_input_element.setAttribute('onclick', `searchCategorySwitch(${index})`);
+
+          // category_form_div_elementに追加
+          check_label_element.appendChild(check_input_element);
+          check_label_element.insertAdjacentHTML('beforeend', `${category.categoryName}`);
+          category_check_div_element.appendChild(check_label_element);
+          category_form_div_element.appendChild(category_check_div_element);
+
+        }
+
+      }
+
+      // カテゴリ検索のチェックボックスが変更された時
+      function searchCategorySwitch(index) {
+
+        categoryList.isSearchSelected = !categoryList.isSearchSelected
+
+        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList.isSearchSelected}}`);
+      }
+
+      // オブジェクト登録時のカテゴリチェックボックスが変更された時
+      function addObjectCategorySwitch(index) {
+        console.log(`addSwitch => ${index}`);
+
+        categoryList.isAddObjectSelected = !categoryList.isAddObjectSelected
+
+        console.log(`categoryList {index: ${index}, isAddObjectSelected: ${categoryList.isAddObjectSelected}}`);
       }
     </script>
 </body>

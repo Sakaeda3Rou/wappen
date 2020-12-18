@@ -111,6 +111,7 @@
           clan_create_button_element.setAttribute('type', 'button');
           clan_create_button_element.setAttribute('value', '新規作成');
           clan_create_button_element.setAttribute('class', 'main-btn new-btn');
+          clan_create_button_element.setAttribute('onclick', `makeTOClan("${search_word}")`);
           result_div_element.appendChild(clan_create_button_element);
 
         } else {
@@ -165,13 +166,13 @@
       }
 
       // クラン作成
-      function makeTOClan() {
+      function makeTOClan(clanName) {
         // 検索されていたワードで作成
         let xhr = new XMLHttpRequest();
 
         // サーバーに送信
         xhr.open('post', '/clan_make');
-        xhr.send(search_word);
+        xhr.send(clanName);
 
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {

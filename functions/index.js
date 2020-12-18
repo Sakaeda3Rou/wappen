@@ -165,8 +165,6 @@ app.get('/my_page', async (req, res) => {
   // cookieからユーザーを取得
   const user = await confirmUser(req);
 
-  console.log(`user => ${user}`);
-
   if (!user) {
     res.redirect('/');
   } else {
@@ -184,11 +182,6 @@ app.get('/my_page', async (req, res) => {
 
 // get profile
 app.get('/profile', (req, res) => {
-  // TODO: get userName, birthday
-  // const result = dao.selectDocById('user_detail', req.session.user.uid);
-
-  // const userName = result.userName;
-  // const birthday = result.birthday;
 
   // cookieからユーザーを取得
   let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
@@ -349,10 +342,10 @@ app.get('/my_object', async (req, res) => {
   } else {
 
     // カテゴリーリストを取得
-    const categoryList = JSON.stringify('[{"categoryId": "1", "categoryName": "a"}]');
+    const categoryList = [{categoryId: 1, categoryName: "ほのお"}, {categoryId: 2, categoryName: "みず"}, {categoryId: 3, categoryName: "くさ"}];
 
     // マイオブジェクトリストを取得
-    const myObjectList = JSON.stringify('[{"myObjectId": "1", "Name": "a"}]');
+    const myObjectList = [{myObjectId: 1, Name: "a"}];
 
     res.render('my-object', {
       categoryList: categoryList,
@@ -484,48 +477,42 @@ app.get('/clan', async (req, res) => {
   }
 })
 
-// post clan
-app.post('/clan', (req, res) => {
-  // TODO: search clan by category
-  //       and sort by 'numberOfAdd'
-
-  // return clan page
-  res.render('clan');
-})
-
-// get clan_make
-app.get('/clan_make', (req, res) => {
-  // return make clan page
-  fs.readFile('views/make_clan.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
-
 // post clan_make
-app.post('/clan_make', (req, res) => {
+app.post('/clan_make', async (req, res) => {
   // TODO: send clanName for make clan
-  //       save clan
-  const clanName = req.body._clanName;
 
-  const clan = require('./static/model/clan.js');
-  clan.setclan(clanName, 0, false);
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
-  const result = dao.saveWithoutId('clan', clan.getClan());
+  if (!user) {
+    res.redirect('/');
+  } else {
+    // save clan
+    const clanName = req.body;
 
-  if(result.hasOwnProperty(err)){
-    // has error
-  }
+    const clan = require('./static/model/clan.js');
+    clan.setclan(clanName, 0, false);
 
-  // return clan page
-  fs.readFile('views/make_clan.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
+    const result = dao.saveWithoutId('clan', clan.getClan());
+
+    console.log(`result => ${result}`);
+
+    if(result.hasOwnProperty(err)){
+      // has error
+    }
+
+    // ユーザーをクランに加入させる
+
+    // TODO: 確認
+    console.log('make clan finished');
+
+    // return clan page
+    res.write('make clan');
     res.end();
-  });
+  }
 });
 
+// クラン検索
 app.post('/clan_search', async (req, res) => {
   // TODO: 確認
   console.log(`search_word => ${req.body}`);
@@ -537,11 +524,15 @@ app.post('/clan_search', async (req, res) => {
   // データベースでクランを検索
   const clanList = await dao.searchClan(search_word, user.uid);
 
+  // TODO: 確認
+  console.log('clan search finished');
+
   // 取得したリストを返す
   res.write(`${JSON.stringify(clanList)}`);
   res.end();
 });
 
+// stylesheet
 exports.style = functions.https.onRequest((req, res) => {
   fs.readFile('static/views/css/style.css', 'utf-8', (err, data) => {
     res.writeHead(200, {'Content-Type': 'text/css'});
@@ -550,6 +541,7 @@ exports.style = functions.https.onRequest((req, res) => {
   });
 });
 
+// reset css
 exports.reset = functions.https.onRequest((req, res) => {
   fs.readFile('static/views/css/reset.css', 'utf-8', (err, data) => {
     res.writeHead(200, {'Content-Type': 'text/css'});
