@@ -255,16 +255,19 @@ exports.searchClan = async(searchWord, userId) => {
     }
 
     snapshot.forEach(doc => {
-      resultArray.push(doc.clanId);
+      console.log(`clanId => ${doc.data()}`);
+      const document = doc.data();
+      resultArray.push(document.clanId);
     })
 
     //return to userClan
+    console.log(`userClan => ${resultArray}`);
     return resultArray;
   }).catch(err => {
     // has error
     return {err : err};
   });
-  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', '20').get().then(snapshot => {
+  const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', 20).get().then(snapshot => {
     // create array
     let resultArray = [];
 
@@ -278,6 +281,7 @@ exports.searchClan = async(searchWord, userId) => {
       var flag = false;
 
       for(var i = 0; i < userClan.length && flag == false; i++){
+        console.log(`userClan[${i}] => ${userClan[i]}`);
         if(doc.id == userClan[i]){
           flag = true;
         }
@@ -296,6 +300,7 @@ exports.searchClan = async(searchWord, userId) => {
   });
 
   // return to controller
+  console.log(`clan => ${clan}`);
   return clan;
 }
 

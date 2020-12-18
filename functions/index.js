@@ -466,15 +466,14 @@ app.post('/clan_search', async (req, res) => {
   console.log(`search_word => ${req.body}`);
   const search_word = req.body;
 
-  // データベースでクランを検索
-  //const clanList = dao.selectDoubleTable(req.session.user.uid, 'userId', 'containment_to_clan', 'clan');
-  const clanSnapshot = await dao.selectDocOneColumn('clan', 'searchClanName', 'array-contains', search_word);
+  // ユーザーを取得
+  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
 
-  console.log(clanSnapshot);
+  // データベースでクランを検索
+  const clanList = await dao.searchClan(search_word, user.uid);
 
   // 取得したリストを返す
-  // res.write(`[{"clanName": "${search_word}", "numberOfMember": 0, "official": false}]`);
-  res.write(`${JSON.stringify(clanSnapshot)}`);
+  res.write(`${JSON.stringify(clanList)}`);
   res.end();
 });
 
