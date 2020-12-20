@@ -5,15 +5,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
-        <link rel="stylesheet" href="views/css/reset.css">
-        <link rel="stylesheet" href="views/css/style.css">
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/style.css">
         <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
     </head>
 
     <body>
         <nav id="set-hamburger" style="display: none;"></nav>
         <header class="header">
-            <a class="header__back" href="/my_page"><i class="fas fa-angle-left fa-lg"></i></a>
+            <a class="header__back" href="/my_page">
+                <div class="search__icon">
+                    <span class="icon-line icon-line--line1"></span>
+                    <span class="icon-line icon-line--line2"></span>
+                </div>
+            </a>
             <div class="header__title">Help</div>
         </header>
         <main>
@@ -48,27 +53,27 @@
                     </dl>
                 </div>
 
-                <div class="contact">
+	        <div class="contact">
                     <h2 class="contact__title">お問い合わせ</h2>
                     <form action="#" method="POST">
-                      <div>
-                          <h4 class="contact__text">E-mail <span class="contact__required">＊必須</span></h4>
-                          <input type='text' class="contact__email" placeholder="例) example@gmail.com">
-                      </div>
-                      <div>
-                          <h4 class="contact__text">確認用E-mail <span class="contact__required">＊必須</span></h4>
-                          <input type='text' class="contact__email" placeholder="例) example@gmail.com">
-                      </div>
-                      <div>
-                          <h4 class="contact__text">お問い合わせ内容</h4>
-                          <textarea class="contact__textarea" name="contact__textarea" cols="50" rows="5"
-                          placeholder="お問い合わせの内容を入力してください"></textarea>
-                      </div>
-                      </table>
-                      <!-- お問い合わせを送信するボタン -->
-                      <div class="contact__send">
-                          <input class="main-btn" type="submit" value="送信">
-                      </div>
+                        <div>
+                            <h4 class="contact__text">E-mail <span class="contact__required">＊必須</span></h4>
+                            <input type='text' class="contact__email" placeholder="例) example@gmail.com">
+                        </div>
+                        <div>
+                            <h4 class="contact__text">確認用E-mail <span class="contact__required">＊必須</span></h4>
+                            <input type='text' class="contact__email" placeholder="例) example@gmail.com">
+                        </div>
+                        <div>
+                            <h4 class="contact__text">お問い合わせ内容</h4>
+                            <textarea class="contact__textarea" name="contact__textarea" cols="50" rows="5"
+                            placeholder="お問い合わせの内容を入力してください"></textarea>
+                        </div>
+                        </table>
+                        <!-- お問い合わせを送信するボタン -->
+                        <div class="contact__send">
+                            <input class="main-btn" type="submit" value="送信">
+                        </div>
                     </form>
                 </div>
             </div>

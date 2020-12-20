@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="views/css/reset.css" type="text/css">
-    <link rel="stylesheet" href="views/css/style.css" type="text/css">
+    <link rel="stylesheet" href="views/css/reset.css">
+    <link rel="stylesheet" href="views/css/style.css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <nav id="set-hamburger"></nav>
     <header class="header">
-        <a class="header__icon" href="/help"><i class="header__icon--fa-size far fa-question-circle"></i></a>
+        <a class="header__icon" href="help.html"><i class="header__icon--fa-size far fa-question-circle"></i></a>
         <div class="header__title">My Page</div>
     </header>
 
@@ -23,10 +23,10 @@
             <div class="clan-modal__bg"></div>
             <div class="clan-modal__main">
                 <div class="clan-out">
-                    <div class="clan-out__box"><h3 class="clan-out__text">クランを脱退しますか？</h3></div>
+                    <div class="clan-out__box"><h3 class="clan-out__title">クランを脱退しますか？</h3></div>
                     <div class="clan-out__box">
-                        <input class="main-btn drop-btn clan-out__box--item" type="submit" value="脱退">
-                        <input class="main-btn not-btn clan-out__box--item" type="submit" value="キャンセル">
+                        <input class="main-btn drop-btn clan-out__box--item" type="button" value="脱退">
+                        <input class="main-btn not-btn clan-out__box--item" type="button" value="キャンセル">
                     </div>
                 </div>
             </div>
@@ -34,48 +34,56 @@
 
         <div class="inner">
 
+            <!-- マイQRコードの表示とダウンロードするエリア -->
             <div class="my-qr">
-                <div class="my-qr__code" style="background-image: url(<%= marker_url %>); background-size: cover; background-repeat: no-repeat;"></div>
+                <div class="my-qr__code" style=" background-image: url(<%= marker_url %>);"></div>
                 <a class="my-qr__download" ><i class="fas fa-download fa-2x"></i></a>
             </div>
 
+            <!-- 下記はQRコード部を除いた下部分で最大画面表示のためのdiv -->
             <div class="bottom-page">
 
+                <!-- ユーザ情報を表示するエリア -->
                 <div class="my-user">
                     <div class="my-user__name">ユーザー名:　
                         <p><%= userName %></p>
                     </div>
 
-                    <div class="my-user__birthday">生年月日:　
+                    <div class="my-user__birthday">　生年月日:　
                         <p><%= birthday %></p>
                     </div>
 
+                    <!-- プロフィール設定へ遷移する -->
                     <div class="my-user__edit">
-                        <a class="main-btn" href="/profile">設定変更<i class="fas fa-edit"></i></a>
+                        <a class="main-btn" href="/profile">プロフィール変更<i class="fas fa-edit" style="margin-left: .3rem;"></i></a>
                     </div>
 
                 </div>
 
+                <!-- 現在所属しているクランを表示するエリア -->
                 <div class="my-clan">
                     <h3 class="my-clan__title">所属クラン一覧</h3>
-                    <div class="my-clan__list">
-                        <div class="my-clan__list--item">クラン１　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン２　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン３　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン４　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン５　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン６　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン７　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン８　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン９　<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１０<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１１<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１２<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１３<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１４<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１５<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                        <div class="my-clan__list--item">クラン１６<input class="main-btn out-btn" type="submit" value="脱退"></div>
-                    </div>
+                    <!-- 実際に結果を表示するエリア -->
+                    <form class="my-clan__list">
+                        <!-- <div class="my-clan__list--item">クラン１　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                            生成の時にクラスは必須 -->
+                        <div class="my-clan__list--item item__hover">クラン１　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン２　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン３　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン４　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン５　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン６　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン７　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン８　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン９　<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１０<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１１<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１２<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１３<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１４<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１５<input class="main-btn out-btn" type="button" value="脱退"></div>
+                        <div class="my-clan__list--item item__hover">クラン１６<input class="main-btn out-btn" type="button" value="脱退"></div>
+                    </form>
 
                 </div>
 
@@ -85,6 +93,7 @@
     </main>
     <footer id="footer"></footer>
     <script src="views/js/include.js"></script>
+    <!-- 所属中のクランから脱退するモーダルのエリア -->
     <script>
         const outBtn = document.querySelectorAll('.out-btn');
         const clanModal = document.querySelector('.clan-modal');

@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="views/css/reset.css" type="text/css">
-    <link rel="stylesheet" href="views/css/style.css" type="text/css">
+    <link rel="stylesheet" href="views/css/reset.css">
+    <link rel="stylesheet" href="views/css/style.css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
 </head>
 
@@ -22,23 +22,23 @@
         <div class="inner">
 
             <div class="my-qr">
-                <div class="my-qr__code"><img src="<%= marker_url %>"></img></div>
+                <div class="my-qr__code" style=" background-image: url(<%= marker_url %>);"></div>
                 <div class="my-qr__download"><i class="fas fa-download fa-2x"></i></div>
             </div>
 
             <div class="bottom-page">
 
-                <form class="my-user" name="my_user_form" action="<%= form_action_url %>" method="post">
+                <form class="my-user">
                     <div class="my-user__name">ユーザー名:　
-                        <input type="text" name="_name">
+                        <input class="name-form" type="text" name="_name" placeholder="ユーザー名を入力">
                     </div>
 
-                    <div class="my-user__birthday">生年月日:　
-                        <input type="date" name="_date">
+                    <div class="my-user__birthday">　生年月日:　
+                        <input class="birthday-form" name="_date" type="date">
                     </div>
                     <div class="my-user__profile-btn">
-                        <input type="submit" name="my_user_submit_button" class="save-btn main-btn" value="保存" onclick="return formCheck()"></input>
-                        <a class="cancel-btn main-btn" href="<%= cancel_link_url %>">キャンセル</a>
+                        <input type="submit" class="save-btn main-btn" value="保存"></input>
+                        <a class="cancel-btn main-btn" href="my-page.html">キャンセル</a>
                     </div>
                 </from>
             </div>

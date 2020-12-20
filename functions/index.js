@@ -363,6 +363,20 @@ app.post('/my_object', (req, res) => {
   res.render('my-object');
 })
 
+app.post('/search_object', (req, res) => {
+
+  // プロパティーを取得
+  const body = JSON.parse(req.body);
+  console.log(`body => ${body}`);
+  console.log(`body type => ${typeof body}`);
+  console.dir(body);
+
+  // TODO: 確認
+  console.log('search_object finished');
+
+  res.end();
+});
+
 // get add_object
 app.get('/add_object', (req, res) => {
   fs.readFile('views/add_object.html', 'utf-8', (err, data) => {

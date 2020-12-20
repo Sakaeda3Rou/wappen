@@ -56,32 +56,8 @@
 
                               <!-- カテゴリーリストを生成 -->
 
-                                <!-- <div class="category__check">
-                                    <label><input type="checkbox"　name="hono" value="ほのお" onchange="checkC(this.value)">ほのお</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div> -->
                             </div>
-                            <input type="submit" value="検索" class="category__search main-btn">
+                            <input id="search_btn" type="button" value="検索" class="category__search main-btn">
                         </form>
                     </div>
                 </div>
@@ -223,19 +199,67 @@
       // カテゴリ検索のチェックボックスが変更された時
       function searchCategorySwitch(index) {
 
-        categoryList.isSearchSelected = !categoryList.isSearchSelected
+        categoryList[index].isSearchSelected = !(categoryList[index].isSearchSelected)
 
-        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList.isSearchSelected}}`);
+        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
       }
 
       // オブジェクト登録時のカテゴリチェックボックスが変更された時
       function addObjectCategorySwitch(index) {
         console.log(`addSwitch => ${index}`);
 
-        categoryList.isAddObjectSelected = !categoryList.isAddObjectSelected
+        categoryList[index].isAddObjectSelected = !(categoryList[index].isAddObjectSelected)
 
-        console.log(`categoryList {index: ${index}, isAddObjectSelected: ${categoryList.isAddObjectSelected}}`);
+        console.log(`categoryList {index: ${index}, isAddObjectSelected: ${categoryList[index].isAddObjectSelected}}`);
       }
+    </script>
+    <script>
+
+      // 検索ボタンにclickイベントを追加
+      let search_btn = document.getElementById('search_btn');
+
+      // 検索ボタンを押した時
+      search_btn.addEventListener('click', () => {
+
+        // 検索するカテゴリリストを作成
+        let searchCategoryList = [];
+
+        for (let category of categoryList) {
+          if (category.isSearchSelected) {
+            searchCategoryList.push(category.categoryName);
+          }
+        }
+
+        // XMLHttpRequestを作成
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('post', '/search_object');
+
+        // オブジェクトリストと、検索カテゴリリストを渡す
+        xhr.send(JSON.stringify({objectList: [{}], searchCategoryList: searchCategoryList}));
+
+        // サーバーの応答を検知
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                // clanリストを取得
+                let restxt = xhr.responseText;
+                console.log(`restxt => ${restxt}`);
+
+                // 検索結果を表示
+            }
+        };
+
+      }, false);
+
+
+      // 検索結果を表示
+      function searchResult() {
+        // 検索結果を表示するdiv領域を取得
+        const result_div_element = document.getElementById('#');
+      }
+
+
+
     </script>
 </body>
 </html>
