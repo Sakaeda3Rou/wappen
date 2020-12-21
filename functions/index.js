@@ -111,11 +111,8 @@ app.post('/login', async(req, res) => {
     // ユーザーをセッションに保存
     res.cookie('__session', json);
 
-    res.render('my-page', {
-      userName: result.userName,
-      birthday: result.birthday,
-      marker_url: result.markerURL,
-    });
+    // マイページへ遷移
+    res.redirect('/my_page');
   }
 })
 
@@ -152,11 +149,7 @@ app.post('/resist_user', async (req, res) => {
   }
 
   // マイページへの遷移
-  res.render('my-page', {
-    userName: userName,
-    birthday: birthday,
-    marker_url: markerURL,
-  });
+  res.redirect('/my_page');
 });
 
 // get my page
@@ -172,10 +165,15 @@ app.get('/my_page', async (req, res) => {
     const birthday = user.birthday;
     const markerURL = user.markerURL;
 
+
+    // TODO: データベースから所属クランリストを取得
+    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
+
     res.render('my-page', {
       userName: userName,
       birthday: birthday,
       marker_url: markerURL,
+      clanList: clanList,
     });
   }
 });
@@ -234,6 +232,8 @@ app.post('/profile', (req, res) => {
   res.render('my-page', {
     userName: userName,
     birthday: birthday,
+    // TODO: clanListを設定
+    clanList: [{}],
   });
 })
 
@@ -517,11 +517,27 @@ app.post('/clan_make', async (req, res) => {
 
     // ユーザーをクランに加入させる
 
-    // TODO: 確認
-    console.log('make clan finished');
 
     // return clan page
     res.write('make clan');
+    res.end();
+  }
+});
+
+app.post('/clan_out', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // クランIDを取得
+    const clanId = req.body;
+
+    // TODO: 脱退処理
+
+    res.write('out clan');
     res.end();
   }
 });

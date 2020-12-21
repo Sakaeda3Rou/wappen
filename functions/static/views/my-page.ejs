@@ -64,10 +64,13 @@
                 <div class="my-clan">
                     <h3 class="my-clan__title">所属クラン一覧</h3>
                     <!-- 実際に結果を表示するエリア -->
-                    <form class="my-clan__list">
+                    <div id="my-clan__list" class="my-clan__list">
                         <!-- <div class="my-clan__list--item">クラン１　<input class="main-btn out-btn" type="button" value="脱退"></div>
                             生成の時にクラスは必須 -->
-                        <div class="my-clan__list--item item__hover">クラン１　<input class="main-btn out-btn" type="button" value="脱退"></div>
+
+                        <!-- 所属クランを表示 -->
+
+                        <!-- <div class="my-clan__list--item item__hover">クラン１　<input class="main-btn out-btn" type="button" value="脱退"></div>
                         <div class="my-clan__list--item item__hover">クラン２　<input class="main-btn out-btn" type="button" value="脱退"></div>
                         <div class="my-clan__list--item item__hover">クラン３　<input class="main-btn out-btn" type="button" value="脱退"></div>
                         <div class="my-clan__list--item item__hover">クラン４　<input class="main-btn out-btn" type="button" value="脱退"></div>
@@ -82,8 +85,8 @@
                         <div class="my-clan__list--item item__hover">クラン１３<input class="main-btn out-btn" type="button" value="脱退"></div>
                         <div class="my-clan__list--item item__hover">クラン１４<input class="main-btn out-btn" type="button" value="脱退"></div>
                         <div class="my-clan__list--item item__hover">クラン１５<input class="main-btn out-btn" type="button" value="脱退"></div>
-                        <div class="my-clan__list--item item__hover">クラン１６<input class="main-btn out-btn" type="button" value="脱退"></div>
-                    </form>
+                        <div class="my-clan__list--item item__hover">クラン１６<input class="main-btn out-btn" type="button" value="脱退"></div> -->
+                    </div>
 
                 </div>
 
@@ -118,6 +121,63 @@
         clanBg.addEventListener('click', () => {
             clanModal.classList.remove('clan-modal__open');
         });
+
+    </script>
+    <script>
+      // 所属クランリストを作成
+      let clanList = []
+
+      <% clanList.forEach((clan) => { %>
+        clanList.push({
+          clanId: "<%= clan.clanId %>",
+          clanName: "<%= clan.clanName %>",
+        })
+      <% }); %>
+
+      setClan();
+
+      function setClan() {
+        // クランリストをセットするdiv領域を取得
+        const clan_div_element = document.getElementById('my-clan__list');
+
+        for (let clan of clanList) {
+          // divタグを作成
+          const div_element = document.createElement('div');
+          div_element.setAttribute('class', 'my-clan__list--item item__hover');
+
+          // inputタグを作成
+          const input_element = document.createElement('input');
+          input_element.setAttribute('class', 'main-btn out-btn');
+          input_element.setAttribute('type', 'button');
+          input_element.setAttribute('value', '脱退');
+          input_element.setAttribute('onclick', `outTOClan("${clan.clanId}")`);
+
+          // divに追加
+          div_element.appendChild(input_element);
+          div_element.insertAdjacentHTML('afterbegin', `${clan.clanName}`);
+          clan_div_element.appendChild(div_element)
+        }
+      }
+
+      // クラン脱退
+      function outTOClan(clanId) {
+        // 検索されていたワードで作成
+        let xhr = new XMLHttpRequest();
+
+        // サーバーに送信
+        xhr.open('post', '/clan_out');
+        xhr.send(clanId);
+
+        // サーバーの応答を検知
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200){
+                // clanリストを取得
+                let restxt = xhr.responseText;
+                console.log(`restxt => ${restxt}`);
+
+            }
+        };
+      }
 
     </script>
 </body>
