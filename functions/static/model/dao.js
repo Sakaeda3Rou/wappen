@@ -129,10 +129,11 @@ exports.selectDocById = async (collectionName, id) => {
 //      column's name as 'columnName',
 //      operator for select as 'operator' (ex : "=="),
 //      word for select as 'word'
+//      number of pages as 'page' (ex : 0(non limit), 1, 2, ...)
 // NB: when select shared object
 //     operator = 'array-contains-any'
 //     word is array ex:['kawaii', 'kimoi']
-exports.selectDocOneColumn = async(collectionName, columnName, operator, word) => {
+exports.selectDocOneColumn = async(collectionName, columnName, operator, word, page) => {
   // get document with select
   const res = await db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
     // create result array
@@ -355,6 +356,79 @@ exports.searchClan = async(searchWord, userId) => {
     return userClan;
   }
 
+}
+
+// when you use : select boject
+// need category as 'category' (ex: ['kawaii', 'kimoi'])
+//      last object's id as 'objectId'
+//      user's id as 'userId'
+exports.searchObject = async(category, objectId, userId) => {
+  // select user's object
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get.then(snapshot => {
+    // create result array
+    let resultArray = [];
+
+    if(snapshot.empty){
+      // no document
+      return resultArray;
+    }
+
+    snapshot.forEach(doc => {
+      var document = doc.data()
+      resultArray.push(document.objectId);
+    })
+  }).catch(err => {
+    return {err: err}
+  })
+
+  if(Array.isArray(userObject)){
+    // judge page number
+    if(!objectId){
+      // page 0
+      const object = await db.collection('object').where('category', 'array-contains', category).get.then(snapshot => {
+        // create array
+        let resultArray = [];
+
+        if(snapshot.empty){
+          // no document
+          return resultArray;
+        }
+
+        snapshot.forEach(doc => {
+          // judge containment
+          var flag = false;
+
+          for(var i = 0; i < userObject.length && flag == false; i++){
+            // console.log(`userClan[${i}] => ${userClan[i]}`);
+            if(doc.id == userObject[i]){
+              flag = true;
+            }
+          }
+
+          if(flag != true){
+            let data = {id : doc.id};
+            let document = doc.data();
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          }
+        })
+
+        // return to object
+        return resultArray;
+      }).catch(err => {
+        return {err: err};
+      })
+
+      return object;
+    }else{
+      // page 2 to n
+    }
+  }else{
+    return userObject;
+  }
 }
 
 // when you use : for increment numberOfAdd
