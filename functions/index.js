@@ -32,9 +32,9 @@ async function confirmUser(req) {
       const result = await dao.selectDocById('user_detail', uid)
 
       // プロフィールをセット
-      user.userName = result.userName
-      user.birthday = result.birthday
-      user.markerURL = result.markerURL
+      user.userName = result[0].userName
+      user.birthday = result[0].birthday
+      user.markerURL = result[0].markerURL
 
       // セッションに保存
       __session.user = user;
@@ -66,8 +66,10 @@ app.post('/login', async(req, res) => {
   let __session = {user: user};
 
   // NB: insert userId at userId from session
+
   const result = await dao.selectDocById('user_detail', uid);
   console.log(`result => ${result}`)
+  console.dir(result);
 
   if(!result){
     // no document
@@ -101,9 +103,9 @@ app.post('/login', async(req, res) => {
     // not first login
 
     // ユーザー情報をセッションに追加
-    __session.user.userName = result.userName;
-    __session.user.birthday = result.birthday;
-    __session.user.markerURL = result.markerURL;
+    __session.user.userName = result[0].userName;
+    __session.user.birthday = result[0].birthday;
+    __session.user.markerURL = result[0].markerURL;
 
     // __sessionをJSONに変換
     const json = JSON.stringify(__session);
