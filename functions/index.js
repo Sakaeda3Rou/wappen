@@ -515,7 +515,7 @@ app.post('/clan_make', async (req, res) => {
       // has error
     }
 
-    // ユーザーをクランに加入させる
+    // TODO: ユーザーをクランに加入させる
 
 
     // return clan page

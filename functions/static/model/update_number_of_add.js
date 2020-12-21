@@ -10,5 +10,5 @@ exports.updeta_number_of_add = functions.firestore
 
       const objectId = newValue.objectId;
       //オブジェクトテーブルのnumberOfAddに追加する処理かいて～
-      dao.incrementNumberOfAdd(objectId);
+      const res = dao.incrementNumberOfAdd(objectId);
     });

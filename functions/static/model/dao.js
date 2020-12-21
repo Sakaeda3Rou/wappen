@@ -71,10 +71,12 @@ exports.deleteDoc = async(collectionName, id) => {
 // need collection's name as 'collectionName'
 exports.selectAll = async (collectionName) => {
   const result = await db.collection(collectionName).get().then(snapshot => {
+    // create result array
     let resultArray = [];
+
     if(snapshot.empty){
       // no document
-      return null;
+      return resultArray;
     }else{
       snapshot.forEach(doc => {
         let data = {id : doc.id};
@@ -102,12 +104,16 @@ exports.selectAll = async (collectionName) => {
 exports.selectDocById = async (collectionName, id) => {
   // get document
   const res = await db.collection(collectionName).doc(id).get().then(doc => {
+    // create result array
+    let resultArray = [];
+
     if(!doc.exists){
       // no document
-      return null;
+      return resultArray;
     }else{
       // return result
-      return doc.data();
+      resultArray.push(doc.data());
+      return resultArray;
     }
   }).catch(err => {
     // error
@@ -129,14 +135,16 @@ exports.selectDocById = async (collectionName, id) => {
 exports.selectDocOneColumn = async(collectionName, columnName, operator, word) => {
   // get document with select
   const res = await db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
+    // create result array
     let resultArray = [];
+
     if(snapshot.empty){
       // no document
-      console.log('empty');
-      return null;
+      // console.log('empty');
+      return resultArray;
     }else{
       // return result
-      console.log(`snapshot => ${snapshot}`);
+      // console.log(`snapshot => ${snapshot}`);
       snapshot.forEach(doc => {
         let data = {id : doc.id};
         let document = doc.data();
@@ -166,13 +174,13 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
   const firstRef = db.collection(firstCollectionName);
   const secondRef = db.collection(secondCollectionName);
 
-  // make result array
-  let returnArray = [];
-
   // first sellection
   const first = await firstRef.where(idName, '==', id).get().then(snapshot => {
+    // make result array
+    let returnArray = [];
+
     if(snapshot.empty){
-      return null;
+      return returnArray;
     }
     // NB: three pattern i think
     if(idName == 'userId'){
@@ -235,7 +243,7 @@ exports.changeSelected = async(userId, newObjectId) => {
   // select object's id what you want to change status to false
   const first = await myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     if(snapshot.empty){
-      return null;
+      return {result: null};
     }
     snapshot.forEach(doc => {
       // change status to false
@@ -256,11 +264,19 @@ exports.changeSelected = async(userId, newObjectId) => {
       return {err: err};
     })
 
+    if(third.hasOwnProperty(err)){
+      return {err: err};
+    }
+
     // return to first
     return {result: success};
   }).catch(err => {
     return {err: err};
   })
+
+  if(first.hasOwnProperty(err)){
+    return {err: err};
+  }
 
   // return to controller
   return first;
@@ -346,6 +362,26 @@ exports.searchClan = async(searchWord, userId) => {
 exports.incrementNumberOfAdd = async(objectId) => {
   const res = await db.collection('object').doc(objectId).update({
     numberOfAdd: admin.firestore.fieldValue.increment(1)
+  });
+
+  return res;
+}
+
+// when you use : for increment numberOfMember
+// need clan's id as 'clanId'
+exports.incrementNumberOfMember = async(clanId) => {
+  const res = await db.collection('clan').doc(clanId).update({
+    numberOfMember: admin.firestore.fieldValue.increment(1)
+  });
+
+  return res;
+}
+
+// when you use : for increment numberOfMember
+// need clan's id as 'clanId'
+exports.decrementNumberOfMember = async(clanId) => {
+  const res = await db.collection('clan').doc(clanId).update({
+    numberOfMember: admin.firestore.fieldValue.increment(-1)
   });
 
   return res;

@@ -11,7 +11,7 @@ exports.clan_delete = functions.firestore
       // ...or the previous value before this update
       const previousValue = change.before.data();
 
-      const clanId = newValue.docmentId;
+      const clanId = context.params.documentId;
       const numberOfMember = newValue.numberOfMember;
       if(numberOfMember = 0){
         //クランを削除する処理かいて～
