@@ -366,3 +366,23 @@ exports.incrementNumberOfAdd = async(objectId) => {
 
   return res;
 }
+
+// when you use : for increment numberOfMember
+// need clan's id as 'clanId'
+exports.incrementNumberOfMember = async(clanId) => {
+  const res = await db.collection('clan').doc(clanId).update({
+    numberOfMember: admin.firestore.fieldValue.increment(1)
+  });
+
+  return res;
+}
+
+// when you use : for increment numberOfMember
+// need clan's id as 'clanId'
+exports.decrementNumberOfMember = async(clanId) => {
+  const res = await db.collection('clan').doc(clanId).update({
+    numberOfMember: admin.firestore.fieldValue.increment(-1)
+  });
+
+  return res;
+}
