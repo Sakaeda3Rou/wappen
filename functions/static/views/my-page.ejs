@@ -12,7 +12,7 @@
 <body>
     <nav id="set-hamburger"></nav>
     <header class="header">
-        <a class="header__icon" href="help.html"><i class="header__icon--fa-size far fa-question-circle"></i></a>
+        <a class="header__icon" href="/help"><i class="header__icon--fa-size far fa-question-circle"></i></a>
         <div class="header__title">My Page</div>
     </header>
 
@@ -149,6 +149,7 @@
           const input_element = document.createElement('input');
           input_element.setAttribute('class', 'main-btn out-btn');
           input_element.setAttribute('type', 'button');
+          input_element.setAttribute('id', `${clan.id}`);
           input_element.setAttribute('value', '脱退');
           input_element.setAttribute('onclick', `outTOClan("${clan.clanId}")`);
 
@@ -167,6 +168,11 @@
         // サーバーに送信
         xhr.open('post', '/clan_out');
         xhr.send(clanId);
+
+        // 脱退ボタンを削除
+        const button_element = document.getElementById(clanId);
+
+        button_element.remove();
 
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {

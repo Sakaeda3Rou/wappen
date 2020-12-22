@@ -169,6 +169,10 @@ app.get('/my_page', async (req, res) => {
 
 
     // TODO: データベースから所属クランリストを取得
+    // const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
+    console.log('result => ');
+    console.dir(result);
+
     const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
     res.render('my-page', {
@@ -252,17 +256,44 @@ app.get('/help', async (req, res) => {
 });
 
 // get camera
-app.get('/camera', (req, res) => {
-  res.render('camera');
+app.get('/camera', async (req, res) => {
+  // cookieからユーザーを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+    // get parameter and prepare camera session
+    const camera = require('./static/model/camera.js');
+
+    // TODO: 必要なもの: 所属クラン、my_object
+
+    // TODO: とりあえずリスト
+    const objectList = [{objectURL: "my_object/1"}, {objectURL: "my_object/2"}]
+    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
+    const clanUser = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/#", objectURL: "object/2"}];
+
+
+    res.render('camera', {
+      objectList: objectList,
+      clanList: clanList,
+      clanUser: clanUser,
+    });
+  }
 });
 
 // post camera
-app.post('/camera', (req, res) => {
-  // TODO: get parameter and prepare camera session
-  const camera = require('./static/model/camera.js');
+app.post('/camera', async (req, res) => {
+  // cookieからユーザーを取得
+  const user = await confirmUser(req);
 
-  // return camera
-  res.render('camera');
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    res.render('camera');
+    res.end();
+  }
 })
 
 // get object_selected
@@ -491,7 +522,7 @@ app.get('/clan', async (req, res) => {
   } else {
     res.render('clan');
   }
-})
+});
 
 // post clan_make
 app.post('/clan_make', async (req, res) => {
@@ -538,6 +569,7 @@ app.post('/clan_out', async (req, res) => {
     const clanId = req.body;
 
     // TODO: 脱退処理
+
 
     res.write('out clan');
     res.end();

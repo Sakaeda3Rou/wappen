@@ -4,7 +4,6 @@ const canvas = createCanvas()
 const context = canvas.getContext('2d')
 
 exports.createImage = async(uid) => {
-
   // 基礎imageをロード
   let image = await loadImage('static/images/wappenQR.png')
 
@@ -33,7 +32,6 @@ exports.createImage = async(uid) => {
 
   // 作成したマーカーのURLを返す
   return marker_url;
-
 }
 
 // uidを描画

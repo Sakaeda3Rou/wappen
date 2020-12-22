@@ -49,7 +49,6 @@ exports.updateDoc = async(collectionName, id, data) => {
   }catch(err){
     return {err: err};
   }
-
 }
 
 // need collection's name as 'collectionName',
