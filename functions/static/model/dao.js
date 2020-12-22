@@ -185,9 +185,9 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }
     // NB: three pattern i think
     if(idName == 'userId'){
-      snapshot.forEach(doc => {
-        const second = secondRef.doc(doc.clanId).get().then(doc => {
-          let data = {id : doc.id};
+      snapshot.forEach(containmentToClan => {
+        const second = secondRef.doc(data.clanId).get().then(doc => {
+          let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
@@ -198,9 +198,10 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
         })
       })
     }else if(idName == 'clanId'){
-      snapshot.forEach(doc => {
+      snapshot.forEach(containmentToClan => {
+        const clan = containmentToClan.data();
         const second = secondRef.doc(doc.userId).get().then(doc => {
-          let data = {id : doc.id};
+          let data = {userId : doc.id, clanId : clan.clanId};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
@@ -211,9 +212,9 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
         })
       })
     }else{
-      snapshot.forEach(doc => {
+      snapshot.forEach(myObject => {
         const second = secondRef.doc(doc.objectId).get().then(doc => {
-          let data = {id : doc.id};
+          let data = {objectId : doc.id, myObjectId : myObject.id};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
@@ -362,7 +363,7 @@ exports.searchClan = async(searchWord, userId) => {
 // need category as 'category' (ex: ['kawaii', 'kimoi'])
 //      last object's id as 'objectId'
 //      user's id as 'userId'
-exports.searchObject = async(category, objectId, userId) => {
+exports.searchObject = async(category, userId, objectId) => {
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get.then(snapshot => {
     // create result array
@@ -385,7 +386,7 @@ exports.searchObject = async(category, objectId, userId) => {
     // judge page number
     if(!objectId){
       // page 0
-      const object = await db.collection('object').where('category', 'array-contains', category).get.then(snapshot => {
+      const object = await db.collection('object').where('category', 'array-contains', category).limit(20).get.then(snapshot => {
         // create array
         let resultArray = [];
 
@@ -425,7 +426,51 @@ exports.searchObject = async(category, objectId, userId) => {
       return object;
     }else{
       // page 2 to n
+      const object = await db.collection('object')
+                             .where('category', 'array-contains', category)
+                             .orderBy(admin.firestore.FieldPath.documentId())
+                             .startAfter(objectId)
+                             .limit(20).get.then(snapshot => {
+        // create array
+        let resultArray = [];
+
+        if(snapshot.empty){
+          // no document
+          return resultArray;
+        }
+
+        snapshot.forEach(doc => {
+          // judge containment
+          var flag = false;
+
+          for(var i = 0; i < userObject.length && flag == false; i++){
+            // console.log(`userClan[${i}] => ${userClan[i]}`);
+            if(doc.id == userObject[i]){
+              flag = true;
+            }
+          }
+
+          if(flag != true){
+            let data = {id : doc.id};
+            let document = doc.data();
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          }
+        })
+
+        // return to object
+        return resultArray;
+      }).catch(err => {
+        return {err: err};
+      })
+
     }
+
+    // return to controller
+    return object;
   }else{
     return userObject;
   }

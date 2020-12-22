@@ -1,7 +1,6 @@
 const userId = null;
 const matching = {
     auth : null,
-    hostUserId : null,
     offer : null,
 }
 
@@ -10,11 +9,9 @@ exports.setUserId = (userId) => {
 }
 
 // auth : member or host
-// hostUserId : host's userId
 // offer : peerConnection's offer
-exports.setMatching = (auth, hostUserId, offer) => {
+exports.setMatching = (auth, offer) => {
     matching.auth = auth;
-    matching.hostUserId = hostUserId;
     matching.offer = offer;
 }
 

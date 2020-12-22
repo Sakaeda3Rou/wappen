@@ -1,6 +1,5 @@
 const userId = null;
 const roomDemo = {
-    offer : null,
     numberOfMember : null
 }
 

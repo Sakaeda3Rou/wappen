@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
 const dao = require('./dao.js');
 
-exports.updeta_number_of_add = functions.firestore
+exports.update_number_of_add = functions.firestore
     .document('my_object/{objectId}')
     .onCreate((snap, context) => {
       // Get an object representing the document
