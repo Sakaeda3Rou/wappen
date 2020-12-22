@@ -543,17 +543,17 @@ app.post('/clan_make', async (req, res) => {
     const result = dao.saveWithoutId('clan', clan.getClan());
 
     console.log(`result => ${result}`);
+    console.dir(result);
 
     if(result.hasOwnProperty(err)){
       // has error
     }
 
     // TODO: ユーザーをクランに加入させる
-
+    // const result = await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: clanId});
 
     // return clan page
-    res.write('make clan');
-    res.end();
+    res.redirect('my_page');
   }
 });
 

@@ -41,6 +41,27 @@
     <footer id="footer" style="display: none;"></footer>
     <script src="views/js/include.js"></script>
     <script src="views/js/modal.js"></script>
+    <script>
+      // クランリストを作成
+      let clanList = []
+
+      <% clanList.forEach((clan) => {%>
+        clanList.push({
+          clanId: "<%= clan.clanId %>",
+          clanName: "<%= clan.clanName %>",
+        });
+      <% }); %>
+
+      // オブジェクトリストを作成
+      let objectList = []
+
+      <% objectList.forEach((object) => {%>
+        objectList.push({
+          objectURL: "<%= object.objectURL %>",
+        });
+      <% }); %>
+
+    </script>
     <script src="views/js/cameraBtn.js"></script>
 </body>
 </html>
