@@ -183,9 +183,9 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
       return returnArray;
     }
     // NB: three pattern i think
-    if(idName == 'userId'){
+    if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
       snapshot.forEach(containmentToClan => {
-        const second = secondRef.doc(data.clanId).get().then(doc => {
+        const second = secondRef.doc(containmentToClan.clanId).get().then(doc => {
           let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
           let document = doc.data();
           for(const key in document){
@@ -196,10 +196,10 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
       })
-    }else if(idName == 'clanId'){
+    }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
       snapshot.forEach(containmentToClan => {
         const clan = containmentToClan.data();
-        const second = secondRef.doc(doc.userId).get().then(doc => {
+        const second = secondRef.doc(containmentToClan.userId).get().then(doc => {
           let data = {userId : doc.id, clanId : clan.clanId};
           let document = doc.data();
           for(const key in document){
@@ -210,9 +210,9 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
       })
-    }else{
+    }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
       snapshot.forEach(myObject => {
-        const second = secondRef.doc(doc.objectId).get().then(doc => {
+        const second = secondRef.doc(myObject.objectId).get().then(doc => {
           let data = {objectId : doc.id, myObjectId : myObject.id};
           let document = doc.data();
           for(const key in document){
@@ -223,6 +223,8 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
       })
+    }else{
+      // didn't think
     }
 
     // return to first
