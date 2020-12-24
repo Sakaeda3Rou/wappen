@@ -199,7 +199,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -223,7 +223,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -246,7 +246,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -340,7 +340,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       return {err: err};
     })
 
-    if(Array.isArray(myObjectList)){
+    if(Array.isArray(myObjectList) && Array.isArray(userDetailList)){
       // create markerList
       let markerList = [];
       for(const myObject of myObjectList){
@@ -351,32 +351,46 @@ exports.selectMarkerList = async(userId, clanId) => {
           return {err: err};
         })
 
-        if(Array.isArray(userDetailList)){
-          // loop userDetailList
-          for(let i = 0; i < userDetailList.length && flag == false; i++){
-            if(myObject.userId == userId && Array.isArray(object)){
-    
-            }else if(Array.isArray(object)){
-    
-            }else{
-              // has error
-              // return to controller
-              console.log(`error in make object : ${object.err}`);
-              return object;
-            }
-          }
-        }else{
+        if(object.hasOwnProperty('err')){
           // has error
           // return to controller
-          console.log(`error in make userDetail : ${userDetailList.err}`);
+          console.log(`error in make object : ${object.err}`);
+          return object;
+        }else{
+          //create flag for discover same userId
+          let flag = false;
+  
+          // loop userDetailList
+          for(let i = 0; i < userDetailList.length && flag == false; i++){
+            let userDetail = userDetailList[i];
+            if(userDetail.userId == myObject.userId){
+              flag = true;
+              if(userDetail.userId == userId && myObject.userId == userId){
+                markerList.unshift({userId: userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              }else{
+                markerList.push({userId: userDetail.userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              }
+            }
+          }
         }
-
       }
-    }else{
+
+      // return to controller
+      console.log('success');
+      return markerList;
+    }else if(!Array.isArray(userDetailList)){
+      // has error
+      // return to controller
+      console.log(`error in make userDetailList : ${userDetailList.err}`);
+      return userDetailList;
+    }else if(!Array.isArray(myObjectList)){
       // has error
       // return to controller
       console.log(`error in make myObjectList : ${myObjectList.err}`);
-      return myObjectList
+      return myObjectList;
+    }else{
+      // ?????
+      console.log('error');
     }
   }else{
     // has error
@@ -400,7 +414,7 @@ exports.changeSelected = async(userId, newObjectId) => {
     snapshot.forEach(doc => {
       // change status to false
       const second = _this.updateDoc('my_object', doc.id, {isSelected: false});
-      if(second.hasOwnProperty(err)){
+      if(second.hasOwnProperty('err')){
         return {err: second.err};
       }
     })
@@ -408,7 +422,7 @@ exports.changeSelected = async(userId, newObjectId) => {
       snapshot.forEach(doc => {
         // change status to true
         const four = _this.updateDoc('my_object', doc.id, {isSelected: true});
-        if(four.hasOwnProperty(err)){
+        if(four.hasOwnProperty('err')){
           return {err: four.err};
         }
       })
@@ -416,7 +430,7 @@ exports.changeSelected = async(userId, newObjectId) => {
       return {err: err};
     })
 
-    if(third.hasOwnProperty(err)){
+    if(third.hasOwnProperty('err')){
       return {err: err};
     }
 
@@ -426,7 +440,7 @@ exports.changeSelected = async(userId, newObjectId) => {
     return {err: err};
   })
 
-  if(first.hasOwnProperty(err)){
+  if(first.hasOwnProperty('err')){
     return {err: err};
   }
 
