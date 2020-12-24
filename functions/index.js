@@ -178,7 +178,7 @@ app.get('/my_page', async (req, res) => {
     res.render('my-page', {
       userName: userName,
       birthday: birthday,
-      marker_url: markerURL,
+      markerURL: markerURL,
       clanList: clanList,
     });
   }
@@ -457,12 +457,25 @@ app.post('/add_object', (req, res) => {
 })
 
 // get share_object
-app.get('/share_object', (req, res) => {
-  res.render('object-share');
+app.get('/object_share', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // カテゴリリストを取得
+    const categoryList = [{categoryId: 1, categoryName: "ほのお"}, {categoryId: 2, categoryName: "みず"}, {categoryId: 3, categoryName: "くさ"}];
+
+    res.render('object-share', {
+      categoryList: categoryList,
+    });
+  }
 });
 
 // post share_object
-app.post('/share_object', (req, res) => {
+app.post('/object_share', (req, res) => {
   // TODO: send word for search
   //       and do search, return result
 

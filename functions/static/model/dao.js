@@ -192,13 +192,13 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           for(const key in document){
             data[key] = document[key];
           }
-          
+
           // return to second
           return data;
         }).catch(err => {
           return {err: err};
         })
-        
+
         if(second.hasOwnProperty(err)){
           // has error
           // return to first
@@ -216,7 +216,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           for(const key in document){
             data[key] = document[key];
           }
-          
+
           // return to second
           return data;
         }).catch(err => {
