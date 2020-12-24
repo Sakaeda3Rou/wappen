@@ -56,7 +56,7 @@ async function confirmUser(req) {
 exports.app = functions.https.onRequest(app);
 
 // post login
-app.post('/login', async(req, res) => {
+app.post('/login', async (req, res) => {
 
   // uidパラメータを取得
   const uid = req.body.uid;
@@ -170,10 +170,10 @@ app.get('/my_page', async (req, res) => {
 
     // TODO: データベースから所属クランリストを取得
     const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
-    console.log('result => ');
+    console.log(`result => ${result}`);
     console.dir(result);
 
-    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
+    // const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
     res.render('my-page', {
       userName: userName,
