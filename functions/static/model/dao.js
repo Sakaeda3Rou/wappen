@@ -185,7 +185,8 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     // NB: three pattern i think
     if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
       snapshot.forEach(containmentToClan => {
-        const second = secondRef.doc(containmentToClan.clanId).get().then(doc => {
+        const containmentToClanData = containmentToClan.data();
+        const second = secondRef.doc(containmentToClanData.clanId).get().then(doc => {
           let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
           let document = doc.data();
           for(const key in document){
@@ -198,9 +199,9 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
       })
     }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
       snapshot.forEach(containmentToClan => {
-        const clan = containmentToClan.data();
-        const second = secondRef.doc(containmentToClan.userId).get().then(doc => {
-          let data = {userId : doc.id, clanId : clan.clanId};
+        const containmentToClanData = containmentToClan.data();
+        const second = secondRef.doc(containmentToClanData.userId).get().then(doc => {
+          let data = {userId : doc.id, clanId : containmentToClanData.clanId};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
@@ -212,7 +213,8 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
       })
     }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
       snapshot.forEach(myObject => {
-        const second = secondRef.doc(myObject.objectId).get().then(doc => {
+        const myObjectData = myObject.data();
+        const second = secondRef.doc(myObjectData.objectId).get().then(doc => {
           let data = {objectId : doc.id, myObjectId : myObject.id};
           let document = doc.data();
           for(const key in document){
@@ -236,6 +238,8 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
   //return to controller
   return first;
 }
+
+// when you use : select markerURL and objectURL
 
 // when you use : change status 'isSelected'
 // need user's id as userId

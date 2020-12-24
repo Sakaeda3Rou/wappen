@@ -80,9 +80,23 @@ exports.twoVideoChatPrepare = async(offer, userId) => {
 }
 
 // case : 'you are host'         case : hostUserId
-//   room exist                    make answer
-//   start? or wait?               insert roomDemo
-//                                 listen roomDemo toUpdate
+//   room exist                    member : make answer
+//   start? or wait?                        insert roomDemo
+//                                 host : listen roomDemo toUpdate
+exports.memberPrepare = async(answer, hostUserId) => {
+    // insert roomDemo
+
+    // return error or success
+}
+
+exports.startVideoChat = async() => {
+    // return ?
+}
+
+exports.endVideoChat = async() => {
+    // return ?
+}
+
 
 // room.length == 0                                            room.length != 0
 // create offer                                                create offer
