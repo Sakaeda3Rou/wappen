@@ -7,11 +7,37 @@
     <link rel="stylesheet" href="views/css/reset.css">
     <link rel="stylesheet" href="views/css/style.css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 </head>
 <body class="camera-page">
     <nav id="set-hamburger"></nav>
     <main>
-        <section class="camera">ここにカメラ</section>
+        <!-- <section class="camera"> -->
+        <div>
+          <!-- a-sceneを開始 -->
+          <a-scene vr-mode-ui="enabled: false">
+            <!-- <a-entity camera style="z-index: 0"> -->
+            <a-entity camera>
+              <div id="marker-area">
+
+                <!-- a-markerを生成 -->
+                <!-- example -->
+                <!-- <a-marker preset="hiro">
+                  <a-entity
+                    position="0 -1 0"
+                    scale="0.05 0.05 0.05"
+                    gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
+                  ></a-entity>
+                </a-marker> -->
+
+                <!-- <a-marker type="pattern" url="#"> -->
+              </div>
+            </a-entity>
+          </a-scene>
+
+        </div>
+        <!-- </section> -->
         <div class="btns">
             <!-- クラン選択を表示するmodalを表示するボタン -->
             <div class="btns__btn btns__btn--clan js-btn">
@@ -45,7 +71,7 @@
       // クランリストを作成
       let clanList = []
 
-      <% clanList.forEach((clan) => {%>
+      <% clanList.forEach((clan) => { %>
         clanList.push({
           clanId: "<%= clan.clanId %>",
           clanName: "<%= clan.clanName %>",
@@ -55,13 +81,66 @@
       // オブジェクトリストを作成
       let objectList = []
 
-      <% objectList.forEach((object) => {%>
+      <% objectList.forEach((object) => { %>
         objectList.push({
           objectURL: "<%= object.objectURL %>",
         });
       <% }); %>
 
+      // マーカーリストを作成
+      let markerList = []
+
+      <% markerList.forEach((marker) => { %>
+        markerList.push({
+          markerURL: "<%= marker.markerURL %>",
+          objectURL: "<%= marker.objectURL %>",
+        })
+      <% }); %>
+
     </script>
     <script src="views/js/cameraBtn.js"></script>
+    <script>
+      // a-markerを生成
+      setARMarker();
+
+      function setARMarker() {
+        // マーカーを生成する領域を取得
+        const marker_area = document.getElementById('marker-area');
+
+        // すでにマーカーが存在していた場合、削除する
+        if (marker_area.hasChildNodes) {
+          // 子要素を削除
+          while (marker_area.firstChild) {
+            marker_area.removeChild(marker_area.firstChild);
+          }
+        }
+
+        for (let marker of markerList) {
+          // a-markerタグを作成
+          const a_marker_element = document.createElement('a-marker');
+          a_marker_element.setAttribute('type', 'pattern');
+          // a_marker_element.setAttribute('url', `${marker.markerURL}`);
+
+          // a-entityタグを作成
+          const a_entity_element = document.createElement('a-entity');
+          a_entity_element.setAttribute('position', '0 -1 0');
+          a_entity_element.setAttribute('scale', '0.05 0.05 0.05');
+          // a_entity_element.setAttribute('gltf-model', `${marker.objectURL}`);
+
+          // divに追加
+          a_marker_element.appendChild(a_entity_element);
+          marker_area.appendChild(a_marker_element);
+
+        }
+      }
+
+    </script>
+    <script>
+      // TODO: クランが選択された時
+    </script>
+    <script>
+      // TODO: オブジェクトが選択された時
+
+    </script>
 </body>
 </html>

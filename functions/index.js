@@ -169,7 +169,7 @@ app.get('/my_page', async (req, res) => {
 
 
     // TODO: データベースから所属クランリストを取得
-    // const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
+    const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
     console.log('result => ');
     console.dir(result);
 
@@ -185,23 +185,29 @@ app.get('/my_page', async (req, res) => {
 });
 
 // get profile
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
 
   // cookieからユーザーを取得
-  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+  const user = await confirmUser(req);
 
-  const userName = user.userName;
-  const birthday = user.birthday;
-  const markerURL = user.markerURL;
+  console.log(`user => ${user}`)
 
-  // TODO: insert to html's textbox by ejs
+  if (!user) {
+    res.redirect('/');
+  } else {
+    const userName = user.userName;
+    const birthday = user.birthday;
+    const markerURL = user.markerURL;
 
-  res.render('profile', {
-    // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
-    cancel_link_url: '/my_page',
-    form_action_url: '/profile',
-    marker_url: `${markerURL}`,
-  });
+    // TODO: insert to html's textbox by ejs
+
+    res.render('profile', {
+      // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
+      cancel_link_url: '/my_page',
+      form_action_url: '/profile',
+      marker_url: `${markerURL}`,
+    });
+  }
 });
 
 // update profile
@@ -246,7 +252,9 @@ app.post('/profile', (req, res) => {
 // get help
 app.get('/help', async (req, res) => {
   // TODO: cookieの確認
-  const user = await confirmUser(res);
+  const user = await confirmUser(req);
+
+  console.log(`user => ${user}`);
 
   if (!user) {
     res.redirect('/');
@@ -271,13 +279,13 @@ app.get('/camera', async (req, res) => {
     // TODO: とりあえずリスト
     const objectList = [{objectURL: "my_object/1"}, {objectURL: "my_object/2"}]
     const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
-    const clanUser = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/#", objectURL: "object/2"}];
+    const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
 
 
     res.render('camera', {
       objectList: objectList,
       clanList: clanList,
-      clanUser: clanUser,
+      markerList: markerList,
     });
   }
 });
