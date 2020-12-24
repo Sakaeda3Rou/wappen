@@ -186,47 +186,77 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
       snapshot.forEach(containmentToClan => {
         const containmentToClanData = containmentToClan.data();
-        const second = secondRef.doc(containmentToClanData.clanId).get().then(doc => {
+        const second = await secondRef.doc(containmentToClanData.clanId).get().then(doc => {
           let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
           }
-          returnArray.push(data);
+          
+          // return to second
+          return data;
         }).catch(err => {
           return {err: err};
         })
+        
+        if(second.hasOwnProperty(err)){
+          // has error
+          // return to first
+          return {err: err};
+        }else{
+          returnArray.push();
+        }
       })
     }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
       snapshot.forEach(containmentToClan => {
         const containmentToClanData = containmentToClan.data();
-        const second = secondRef.doc(containmentToClanData.userId).get().then(doc => {
+        const second = await secondRef.doc(containmentToClanData.userId).get().then(doc => {
           let data = {userId : doc.id, clanId : containmentToClanData.clanId};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
           }
-          returnArray.push(data);
+          
+          // return to second
+          return data;
         }).catch(err => {
           return {err: err};
         })
+
+        if(second.hasOwnProperty(err)){
+          // has error
+          // return to first
+          return {err: err};
+        }else{
+          returnArray.push();
+        }
       })
     }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
       snapshot.forEach(myObject => {
         const myObjectData = myObject.data();
-        const second = secondRef.doc(myObjectData.objectId).get().then(doc => {
+        const second = await secondRef.doc(myObjectData.objectId).get().then(doc => {
           let data = {objectId : doc.id, myObjectId : myObject.id};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
           }
-          returnArray.push(data);
+          // return to second
+          return data;
         }).catch(err => {
           return {err: err};
         })
+
+        if(second.hasOwnProperty(err)){
+          // has error
+          // return to first
+          return {err: err};
+        }else{
+          returnArray.push();
+        }
       })
     }else{
       // didn't think
+      console.log('????');
     }
 
     // return to first
@@ -240,6 +270,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
 }
 
 // when you use : select markerURL and objectURL
+// need user
 
 // when you use : change status 'isSelected'
 // need user's id as userId
