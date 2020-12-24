@@ -36,52 +36,14 @@
 
                         </div>
 
-                        <div class="my-object-list__checks">
-                            <div class="my-object-list__check">
+                        <div id="my-object-list__checks" class="my-object-list__checks">
+
+                            <!-- カテゴリリストを追加 -->
+
+                            <!-- example -->
+                            <!-- <div class="my-object-list__check">
                                 <label><input type="checkbox" checked="checked">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
-                            <div class="my-object-list__check">
-                                <label><input type="checkbox">カテゴリ</label>
-                            </div>
+                            </div> -->
                         </div>
                         <!-- 共有するボタン -->
                         <div class="my-object-list__decision">
@@ -138,31 +100,18 @@
                             <span class="icon-line icon-line--line1"></span>
                             <span class="icon-line icon-line--line2"></span>
                         </div>
-		                </div>
+		    </div>
                 </div>
                 <div class="search__category">
                     <div class="category">
                         <h3 class="category__title">
                             カテゴリ検索
                         </h3>
-                        <form action="#">
-                            <div class="category__checks">
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
-                                <div class="category__check">
-                                    <label><input type="checkbox">カテゴリ</label>
-                                </div>
+                        <form action="#" style="display: flex; flex-direction: column;">
+                            <div id="category__checks" class="category__checks">
+								                      <!-- カテゴリーリストを生成 -->
                             </div>
-                            <div class="category__search">
-                                <input type="submit" value="検索" class="main-btn">
-                            </div>
+                            <input id="search_btn" type="button" value="検索" class="category__search main-btn">
                         </form>
                     </div>
                     <div class="ranking">
@@ -207,7 +156,7 @@
     <footer id="footer"></footer>
     <script src="views/js/include.js"></script>
     <script src="views/js/modal.js"></script>
-    <script src="views/js/objectShaer.js"></script>
+    <script src="views/js/objectShare.js"></script>
     <script>
 
 //マイオブジェクト一覧を表示するボタンの変化
@@ -290,5 +239,99 @@
         });
 
     </script>
+	<!-- 検索script -->
+	<script>
+      // カテゴリーリストを作成
+      let categoryList = []
+
+      <% categoryList.forEach((category) => { %>
+        categoryList.push({
+          categoryId: "<%= category.categoryId %>",
+          categoryName: "<%= category.categoryName %>",
+          // カテゴリ検索の選択フラグ
+          isSearchSelected: false,
+          // オブジェクト共有時のカテゴリ選択フラグ
+          isSharedCategorySwitch: false
+        });
+      <% }); %>
+
+      console.dir(categoryList);
+
+      // カテゴリーをセット
+      setCategory();
+
+      // html documentにカテゴリーをセット
+      function setCategory() {
+        // 検索カテゴリ選択のdiv領域を取得
+        const category_check_div_element = document.getElementById('category__checks');
+
+        // マイオブジェクト共有のカテゴリ領域を取得
+        const category_share_div_element = document.getElementById('my-object-list__checks');
+
+        for (let [index, category] of categoryList.entries()) {
+          // 検索カテゴリ選択の領域
+          // divを作成
+          const check_div_element = document.createElement('div');
+          check_div_element.setAttribute('class', 'category__check');
+
+          // labelを作成
+          const check_label_element = document.createElement('label');
+
+          // inputタグを作成
+          const check_input_element = document.createElement('input');
+          check_input_element.setAttribute('type', 'checkbox');
+          check_input_element.setAttribute('value', `${category.categoryName}`);
+          check_input_element.setAttribute('onclick', `searchCategorySwitch(${index})`);
+
+          // category_check_div_elementに追加
+          check_label_element.appendChild(check_input_element);
+          check_label_element.insertAdjacentHTML('beforeend', `${category.categoryName}`);
+          check_div_element.appendChild(check_label_element);
+          category_check_div_element.appendChild(check_div_element);
+
+          // オブジェクト共有カテゴリ選択領域
+          // divを作成
+          const share_div_element = document.createElement('div');
+          share_div_element.setAttribute('class', 'my-object-list__check');
+
+          // labelを作成
+          const share_label_element = document.createElement('label');
+
+          // inputタグを作成
+          const share_input_element = document.createElement('input');
+          share_input_element.setAttribute('type', 'checkbox');
+          share_input_element.setAttribute('value', `${category.categoryName}`);
+          share_input_element.setAttribute('onclick', `shareCategorySwitch(${index})`);
+
+          // category_share_div_elementに追加
+          share_label_element.appendChild(share_input_element);
+          share_label_element.insertAdjacentHTML('beforeend', `${category.categoryName}`);
+          share_div_element.appendChild(share_label_element);
+          category_share_div_element.appendChild(share_div_element);
+
+        }
+
+      }
+
+      // カテゴリ検索のチェックボックスが変更された時
+      function searchCategorySwitch(index) {
+
+        categoryList[index].isSearchSelected = !(categoryList[index].isSearchSelected)
+
+        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
+      }
+
+      // オブジェクト登録時のカテゴリチェックボックスが変更された時
+      function shareCategorySwitch(index) {
+        console.log(`addSwitch => ${index}`);
+
+        categoryList[index].isSharedCategorySwitch = !(categoryList[index].isSharedCategorySwitch)
+
+        console.log(`categoryList {index: ${index}, isSharedCategorySwitch: ${categoryList[index].isSharedCategorySwitch}}`);
+      }
+  </script>
+
+
+
 </body>
 </html>

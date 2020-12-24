@@ -1,11 +1,11 @@
 // 検索コンテキストのアコーディオンを表示（サーバーに接続し、検索ボタンを押したときの処理を追加で書く）
 const search = document.querySelector('.search__btn');
 const category = document.querySelector('.search__category');
-let i = document.querySelector('i');
+let icon = document.querySelector('.search__icon');
 
 search.addEventListener('click', () => {
     category.classList.toggle('search-open');
-    i.classList.toggle('active__i');
+    icon.classList.toggle('active__i');
 
 
     if (category.classList.contains('search-open')) {

@@ -36,8 +36,8 @@
 
             <!-- マイQRコードの表示とダウンロードするエリア -->
             <div class="my-qr">
-                <div class="my-qr__code" style=" background-image: url(<%= marker_url %>);"></div>
-                <a class="my-qr__download" ><i class="fas fa-download fa-2x"></i></a>
+                <div class="my-qr__code" style=" background-image: url(<%= markerURL %>); background-repeat: no-repeat;"></div>
+                <a class="my-qr__download" href="<%= markerURL %>" download="marker.png"><i class="fas fa-download fa-2x"></i></a>
             </div>
 
             <!-- 下記はQRコード部を除いた下部分で最大画面表示のためのdiv -->
