@@ -173,7 +173,7 @@ app.get('/my_page', async (req, res) => {
     console.log(`result => ${result}`);
     console.dir(result);
 
-    // const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
+    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
     res.render('my-page', {
       userName: userName,

@@ -186,7 +186,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
       snapshot.forEach(containmentToClan => {
         const containmentToClanData = containmentToClan.data();
-        const second = await secondRef.doc(containmentToClanData.clanId).get().then(doc => {
+        const second = secondRef.doc(containmentToClanData.clanId).get().then(doc => {
           let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
           let document = doc.data();
           for(const key in document){
@@ -210,7 +210,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
       snapshot.forEach(containmentToClan => {
         const containmentToClanData = containmentToClan.data();
-        const second = await secondRef.doc(containmentToClanData.userId).get().then(doc => {
+        const second = secondRef.doc(containmentToClanData.userId).get().then(doc => {
           let data = {userId : doc.id, clanId : containmentToClanData.clanId};
           let document = doc.data();
           for(const key in document){
@@ -234,7 +234,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
     }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
       snapshot.forEach(myObject => {
         const myObjectData = myObject.data();
-        const second = await secondRef.doc(myObjectData.objectId).get().then(doc => {
+        const second = secondRef.doc(myObjectData.objectId).get().then(doc => {
           let data = {objectId : doc.id, myObjectId : myObject.id};
           let document = doc.data();
           for(const key in document){
@@ -270,7 +270,121 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
 }
 
 // when you use : select markerURL and objectURL
-// need user
+// need user's id as userId
+//      clan's id as clanId
+exports.selectMarkerList = async(userId, clanId) => {
+  // create path to document
+  const containmentToClanRef = db.collection('containment_to_clan');
+  const userDetailRef = db.collection('user_detail');
+  const myObjectRef = db.collection('my_object');
+  const objectRef = db.collection('object');
+
+  // select clan from containment_to_clan by clanId
+  const userIdList = await containmentToClanRef.where('clanId', '==', clanId).get().then(snapshot => {
+    // create return array
+    let returnArray = [];
+
+    if(snapshot.empty){
+      return returnArray;
+    }
+
+    snapshot.forEach(doc => {
+      const containmentToClanData = doc.data();
+      returnArray.push(containmentToClanData.userId);
+    })
+
+    // return to userIdList
+    return returnArray;
+  }).catch(err => {
+    // has error
+    return {err: err};
+  })
+
+  if(Array.isArray(userIdList)){
+    // select userDetail from user_detail by userIdList
+    const userDetailList = await userDetailRef.where('userId', 'array-contains', userIdList).get().then(snapshot => {
+      let returnArray = [];
+
+      if(snapshot.empty){
+        return returnArray;
+      }
+
+      snapshot.forEach(doc => {
+        const userDetailData = doc.data();
+        returnArray.push({userId: doc.id, markerURL: userDetailData.markerURL});
+      })
+
+      // return to userDetailList
+      return returnArray;
+    }).catch(err => {
+      // has error
+      return {err: err};
+    })
+
+    const myObjectList = await myObjectRef.where('userId', 'array-contains', userIdList).where('isSelected', '==', true).get().then(snapshot => {
+      let returnArray = [];
+      
+      if(snapshot.empty){
+        return returnArray;
+      }
+
+      snapshot.forEach(doc => {
+        const myObjectData = doc.data();
+        returnArray.push(myObjectData);
+      })
+
+      // return to myObjectList
+      return returnArray;
+    }).catch(err => {
+      // has error
+      return {err: err};
+    })
+
+    if(Array.isArray(myObjectList)){
+      // create markerList
+      let markerList = [];
+      for(const myObject of myObjectList){
+        const object = await objectRef.doc(myObject.objectId).get().then(doc => {
+
+          return doc.data();
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(Array.isArray(userDetailList)){
+          // loop userDetailList
+          for(let i = 0; i < userDetailList.length && flag == false; i++){
+            if(myObject.userId == userId && Array.isArray(object)){
+    
+            }else if(Array.isArray(object)){
+    
+            }else{
+              // has error
+              // return to controller
+              console.log(`error in make object : ${object.err}`);
+              return object;
+            }
+          }
+        }else{
+          // has error
+          // return to controller
+          console.log(`error in make userDetail : ${userDetailList.err}`);
+        }
+
+      }
+    }else{
+      // has error
+      // return to controller
+      console.log(`error in make myObjectList : ${myObjectList.err}`);
+      return myObjectList
+    }
+  }else{
+    // has error
+    // return to controller
+    console.log(`error in make userIdList : ${userIdList.err}`);
+    return userIdList;
+  }
+}
 
 // when you use : change status 'isSelected'
 // need user's id as userId
