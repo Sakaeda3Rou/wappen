@@ -204,7 +204,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           // return to first
           return {err: err};
         }else{
-          returnArray.push();
+          returnArray.push(second);
         }
       })
     }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
@@ -228,7 +228,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           // return to first
           return {err: err};
         }else{
-          returnArray.push();
+          returnArray.push(second);
         }
       })
     }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
@@ -251,7 +251,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           // return to first
           return {err: err};
         }else{
-          returnArray.push();
+          returnArray.push(second);
         }
       })
     }else{
