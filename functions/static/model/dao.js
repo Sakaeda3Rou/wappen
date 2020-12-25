@@ -343,6 +343,8 @@ exports.selectMarkerList = async(userId, clanId) => {
     if(Array.isArray(myObjectList) && Array.isArray(userDetailList)){
       // create markerList
       let markerList = [];
+      //create flag for discover same userId
+      let flag = false;
       for(const myObject of myObjectList){
         const object = await objectRef.doc(myObject.objectId).get().then(doc => {
 
@@ -357,21 +359,20 @@ exports.selectMarkerList = async(userId, clanId) => {
           console.log(`error in make object : ${object.err}`);
           return object;
         }else{
-          //create flag for discover same userId
-          let flag = false;
-  
           // loop userDetailList
           for(let i = 0; i < userDetailList.length && flag == false; i++){
             let userDetail = userDetailList[i];
             if(userDetail.userId == myObject.userId){
               flag = true;
               if(userDetail.userId == userId && myObject.userId == userId){
-                markerList.unshift({userId: userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+                markerList.unshift({userId: userId, userName: userDetail.userName, markerURL: userDetail.markerURL, objectURL: object.objectURL});
               }else{
-                markerList.push({userId: userDetail.userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+                markerList.push({userId: userDetail.userId, userName: userDetail.userName, markerURL: userDetail.markerURL, objectURL: object.objectURL});
               }
             }
           }
+          // reset flag
+          flag = false;
         }
       }
 
