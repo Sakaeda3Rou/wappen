@@ -1,7 +1,7 @@
 const objectId = null;
 const object = {
     numberOfAdd : null,
-    objectUrl : null,
+    objectURL : null,
     isShared : null,
     category : null
 }
@@ -11,9 +11,9 @@ exports.setObjectId = (objectId) => {
 }
 
 // NB: category is array ex: ['kawaii', 'kimoi']
-exports.setObject = (numberOfAdd, objectUrl, isShared, category) => {
+exports.setObject = (numberOfAdd, objectURL, isShared, category) => {
     object.numberOfAdd = numberOfAdd;
-    object.objectUrl = objectUrl;
+    object.objectURL = objectURL;
     object.isShared = isShared;
     object.category = category;
 }

@@ -199,7 +199,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -223,7 +223,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -246,7 +246,7 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
           return {err: err};
         })
 
-        if(second.hasOwnProperty(err)){
+        if(second.hasOwnProperty('err')){
           // has error
           // return to first
           return {err: err};
@@ -270,7 +270,135 @@ exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollect
 }
 
 // when you use : select markerURL and objectURL
-// need user
+// need user's id as userId
+//      clan's id as clanId
+exports.selectMarkerList = async(userId, clanId) => {
+  // create path to document
+  const containmentToClanRef = db.collection('containment_to_clan');
+  const userDetailRef = db.collection('user_detail');
+  const myObjectRef = db.collection('my_object');
+  const objectRef = db.collection('object');
+
+  // select clan from containment_to_clan by clanId
+  const userIdList = await containmentToClanRef.where('clanId', '==', clanId).get().then(snapshot => {
+    // create return array
+    let returnArray = [];
+
+    if(snapshot.empty){
+      return returnArray;
+    }
+
+    snapshot.forEach(doc => {
+      const containmentToClanData = doc.data();
+      returnArray.push(containmentToClanData.userId);
+    })
+
+    // return to userIdList
+    return returnArray;
+  }).catch(err => {
+    // has error
+    return {err: err};
+  })
+
+  if(Array.isArray(userIdList)){
+    // select userDetail from user_detail by userIdList
+    const userDetailList = await userDetailRef.where('userId', 'array-contains', userIdList).get().then(snapshot => {
+      let returnArray = [];
+
+      if(snapshot.empty){
+        return returnArray;
+      }
+
+      snapshot.forEach(doc => {
+        const userDetailData = doc.data();
+        returnArray.push({userId: doc.id, markerURL: userDetailData.markerURL});
+      })
+
+      // return to userDetailList
+      return returnArray;
+    }).catch(err => {
+      // has error
+      return {err: err};
+    })
+
+    const myObjectList = await myObjectRef.where('userId', 'array-contains', userIdList).where('isSelected', '==', true).get().then(snapshot => {
+      let returnArray = [];
+      
+      if(snapshot.empty){
+        return returnArray;
+      }
+
+      snapshot.forEach(doc => {
+        const myObjectData = doc.data();
+        returnArray.push(myObjectData);
+      })
+
+      // return to myObjectList
+      return returnArray;
+    }).catch(err => {
+      // has error
+      return {err: err};
+    })
+
+    if(Array.isArray(myObjectList) && Array.isArray(userDetailList)){
+      // create markerList
+      let markerList = [];
+      for(const myObject of myObjectList){
+        const object = await objectRef.doc(myObject.objectId).get().then(doc => {
+
+          return doc.data();
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(object.hasOwnProperty('err')){
+          // has error
+          // return to controller
+          console.log(`error in make object : ${object.err}`);
+          return object;
+        }else{
+          //create flag for discover same userId
+          let flag = false;
+  
+          // loop userDetailList
+          for(let i = 0; i < userDetailList.length && flag == false; i++){
+            let userDetail = userDetailList[i];
+            if(userDetail.userId == myObject.userId){
+              flag = true;
+              if(userDetail.userId == userId && myObject.userId == userId){
+                markerList.unshift({userId: userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              }else{
+                markerList.push({userId: userDetail.userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              }
+            }
+          }
+        }
+      }
+
+      // return to controller
+      console.log('success');
+      return markerList;
+    }else if(!Array.isArray(userDetailList)){
+      // has error
+      // return to controller
+      console.log(`error in make userDetailList : ${userDetailList.err}`);
+      return userDetailList;
+    }else if(!Array.isArray(myObjectList)){
+      // has error
+      // return to controller
+      console.log(`error in make myObjectList : ${myObjectList.err}`);
+      return myObjectList;
+    }else{
+      // ?????
+      console.log('error');
+    }
+  }else{
+    // has error
+    // return to controller
+    console.log(`error in make userIdList : ${userIdList.err}`);
+    return userIdList;
+  }
+}
 
 // when you use : change status 'isSelected'
 // need user's id as userId
@@ -286,7 +414,7 @@ exports.changeSelected = async(userId, newObjectId) => {
     snapshot.forEach(doc => {
       // change status to false
       const second = _this.updateDoc('my_object', doc.id, {isSelected: false});
-      if(second.hasOwnProperty(err)){
+      if(second.hasOwnProperty('err')){
         return {err: second.err};
       }
     })
@@ -294,7 +422,7 @@ exports.changeSelected = async(userId, newObjectId) => {
       snapshot.forEach(doc => {
         // change status to true
         const four = _this.updateDoc('my_object', doc.id, {isSelected: true});
-        if(four.hasOwnProperty(err)){
+        if(four.hasOwnProperty('err')){
           return {err: four.err};
         }
       })
@@ -302,7 +430,7 @@ exports.changeSelected = async(userId, newObjectId) => {
       return {err: err};
     })
 
-    if(third.hasOwnProperty(err)){
+    if(third.hasOwnProperty('err')){
       return {err: err};
     }
 
@@ -312,7 +440,7 @@ exports.changeSelected = async(userId, newObjectId) => {
     return {err: err};
   })
 
-  if(first.hasOwnProperty(err)){
+  if(first.hasOwnProperty('err')){
     return {err: err};
   }
 
