@@ -323,7 +323,7 @@ exports.selectMarkerList = async(userId, clanId) => {
 
     const myObjectList = await myObjectRef.where('userId', 'array-contains', userIdList).where('isSelected', '==', true).get().then(snapshot => {
       let returnArray = [];
-      
+
       if(snapshot.empty){
         return returnArray;
       }
@@ -359,7 +359,7 @@ exports.selectMarkerList = async(userId, clanId) => {
         }else{
           //create flag for discover same userId
           let flag = false;
-  
+
           // loop userDetailList
           for(let i = 0; i < userDetailList.length && flag == false; i++){
             let userDetail = userDetailList[i];

@@ -7,7 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const cookie = require('cookie');
-const dao = require('./static/model/dao.js');
+// const dao = require('./static/model/dao.js');
 
 const app = express();
 
@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
   // NB: insert userId at userId from session
 
   const result = await dao.selectDocById('user_detail', uid);
-  console.log(`result => ${result}`)
+  console.log(`login result => ${result}`);
   console.dir(result);
 
   if(!result){
@@ -170,7 +170,7 @@ app.get('/my_page', async (req, res) => {
 
     // TODO: データベースから所属クランリストを取得
     const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
-    console.log(`result => ${result}`);
+    console.log(`mypage clan result => ${result}`);
     console.dir(result);
 
     const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
