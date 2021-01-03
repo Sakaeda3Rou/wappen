@@ -18,7 +18,7 @@ exports.twoVideoChatPrepare = async(offer, userId) => {
             // save roomDemo
             const roomDemoResult = dao.saveWithId('room_demo', userId, roomDemo.getRoomDemo());
 
-            if(roomDemoResult.hasOwnProperty(err)){
+            if(roomDemoResult.hasOwnProperty('err')){
                 // has error
                 return {err: err};
             }
@@ -30,14 +30,14 @@ exports.twoVideoChatPrepare = async(offer, userId) => {
 
                 const updateResult = await dao.saveWithId('matching', memberId, {hostUserId: userId});
 
-                if(updateResult.hasOwnProperty(err)){
+                if(updateResult.hasOwnProperty('err')){
                     // has error
                     return {err: err};
                 }
             });
 
             // listen Update room_demo
-            functions.firestore.document(`room_demo/${userId}`).onUpdate((change, context) => {
+            functions.firestore.document(`room_demo/{${userId}}`).onUpdate((change, context) => {
                 // get answer
                 const newRoomDemo = change.after.data();
 
@@ -47,7 +47,7 @@ exports.twoVideoChatPrepare = async(offer, userId) => {
 
                 const roomResult = dao.saveWithId('rooms', userId, rooms.getRoom());
 
-                if(roomResult.hasOwnProperty(err)){
+                if(roomResult.hasOwnProperty('err')){
                     // has error
                     return {err: err};
                 }
@@ -60,7 +60,7 @@ exports.twoVideoChatPrepare = async(offer, userId) => {
             matching.setMatching('member', offer);
 
             // listen Update matching
-            functions.firestore.document(`matching/${userId}`).onUpdate((change, context) => {
+            functions.firestore.document(`matching/{${userId}}`).onUpdate((change, context) => {
                 // get hostUserId
                 const newMatching = change.after.data();
 

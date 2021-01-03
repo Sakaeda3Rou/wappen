@@ -7,7 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const cookie = require('cookie');
-// const dao = require('./static/model/dao.js');
+const dao = require('./static/model/dao.js');
 
 const app = express();
 
@@ -614,6 +614,18 @@ app.post('/clan_search', async (req, res) => {
 
   // 取得したリストを返す
   res.write(`${JSON.stringify(clanList)}`);
+  res.end();
+});
+
+// TODO: test
+app.get('/test', async (req, res) => {
+  // userId
+  const userId = "q5GsxMu8h2OAkmqxEY6prVzWAVj2";
+
+  const result = await dao.selectDoubleTable(userId, 'userId', 'containment_to_clan',  'clan');
+  console.log(`result => ${result}`);
+  console.dir(result)
+
   res.end();
 });
 
