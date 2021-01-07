@@ -190,7 +190,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
       }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
         data = document.objectId;
       }else{
-
+        // ???????????
       }
       returnArray.push(data);
     })
@@ -209,8 +209,19 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
       }
 
       snapshot.forEach(doc => {
+        let data = null;
+        if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
+          data = {clanId: doc.id};
+        }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
+          data = {objectId: doc.id};
+        }else{
+          // ????????????
+        }
         let document = doc.data();
-        returnArray.push(document);
+        for(const key in document){
+          data[key] = document[key];
+        }
+        returnArray.push(data);
       })
 
       return returnArray;

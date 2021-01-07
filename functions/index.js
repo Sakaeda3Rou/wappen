@@ -169,9 +169,9 @@ app.get('/my_page', async (req, res) => {
 
 
     // TODO: データベースから所属クランリストを取得
-    // const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
-
-    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
+    const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
+    console.dir(clanList)
+    // const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
     res.render('my-page', {
       userName: userName,
@@ -587,6 +587,7 @@ app.post('/clan_out', async (req, res) => {
 
     // TODO: 脱退処理
     console.log(clanId);
+    
 
     res.write('out clan');
     res.end();

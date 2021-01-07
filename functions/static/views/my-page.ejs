@@ -129,12 +129,12 @@
           // divタグを作成
           const div_element = document.createElement('div');
           div_element.setAttribute('class', 'my-clan__list--item item__hover');
+          div_element.setAttribute('id', `${clan.clanId}`);
 
           // inputタグを作成
           const input_element = document.createElement('input');
           input_element.setAttribute('class', 'main-btn out-btn');
           input_element.setAttribute('type', 'button');
-          input_element.setAttribute('id', `${clan.id}`);
           input_element.setAttribute('value', '脱退');
           input_element.setAttribute('onclick', `outTOClan("${clan.clanId}")`);
 
@@ -154,10 +154,10 @@
         xhr.open('post', '/clan_out');
         xhr.send(JSON.stringify({clanId: clanId}));
 
-        // 脱退ボタンを削除
-        const button_element = document.getElementById(clanId);
+        // 脱退したクランの領域を削除
+        const div_element = document.getElementById(clanId);
 
-        button_element.remove();
+        div_element.remove();
 
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {
