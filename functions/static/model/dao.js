@@ -455,6 +455,10 @@ exports.searchClan = async(searchWord, userId) => {
       snapshot.forEach(doc => {
         // judge containment
         var flag = false;
+        let document = doc.data();
+        if(document.numberOfMember >= 20){
+          flag = true;
+        }
 
         for(var i = 0; i < userClan.length && flag == false; i++){
           // console.log(`userClan[${i}] => ${userClan[i]}`);
@@ -463,14 +467,24 @@ exports.searchClan = async(searchWord, userId) => {
           }
         }
 
-        if(flag != true){
-          let data = {id : doc.id};
+        if(flag == true){
+          let data = {id : doc.id, propriety : true};
           let document = doc.data();
           for(const key in document){
             data[key] = document[key];
           }
 
           resultArray.push(data);
+        }else if(flag == false){
+          let data = {id : doc.id, propriety : false};
+          let document = doc.data();
+          for(const key in document){
+            data[key] = document[key];
+          }
+
+          resultArray.push(data);
+        }else{
+          // ????????
         }
       })
 
