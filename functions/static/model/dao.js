@@ -165,108 +165,64 @@ exports.selectDocOneColumn = async(collectionName, columnName, operator, word, p
 }
 
 // when you use : select double table (ex: my_object and object)
-// need first collection's xxId (ex: userId, clanId) as 'id',
-//      first collection's id name (ex: 'userId') as 'idName',
+// need user's Id as 'userId',
 //      first collection's name as 'firstCollectionName',
 //      second collection's name as 'firstColectionName'
 // NB: return result by array
-exports.selectDoubleTable = async(id, idName, firstCollectionName, secondCollectionName) => {
+exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionName) => {
   const firstRef = db.collection(firstCollectionName);
   const secondRef = db.collection(secondCollectionName);
 
   // first sellection
-  const first = await firstRef.where(idName, '==', id).get().then(snapshot => {
+  const first = await firstRef.where('userId', '==', userId).get().then(snapshot => {
     // make result array
     let returnArray = [];
 
     if(snapshot.empty){
       return returnArray;
     }
-    // NB: three pattern i think
-    if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
-      snapshot.forEach(containmentToClan => {
-        const containmentToClanData = containmentToClan.data();
-        const second = secondRef.doc(containmentToClanData.clanId).get().then(doc => {
-          let data = {clanId : doc.id, containmentToClanId : containmentToClan.id};
-          let document = doc.data();
-          for(const key in document){
-            data[key] = document[key];
-          }
 
-          // return to second
-          return data;
-        }).catch(err => {
-          return {err: err};
-        })
+    snapshot.forEach(doc => {
+      let document = doc.data();
+      let data = null;
+      if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'clan'){
+        data = document.clanId;
+      }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
+        data = document.objectId;
+      }else{
 
-        if(second.hasOwnProperty('err')){
-          // has error
-          // return to first
-          return {err: err};
-        }else{
-          returnArray.push(second);
-        }
-      })
-    }else if(firstCollectionName == 'containment_to_clan' && secondCollectionName == 'user'){
-      snapshot.forEach(containmentToClan => {
-        const containmentToClanData = containmentToClan.data();
-        const second = secondRef.doc(containmentToClanData.userId).get().then(doc => {
-          let data = {userId : doc.id, clanId : containmentToClanData.clanId};
-          let document = doc.data();
-          for(const key in document){
-            data[key] = document[key];
-          }
+      }
+      returnArray.push(data);
+    })
 
-          // return to second
-          return data;
-        }).catch(err => {
-          return {err: err};
-        })
-
-        if(second.hasOwnProperty('err')){
-          // has error
-          // return to first
-          return {err: err};
-        }else{
-          returnArray.push(second);
-        }
-      })
-    }else if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
-      snapshot.forEach(myObject => {
-        const myObjectData = myObject.data();
-        const second = secondRef.doc(myObjectData.objectId).get().then(doc => {
-          let data = {objectId : doc.id, myObjectId : myObject.id};
-          let document = doc.data();
-          for(const key in document){
-            data[key] = document[key];
-          }
-          // return to second
-          return data;
-        }).catch(err => {
-          return {err: err};
-        })
-
-        if(second.hasOwnProperty('err')){
-          // has error
-          // return to first
-          return {err: err};
-        }else{
-          returnArray.push(second);
-        }
-      })
-    }else{
-      // didn't think
-      console.log('????');
-    }
-
-    // return to first
     return returnArray;
   }).catch(err => {
     return {err: err};
   });
 
-  //return to controller
-  return first;
+  if(Array.isArray(first)){
+    const second = await secondRef.where(firebase.firestore.FieldPath.documentId(), 'array-contains', first).get().then(snapshot => {
+      let returnArray = [];
+
+      if(snapshot.empty){
+        return returnArray
+      }
+
+      snapshot.forEach(doc => {
+        let document = doc.data();
+        returnArray.push(document);
+      })
+
+      return returnArray;
+    }).catch(err => {
+      return {err: err};
+    })
+
+    //return to controller
+    return second;
+  }else{
+    return first;
+  }
 }
 
 // when you use : select markerURL and objectURL
