@@ -59,7 +59,7 @@
         let xhr = new XMLHttpRequest();
 
         xhr.open('post', '/clan_search');
-        xhr.send(search_word);
+        xhr.send(JSON.stringify({searchWord: search_word}));
 
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {

@@ -201,7 +201,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
   });
 
   if(Array.isArray(first)){
-    const second = await secondRef.where(firebase.firestore.FieldPath.documentId(), 'array-contains', first).get().then(snapshot => {
+    const second = await secondRef.where(admin.firestore.FieldPath.documentId(), 'in', first).get().then(snapshot => {
       let returnArray = [];
 
       if(snapshot.empty){

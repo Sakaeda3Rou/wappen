@@ -169,9 +169,7 @@ app.get('/my_page', async (req, res) => {
 
 
     // TODO: データベースから所属クランリストを取得
-    const result = await dao.selectDoubleTable(user.uid, 'userId', 'containment_to_clan',  'clan');
-    console.log(`mypage clan result => ${result}`);
-    console.dir(result);
+    // const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
 
     const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
@@ -279,7 +277,8 @@ app.get('/camera', async (req, res) => {
     // TODO: とりあえずリスト
     const objectList = [{objectURL: "my_object/1"}, {objectURL: "my_object/2"}]
     const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
-    const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
+    const markerList = [];
+    // const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
 
 
     res.render('camera', {
@@ -332,27 +331,24 @@ app.post('/object_selected', (req, res) => {
   });
 })
 
-// get clan_selected
-app.get('/clan_selected', (req, res) => {
-  fs.readFile('views/clan_selected.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
-
 // post clan_selected
-app.post('/clan_selected', (req, res) => {
-  // TODO: send parameter about clan
-  //       make data about clan for camera
-  // const clanId = req.body._clanId;
+app.post('/clan_selected', async (req, res) => {
+  // TODO: 選択されたクランのマーカーリストを取得する
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
-  // return camera
-  fs.readFile('views/camera.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
+  if (!user) {
+    res.redirect('/');
+  } else {
+    // 選択したクランのIDを取得
+    const clanId = req.body;
+
+    // クランのマーカーリストを取得
+    const markerList = await selectMarkerList(user.uid, clanId);
+
+    res.write(`${JSON.stringify(markerList)}`);
     res.end();
-  });
+  }
 })
 
 app.post('/containment_clan', async (req, res) => {
@@ -587,10 +583,10 @@ app.post('/clan_out', async (req, res) => {
   } else {
 
     // クランIDを取得
-    const clanId = req.body;
+    const clanId = JSON.parse(req.body).clanId;
 
     // TODO: 脱退処理
-
+    console.log(clanId);
 
     res.write('out clan');
     res.end();
@@ -599,15 +595,14 @@ app.post('/clan_out', async (req, res) => {
 
 // クラン検索
 app.post('/clan_search', async (req, res) => {
-  // TODO: 確認
-  console.log(`search_word => ${req.body}`);
-  const search_word = req.body;
+  // 検索ワードを取得
+  const searchWord = JSON.parse(req.body).searchWord;
 
   // ユーザーを取得
   let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
 
   // データベースでクランを検索
-  const clanList = await dao.searchClan(search_word, user.uid);
+  const clanList = await dao.searchClan(searchWord, user.uid);
 
   // TODO: 確認
   console.log('clan search finished');
@@ -622,7 +617,7 @@ app.get('/test', async (req, res) => {
   // userId
   const userId = "q5GsxMu8h2OAkmqxEY6prVzWAVj2";
 
-  const result = await dao.selectDoubleTable(userId, 'userId', 'containment_to_clan',  'clan');
+  const result = await dao.selectDoubleTable(userId, 'containment_to_clan',  'clan');
   console.log(`result => ${result}`);
   console.dir(result)
 

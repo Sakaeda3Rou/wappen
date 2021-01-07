@@ -51,7 +51,7 @@ async function drawUidToImage(uid, image) {
 
   // 座標を指定して文字を描画
   var x = (canvas.width/2)
-  var y = (canvas.height*3.5)
+  var y = (canvas.height*3/5)
   context.fillText(text2, x, y)
   y = (canvas.height/2)
   context.fillText(text1, x, y)

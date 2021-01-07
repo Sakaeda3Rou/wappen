@@ -152,7 +152,7 @@
 
         // サーバーに送信
         xhr.open('post', '/clan_out');
-        xhr.send(clanId);
+        xhr.send(JSON.stringify({clanId: clanId}));
 
         // 脱退ボタンを削除
         const button_element = document.getElementById(clanId);
