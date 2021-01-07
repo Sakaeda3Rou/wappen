@@ -443,7 +443,7 @@ exports.searchClan = async(searchWord, userId) => {
   });
 
   if(Array.isArray(userClan)){
-    const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).where('numberOfMember', '<', 20).get().then(snapshot => {
+    const clan = await db.collection('clan').where('searchClanName', 'array-contains', searchWord).get().then(snapshot => {
       // create array
       let resultArray = [];
 

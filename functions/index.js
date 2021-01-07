@@ -587,7 +587,7 @@ app.post('/clan_out', async (req, res) => {
 
     // TODO: 脱退処理
     console.log(clanId);
-    
+    dao.prisonBreak(user.uid, clanId);
 
     res.write('out clan');
     res.end();
