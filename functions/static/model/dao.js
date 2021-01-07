@@ -221,7 +221,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
         for(const key in document){
           data[key] = document[key];
         }
-        resultArray.push(data);
+        returnArray.push(data);
       })
 
       return returnArray;
@@ -497,7 +497,7 @@ exports.searchClan = async(searchWord, userId) => {
 //      user's id as 'userId'
 exports.searchObject = async(category, userId, objectId) => {
   // select user's object
-  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get.then(snapshot => {
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get().then(snapshot => {
     // create result array
     let resultArray = [];
 
@@ -518,7 +518,7 @@ exports.searchObject = async(category, userId, objectId) => {
     // judge page number
     if(!objectId){
       // page 0
-      const object = await db.collection('object').where('category', 'array-contains', category).limit(20).get.then(snapshot => {
+      const object = await db.collection('object').where('category', 'array-contains', category).limit(20).get().then(snapshot => {
         // create array
         let resultArray = [];
 
@@ -562,7 +562,7 @@ exports.searchObject = async(category, userId, objectId) => {
                              .where('category', 'array-contains', category)
                              .orderBy(admin.firestore.FieldPath.documentId())
                              .startAfter(objectId)
-                             .limit(20).get.then(snapshot => {
+                             .limit(20).get().then(snapshot => {
         // create array
         let resultArray = [];
 
@@ -606,6 +606,34 @@ exports.searchObject = async(category, userId, objectId) => {
   }else{
     return userObject;
   }
+}
+
+// when you use : for prison break
+// need user's id as 'userId'
+//      clan's id as 'clanId'
+exports.prisonBreak = async(userId, clanId) => {
+  const containmentToClan = await db.collection('containment_to_clan').where('userId', '==', userId).where('clanId', '==', clanId).get().then(snapshot => {
+    let id = null;
+    snapshot.forEach(doc => {
+      id = doc.id;
+    })
+
+    // return to containmentToClan
+    return id;
+  }).catch(err => {
+    console.log(err);
+    return false;
+  });
+
+  const result = _this.deleteDoc('containment_to_clan', containmentToClan);
+
+  if(result.hasOwnProperty('err')){
+    // has error
+    console.log(err);
+    return false;
+  }
+
+  return true;
 }
 
 // when you use : for increment numberOfAdd
