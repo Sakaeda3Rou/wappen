@@ -18,21 +18,19 @@
           <!-- a-sceneを開始 -->
           <a-scene vr-mode-ui="enabled: false">
             <!-- <a-entity camera style="z-index: 0"> -->
-            <a-entity camera>
-              <div id="marker-area">
+            <a-entity id="marker-area" camera>
 
                 <!-- a-markerを生成 -->
                 <!-- example -->
-                <!-- <a-marker preset="hiro">
+                <a-marker preset="hiro">
                   <a-entity
                     position="0 -1 0"
                     scale="0.05 0.05 0.05"
                     gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
                   ></a-entity>
-                </a-marker> -->
+                </a-marker>
 
                 <!-- <a-marker type="pattern" url="#"> -->
-              </div>
             </a-entity>
           </a-scene>
 
@@ -101,7 +99,7 @@
     <script src="views/js/cameraBtn.js"></script>
     <script>
       // a-markerを生成
-      setARMarker();
+      // setARMarker();
 
       function setARMarker() {
         // マーカーを生成する領域を取得
