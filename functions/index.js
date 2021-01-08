@@ -170,8 +170,6 @@ app.get('/my_page', async (req, res) => {
 
     // TODO: データベースから所属クランリストを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
-    console.dir(clanList)
-    // const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
 
     res.render('my-page', {
       userName: userName,
@@ -209,7 +207,7 @@ app.get('/profile', async (req, res) => {
 });
 
 // update profile
-app.post('/profile', (req, res) => {
+app.post('/profile', async (req, res) => {
 
   // cookieからユーザーを取得
   let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
@@ -238,12 +236,14 @@ app.post('/profile', (req, res) => {
   // ユーザーをセッションに保存
   res.cookie('__session', json);
 
+  // TODO: データベースから所属クランリストを取得
+  const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
 
   res.render('my-page', {
     userName: userName,
     birthday: birthday,
-    // TODO: clanListを設定
-    clanList: [{}],
+    markerURL: user.markerURL,
+    clanList: clanList,
   });
 })
 
@@ -551,27 +551,38 @@ app.post('/clan_make', async (req, res) => {
   if (!user) {
     res.redirect('/');
   } else {
-    // save clan
-    const clanName = req.body;
+    // 作成するクラン名を取得
+    const clanName = req.body._clanName;
 
+    // 検索時のワードを設定
+    let searchClanName = []
+    for (let i = 1; i <= clanName.length; i++) {
+      searchClanName.push(clanName.substring(0, i));
+    }
+
+    // clanオブジェクトを作成
     const clan = require('./static/model/clan.js');
-    clan.setclan(clanName, 0, false);
+    clan.setClan(clanName, searchClanName, 0, false);
 
-    const result = dao.saveWithoutId('clan', clan.getClan());
+    // データベースにクランを保存
+    const result = await dao.saveWithoutId('clan', clan.getClan());
 
     console.log(`result => ${result}`);
     console.dir(result);
 
-    if(result.hasOwnProperty(err)){
+    if(result.hasOwnProperty("err")){
       // has error
     }
 
     // TODO: ユーザーをクランに加入させる
     // const result = await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: clanId});
 
-    // return clan page
-    res.redirect('my_page');
-  }
+    // ユーザーの所属クランリストを取得
+    const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
+
+    // マイページへリダイレクト
+    res.redirect('/my_page');
+  };
 });
 
 app.post('/clan_out', async (req, res) => {
@@ -604,9 +615,6 @@ app.post('/clan_search', async (req, res) => {
 
   // データベースでクランを検索
   const clanList = await dao.searchClan(searchWord, user.uid);
-
-  // TODO: 確認
-  console.log('clan search finished');
 
   // 取得したリストを返す
   res.write(`${JSON.stringify(clanList)}`);

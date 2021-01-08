@@ -15,20 +15,20 @@
     <header class="header">
         <a class="header__cancel" href="<%= cancel_link_url %>">キャンセル</a> <!-- header__cancel-btn-->
         <div class="header__title">Profile setting</div>
-        <a class="header__save header__save-btn" onclick="return sendPost()">保存</a> <!-- header__save-btn-->
+        <a class="header__save header__save-btn" onclick="formCheck()">保存</a> <!-- header__save-btn-->
     </header>
 
     <main>
         <div class="inner">
 
             <div class="my-qr">
-                <div class="my-qr__code" style=" background-image: url(<%= marker_url %>);"></div>
+                <div class="my-qr__code"><img src="<%= marker_url %>"></img></div>
                 <div class="my-qr__download"><i class="fas fa-download fa-2x"></i></div>
             </div>
 
             <div class="bottom-page">
 
-                <form class="my-user">
+                <form class="my-user" name="my_user_form" action="<%= form_action_url %>" method="post">
                     <div class="my-user__name">ユーザー名:　
                         <input class="name-form" type="text" name="_name" placeholder="ユーザー名を入力">
                     </div>
@@ -37,8 +37,8 @@
                         <input class="birthday-form" name="_date" type="date">
                     </div>
                     <div class="my-user__profile-btn">
-                        <input type="submit" class="save-btn main-btn" value="保存"></input>
-                        <a class="cancel-btn main-btn" href="my-page.html">キャンセル</a>
+                        <input type="submit" name="my_user_submit_button" class="save-btn main-btn" value="保存" onclick="return formCheck()"></input>
+                        <a class="cancel-btn main-btn" href="<%= cancel_link_url %>">キャンセル</a>
                     </div>
                 </from>
             </div>
@@ -48,8 +48,7 @@
     <script src="views/js/include.js"></script>
     <script>
       function sendPost() {
-        console.log(document.forms.my_user_form.my_user_submit_button);
-
+        // フォームボタンをクリック
         let result = document.forms.my_user_form.my_user_submit_button.click();
 
         return result
@@ -61,9 +60,13 @@
         let date = document.forms.my_user_form._date.value;
 
         if(name == "" || date == "") {
+          // アラートを表示
+          window.alert("入力されていない項目があります。");
+
           return false;
         } else {
-          return true;
+          // フォームを送信
+          sendPost();
         }
       }
     </script>

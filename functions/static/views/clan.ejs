@@ -55,28 +55,34 @@
         // 検索するワードを取得
         search_word = document.getElementById('search_word').value;
 
-        // XMLHttpRequestを作成
-        let xhr = new XMLHttpRequest();
+        // 検索欄が空の場合、アラートを表示
+        if (search_word == "") {
+          window.alert('検索ワードが入力されていません。')
+        } else {
+          // XMLHttpRequestを作成
+          let xhr = new XMLHttpRequest();
 
-        xhr.open('post', '/clan_search');
-        xhr.send(JSON.stringify({searchWord: search_word}));
+          xhr.open('post', '/clan_search');
+          xhr.send(JSON.stringify({searchWord: search_word}));
 
-        // サーバーの応答を検知
-        xhr.onreadystatechange = function () {
+          // サーバーの応答を検知
+          xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
-                // clanリストを取得
-                let restxt = xhr.responseText;
-                console.log(`restxt => ${restxt}`);
+              // clanリストを取得
+              let restxt = xhr.responseText;
+              console.log(`restxt => ${restxt}`);
 
-                // string => jsonに変換
-                let clanList = JSON.parse(restxt);
-                console.log(`clanList => ${clanList}`);
-                console.dir(clanList)
+              // string => jsonに変換
+              let clanList = JSON.parse(restxt);
+              console.log(`clanList => ${clanList}`);
+              console.dir(clanList)
 
-                // 検索結果を表示する
-                searchResult(clanList);
+              // 検索結果を表示する
+              searchResult(clanList);
             }
+          };
         };
+
       }, false);
 
     </script>
@@ -112,13 +118,22 @@
 
         if(!clanList || clanList.length == 0) {
           // 検索結果がnullのとき
-          // 新規作成ボタンを生成
+          // 新規作成フォームを作成
+          const form_element = document.createElement('form');
+          form_element.setAttribute('id', 'clan_create_form');
+          form_element.setAttribute('action', '/clan_make');
+          form_element.setAttribute('method', 'post');
+
+          // 新規作成ボタンを作成
           const clan_create_button_element = document.createElement('input');
           clan_create_button_element.setAttribute('type', 'button');
           clan_create_button_element.setAttribute('value', '新規作成');
           clan_create_button_element.setAttribute('class', 'main-btn new-btn');
           clan_create_button_element.setAttribute('onclick', `makeTOClan("${search_word}")`);
-          result_div_element.appendChild(clan_create_button_element);
+
+          // フォームに要素を追加
+          form_element.appendChild(clan_create_button_element);
+          result_div_element.appendChild(form_element);
 
         } else {
           // クランリストを表示
@@ -131,15 +146,18 @@
             clan_div_element.setAttribute('class', 'result__list--item');
             clan_div_element.innerHTML = clanName;
 
-            const input_button_element = document.createElement('input');
-            input_button_element.setAttribute('class', 'main-btn in-btn');
-            input_button_element.setAttribute('type', 'button');
-            input_button_element.setAttribute('id', `${clan.id}`);
-            input_button_element.setAttribute('value', '加入');
-            input_button_element.setAttribute('onclick', `containment("${clan.id}")`);
+            // 加入できるクランのみ加入ボタンを作成
+            if (!clan.propriety) {
+              const input_button_element = document.createElement('input');
+              input_button_element.setAttribute('class', 'main-btn in-btn');
+              input_button_element.setAttribute('type', 'button');
+              input_button_element.setAttribute('id', `${clan.id}`);
+              input_button_element.setAttribute('value', '加入');
+              input_button_element.setAttribute('onclick', `containment("${clan.id}")`);
+              clan_div_element.appendChild(input_button_element);
+            }
 
             // クランリストに要素を追加
-            clan_div_element.appendChild(input_button_element);
             result_list_div_element.appendChild(clan_div_element);
           }
         }
@@ -173,22 +191,21 @@
 
       // クラン作成
       function makeTOClan(clanName) {
-        // 検索されていたワードで作成
-        let xhr = new XMLHttpRequest();
 
-        // サーバーに送信
-        xhr.open('post', '/clan_make');
-        xhr.send(clanName);
+        // フォームを取得
+        let form_element = document.getElementById('clan_create_form');
 
-        // サーバーの応答を検知
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4 && xhr.status === 200){
-                // clanリストを取得
-                let restxt = xhr.responseText;
-                console.log(`restxt => ${restxt}`);
+        // text要素を作成
+        let text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_clanName');
+        text_element.setAttribute('value', clanName);
 
-            }
-        };
+        // フォームに要素を追加
+        form_element.appendChild(text_element);
+
+        // フォームを送信
+        form_element.submit()
       }
     </script>
 
