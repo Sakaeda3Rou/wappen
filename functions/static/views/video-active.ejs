@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav id="set-hamburger" style="display: none;"></nav>
+    <header class="header">
+        <!-- <a href="javascript:history.back();" class="header__video-back">
+                <div class="search__icon">
+                    <span class="icon-line icon-line--line1"></span>
+                    <span class="icon-line icon-line--line2"></span>
+                </div>
+            </a> -->
+        <div class="header__name">部屋名</div>
+    </header>
+    <main class="main">
+        <section class="video-area"></section><!-- セレクトボタンが押されて生成 -->
+
+        <!-- マイオブジェクトから共有するmodalのコード -->
+        <div class="modal js-modal">
+            <div class="modal__bg js-bg"></div>
+            <div class="modal__main">
+                <div class="my-object-list">
+                    <h2 class="my-object-list__title">マイオブジェクト一覧</h2>
+
+                    <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
+                    <div class="category__my-object">
+                        <!-- 選択中の画像を表示 -->
+                        <div class="my-object-list__select my-object-list__select--video"></div>
+                        <!-- 選択するボタン -->
+                        <div class="my-object-list__decision">
+                            <input type="submit" value="マイオブジェクトを選択" class="main-btn my-object-list__submit">
+                            <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel"
+                                id="js-category-cansel">
+                        </div>
+                    </div>
+
+                    <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
+                    <ul class="my-object-list__items">
+                        <li class="my-object-list__item" id="my-object-list__item1"></li>
+                        <li class="my-object-list__item" id="my-object-list__item2"></li>
+                        <li class="my-object-list__item" id="my-object-list__item3"></li>
+                        <li class="my-object-list__item" id="my-object-list__item4"></li>
+                        <li class="my-object-list__item" id="my-object-list__item5"></li>
+                        <li class="my-object-list__item" id="my-object-list__item6"></li>
+                        <li class="my-object-list__item" id="my-object-list__item7"></li>
+                        <li class="my-object-list__item" id="my-object-list__item8"></li>
+                        <li class="my-object-list__item" id="my-object-list__item9"></li>
+                        <li class="my-object-list__item" id="my-object-list__item10"></li>
+                        <li class="my-object-list__item" id="my-object-list__item11"></li>
+                        <li class="my-object-list__item" id="my-object-list__item12"></li>
+                        <li class="my-object-list__item" id="my-object-list__item13"></li>
+                        <li class="my-object-list__item" id="my-object-list__item14"></li>
+                        <li class="my-object-list__item" id="my-object-list__item15"></li>
+                        <li class="my-object-list__item" id="my-object-list__item16"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    <section class="video-menu">
+        <div class="video-menu__object js-btn"><i class="fas fa-images fa-2x"></i>オブジェクト</div>
+        <div class="video-menu__mic"><i class="fas fa-microphone-slash fa-2x icon-mic"></i>マイク</div>
+        <div class="video-menu__video"><i class="fas fa-video-slash fa-2x icon-video"></i>ビデオ</div>
+        <div class="video-menu__end"><a href="video.html"><i class="fas fa-sign-out-alt fa-2x"></i>退室</a></div>
+    </section>
+    <footer id="footer" style="display: none;"></footer>
+
+    <script src="js/include.js"></script>
+    <script src="js/modal.js"></script>
+    <script>
+        const videoArea = document.querySelector('.video-area');
+        const videoMenu = document.querySelector('.video-menu');
+        const videoBtn = document.querySelector('.video-menu__video');
+        const micBtn = document.querySelector('.video-menu__mic');
+        const iconVideo = document.querySelector('.icon-video');
+        const iconMic = document.querySelector('.icon-mic');
+
+        const videoTwo = ['item1', 'item2'];
+        const videoFour = ['item1', 'item2', 'item3', 'item4'];
+        let people = videoFour;
+
+        // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
+
+        videoBtn.addEventListener('click', () => {
+            iconVideo.classList.toggle('fa-video');
+            iconVideo.classList.toggle('fa-video-slash');
+        });
+
+        micBtn.addEventListener('click', () => {
+            iconMic.classList.toggle('fa-microphone');
+            iconMic.classList.toggle('fa-microphone-slash');
+        });
+
+        window.onload = function () {
+            //getパラメータを取得
+            var params = (new URL(document.location)).searchParams;
+            var queryValue = params.get('people');
+            if (queryValue == 4) {
+                people = videoFour;
+            } else if (queryValue == 2) {
+                people = videoTwo;
+            }
+
+            // 表示する場所を生成
+            videoMenu.style.display = 'flex';
+
+            if (people === videoTwo) {
+                videoTwo.forEach(userName => {
+                    const user = document.createElement('div');
+                    user.classList.add('user');
+                    user.id = userName;
+                    if (window.matchMedia('(min-width: 1000px)').matches) {
+                        user.style.width = '48%';
+                        user.style.height = '100%';
+                    } else {
+                        user.style.width = '100%';
+                        user.style.height = '48%';
+                    };
+
+                    const userDisplay = document.createElement('div');
+                    userDisplay.classList.add('user__name');                    
+                    userDisplay.appendChild(document.createTextNode(userName));
+                    user.appendChild(userDisplay);
+                    videoArea.appendChild(user);
+                    videoArea.style.display = 'flex';
+                });
+            } else {
+                people.forEach(userName => {
+                    const user = document.createElement('div');
+                    user.classList.add('user');
+                    user.id = userName;
+                    user.style.width = '48%';
+                    user.style.height = '48%';
+
+                    const userDisplay = document.createElement('div');
+                    userDisplay.classList.add('user__name');
+                    userDisplay.appendChild(document.createTextNode(userName));
+                    user.appendChild(userDisplay);
+                    user.appendChild(userDisplay);
+
+                    videoArea.appendChild(user);
+                    videoArea.style.display = 'flex';
+                });
+            }
+        };
+
+        //マイオブジェクト一覧を表示
+        const items = document.querySelectorAll('.my-object-list__item');
+        const categoryMyObject = document.querySelector('.category__my-object');
+        const myObjectListItems = document.querySelector('.my-object-list__items');
+        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const categorySubmit = document.querySelector('.my-object-list__submit');
+        //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                categoryMyObject.classList.toggle('category-open');
+                myObjectListItems.classList.toggle('my-object-list__items--close');
+
+                if (categoryMyObject.classList.contains('category-open')) {
+                    categoryMyObject.style.height = '80%';
+                } else {
+                    categoryMyObject.style.height = 0;
+                }
+
+                if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                    myObjectListItems.style.height = 0;
+                } else {
+                    myObjectListItems.style.height = '80%';
+                }
+            });
+        });
+        //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
+        categoryCansel.addEventListener('click', () => {
+            categoryMyObject.classList.toggle('category-open');
+            myObjectListItems.classList.toggle('my-object-list__items--close');
+
+            if (categoryMyObject.classList.contains('category-open')) {
+                categoryMyObject.style.height = '80%';
+            } else {
+                categoryMyObject.style.height = 0;
+            }
+
+            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                myObjectListItems.style.height = 0;
+            } else {
+                myObjectListItems.style.height = '80%';
+            }
+        });
+    </script>
+</body>
+
+</html>
