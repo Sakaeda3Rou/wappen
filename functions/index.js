@@ -379,7 +379,7 @@ app.get('/my_object', async (req, res) => {
   } else {
 
     // カテゴリーリストを取得
-    const categoryList = [{categoryId: 1, categoryName: "ほのお"}, {categoryId: 2, categoryName: "みず"}, {categoryId: 3, categoryName: "くさ"}];
+    const categoryList = await dao.selectAll('category');
 
     // マイオブジェクトリストを取得
     const myObjectList = [{myObjectId: 1, Name: "a"}];
@@ -400,56 +400,74 @@ app.post('/my_object', (req, res) => {
   res.render('my-object');
 })
 
-app.post('/search_object', (req, res) => {
+app.post('/search_object', async (req, res) => {
 
-  // プロパティーを取得
-  const body = JSON.parse(req.body);
-  console.log(`body => ${body}`);
-  console.log(`body type => ${typeof body}`);
-  console.dir(body);
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
-  // TODO: 確認
-  console.log('search_object finished');
+  if (!user) {
+    res.redirect('/');
+  } else {
+    // プロパティーを取得
+    const body = JSON.parse(req.body)
+    const objectList = body.objectList
+    const searchCategoryList = body.searchCategoryList
 
-  res.end();
+    console.log(`objectList => ${objectList}`);
+    console.dir(objectList);
+    console.log(`searchCategoryList => ${searchCategoryList}`);
+    console.dir(searchCategoryList);
+
+    // TODO: 検索結果リストを取得
+
+
+    res.end();
+  }
 });
 
-// get add_object
-app.get('/add_object', (req, res) => {
-  fs.readFile('views/add_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
-
 // post add_object
-app.post('/add_object', (req, res) => {
-  // TODO: save in storage and make object
-  //       require sao, dao
-  //       then save object make var about objectId
+app.post('/object_upload', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
-  // TODO: send data about my_object and save
-  const locationX = req.body._locationX;
-  const locationY = req.body._locationY;
-  const locationZ = req.body._locationZ;
+  if (!user) {
+    res.redirect('/');
+  } else {
 
-  const myObject = require('./static/model/my_object.js');
+    // パラメータを取得
+    const body = JSON.parse(req.body._request_body);
 
-  myObject.setMyObject(req.session.user.uid, objectId, true, locationX, locationY, locationZ);
+    const image = body.image;
+    const categoryList = body.uploadCategoryList;
 
-  const result = dao.saveWithoutId('my_object', myObject.getMyObject());
+    // TODO: send data about my_object and save
+    const locationX = 0;
+    const locationY = 0;
+    const locationZ = 0;
 
-  if(result.hasOwnProperty(err)){
-    // has error
-  }
+    // TODO: 画像をストレージに保存
 
-  // return my_object
-  fs.readFile('views/my_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
+    // TODO: オブジェクトコレクションに登録
+
+    // TODO: マイオブジェクトコレクションに登録
+
+    
+
     res.end();
-  });
+
+    // const myObject = require('./static/model/my_object.js');
+    //
+    // myObject.setMyObject(req.session.user.uid, objectId, true, locationX, locationY, locationZ);
+    //
+    // const result = dao.saveWithoutId('my_object', myObject.getMyObject());
+    //
+    // if(result.hasOwnProperty(err)){
+    //   // has error
+    // }
+    //
+    // // マイオブジェクト画面へリダイレクト
+    // res.redirect('/my_object');
+  }
 })
 
 // get share_object
@@ -567,18 +585,15 @@ app.post('/clan_make', async (req, res) => {
     // データベースにクランを保存
     const result = await dao.saveWithoutId('clan', clan.getClan());
 
-    console.log(`result => ${result}`);
-    console.dir(result);
+    // クランIDを取得
+    const clanId = result.id;
 
     if(result.hasOwnProperty("err")){
       // has error
     }
 
-    // TODO: ユーザーをクランに加入させる
-    // const result = await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: clanId});
-
-    // ユーザーの所属クランリストを取得
-    const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
+    // ユーザーをクランに加入させる
+    await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: clanId});
 
     // マイページへリダイレクト
     res.redirect('/my_page');

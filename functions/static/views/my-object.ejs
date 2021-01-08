@@ -21,7 +21,7 @@
         <div class="modal js-modal">
             <div class="modal__bg js-bg"></div>
             <div class="modal__main">
-                <form action="" style="height: 100%; display: flex; flex-direction: column;">
+                <form id="upload_form" action="/object_upload" method="post" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="drop">
                         <div id="preview" class="drop__preview"></div>
                         <div id="drop-zone" class="drop__zone">　<!-- ここに画像のドロップエリア -->
@@ -35,7 +35,7 @@
                       <!-- カテゴリーリストを生成 -->
 
                     </ul>
-                    <input type="submit" class="main-btn" value="マイオブジェクトへ登録" style="margin: auto;">
+                    <input type="submit" class="main-btn" value="マイオブジェクトへ登録" onclick="return create_upload_body()" style="margin: auto;">
                 </form>
             </div>
         </div>
@@ -139,7 +139,7 @@
           isAddObjectSelected: false,
         });
       <% }); %>
-      
+
       console.dir(categoryList);
 
       // カテゴリーをセット
@@ -226,7 +226,7 @@
 
         for (let category of categoryList) {
           if (category.isSearchSelected) {
-            searchCategoryList.push(category.categoryName);
+            searchCategoryList.push(category.categoryId);
           }
         }
 
@@ -241,16 +241,54 @@
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
-                // clanリストを取得
+                // オブジェクトリストを取得
                 let restxt = xhr.responseText;
                 console.log(`restxt => ${restxt}`);
 
-                // 検索結果を表示
+                // TODO: オブジェクトを再表示
+
             }
         };
 
       }, false);
 
+      // アップロードするbodyを作成
+      function create_upload_body() {
+
+        // アップロードする画像を取得
+        let image = document.querySelector('#drop-zone').src;
+
+        console.log(image);
+
+        if (image == undefined) {
+          window.alert('アップロードする画像を選択してね')
+          return false;
+        }
+
+        // formを取得
+        const form_element = document.getElementById('upload_form');
+
+        // 選択カテゴリーリストを作成
+        let uploadCategoryList = []
+        for (let category of categoryList) {
+          if (category.isAddObjectSelected) {
+            uploadCategoryList.push(category.categoryId);
+          }
+        }
+
+        // リクエストボディを作成
+        const request_body = {image: image, uploadCategoryList: uploadCategoryList};
+
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
+
+        // formを送信
+        form_element.submit();
+      }
 
       // 検索結果を表示
       function searchResult() {
