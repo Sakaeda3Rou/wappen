@@ -1,6 +1,7 @@
 var _this = this;
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const { object } = require('firebase-functions/lib/providers/storage');
 
 
 let db = admin.firestore();
@@ -578,7 +579,6 @@ exports.searchObject = async(category, userId, objectId) => {
   const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get().then(snapshot => {
     // create result array
     let resultArray = [];
-    // let length = 0;
 
     if(snapshot.empty){
       // no document
@@ -587,11 +587,8 @@ exports.searchObject = async(category, userId, objectId) => {
 
     snapshot.forEach(doc => {
       var document = doc.data();
-      // length = length + 1;
       resultArray.push(document.objectId);
     })
-
-    // resultArray.push(length);
 
     // return to userObject
     return resultArray;
@@ -687,6 +684,8 @@ exports.searchObject = async(category, userId, objectId) => {
       })
 
     }
+
+    object.push(userObject.length);
 
     // return to controller
     return object;
