@@ -1,8 +1,5 @@
 var _this = this;
 const admin = require('firebase-admin');
-const functions = require('firebase-functions');
-const { object } = require('firebase-functions/lib/providers/storage');
-
 
 let db = admin.firestore();
 
