@@ -2,24 +2,6 @@ const admin = require('firebase-admin');
 
 let db = admin.firestore();
 
-// default configuration
-const configuration = {
-  iceServers: [
-    {
-      urls: [
-        'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-      ],
-    },
-  ],
-  iceCandidatePoolSize: 10,
-};
-
-let peerConnection = null;
-let localStream = null;
-let remoteStream = null;
-let roomDialog = null;
-
 // video chat prepare for two people
 function twoVideoChatPrepare(userId){
   const numberOfRoomDemo = db.collection('room_demo').get().then(snapshot => {
@@ -35,21 +17,9 @@ function twoVideoChatPrepare(userId){
   })
 
   if(Array.isArray(numberOfRoomDemo)){
-    // create peerConnection
-    peerConnection = new RTCPeerConnection(configuration);
-  
-    registerPeerConnectionListeners();
-  
-    // create offer
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-  
+    // create matching
     const matching = {
-      userId : userId,
-      offer : {
-        type : offer.type,
-        sdp : offer.sdp
-      }
+      userId : userId
     };
   
     // insert matching to db
@@ -66,13 +36,23 @@ function twoVideoChatPrepare(userId){
       // listen for update my room_demo
 
 
-      // 
+      // create room
+
+
+      // return 'host', userId or insert these to DOM
+
+
     }else if(numberOfRoomDemo.length >= 1){
       // insert to anyone's matching
 
-      // listen for update my matching document
 
-      // insert answer to host's room_demo 
+      // listen for update my matching document
+      // get hostUserId
+
+
+      // return 'member', hostUserId or insert these to DOM
+
+      
     }else{
       // ????????????
     }
