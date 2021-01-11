@@ -36,13 +36,16 @@ exports.uploadPatt = async (file_name, body) => {
 // オブジェクトファイルのアップロード
 exports.uploadObject = async (file_name, body) => {
 
+  body = body.replace(/.+,/, '');
+  body = new Buffer(body, 'base64');
+
   const upload_file = bucket.file(`object_images/${file_name}`);
 
   await upload_file.save(body, {
     predefinedAcl: 'publicRead',
     metadata: {
       // TODO: contentTypeを設定
-      contentType: 'application/octet-stream',
+      contentType: 'image/png',
     },
   });
 };
@@ -75,7 +78,7 @@ exports.getMarkerUrl = async (file_name) => {
 exports.getObjectUrl = async (file_name) => {
 
   // 指定ファイルのメタデータを取得
-  const file = await buket.file(`images/${file_name}`).getMetadata();
+  const file = await bucket.file(`object_images/${file_name}`).getMetadata();
 
   // メタデータからメディアURLを取得
   const file_url = file[0].mediaLink

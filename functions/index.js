@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const cookie = require('cookie');
 const dao = require('./static/model/dao.js');
+const sao = require('./static/model/sao.js');
 
 const app = express();
 
@@ -380,6 +381,7 @@ app.get('/my_object', async (req, res) => {
 
     // カテゴリーリストを取得
     const categoryList = await dao.selectAll('category');
+    console.dir(categoryList)
 
     // マイオブジェクトリストを取得
     const myObjectList = [{myObjectId: 1, Name: "a"}];
@@ -390,15 +392,6 @@ app.get('/my_object', async (req, res) => {
     });
   }
 });
-
-// post my_object
-app.post('/my_object', (req, res) => {
-  // TODO: search my_object about category
-  // and sort about 'numberOfAdd'
-
-  // return my_object
-  res.render('my-object');
-})
 
 app.post('/search_object', async (req, res) => {
 
@@ -445,28 +438,17 @@ app.post('/object_upload', async (req, res) => {
     const locationY = 0;
     const locationZ = 0;
 
-    // TODO: 画像をストレージに保存
+    // 画像をストレージに保存 オブジェクトファイル名
+    const fileName = user.uid;
 
-    // TODO: オブジェクトコレクションに登録
+    await sao.uploadObject(fileName, image);
+    const objectURL = await sao.getObjectUrl(fileName);
 
-    // TODO: マイオブジェクトコレクションに登録
+    // オブジェクトコレクションに登録
+    const result = await dao.saveObject(user.uid, objectURL, categoryList, locationX, locationY, locationZ, false);
 
-    
-
-    res.end();
-
-    // const myObject = require('./static/model/my_object.js');
-    //
-    // myObject.setMyObject(req.session.user.uid, objectId, true, locationX, locationY, locationZ);
-    //
-    // const result = dao.saveWithoutId('my_object', myObject.getMyObject());
-    //
-    // if(result.hasOwnProperty(err)){
-    //   // has error
-    // }
-    //
-    // // マイオブジェクト画面へリダイレクト
-    // res.redirect('/my_object');
+    // マイオブジェクト画面にリダイレクト
+    res.redirect('/my_object');
   }
 })
 
