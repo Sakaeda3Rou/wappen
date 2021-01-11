@@ -1,7 +1,5 @@
 var _this = this;
 const admin = require('firebase-admin');
-const functions = require('firebase-functions');
-
 
 let db = admin.firestore();
 
@@ -34,6 +32,67 @@ exports.saveWithoutId = async(collectionName, data) => {
     return {err: err};
   }
 
+}
+
+// when you use : save object and my_object, object_in_category
+// need user's id as 'userId'
+//      object's URL as 'objectURL'
+//      category's list as 'categoryList'
+//      location's X as 'locationX'
+//                 Y as 'locationY'
+//                 Z as 'locationZ'
+//      can share or not as 'isShared'
+exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY, locationZ, isShared) => {
+  // save object
+  // create objectData
+  const objectData = {
+    numberOfAdd : 0,
+    objectURL : objectURL,
+    isShared : isShared,
+    category : categoryList
+  };
+
+  const objectResult = await _this.saveWithoutId('object', objectData);
+
+  if(objectResult.hasOwnProperty('err')){
+    return objectResult;
+  }
+
+  // save my_object
+  // create myObjectData
+  const myObjectData = {
+    userId : userId,
+    objectId : objectResult.id,
+    isSelected : true,
+    locationX : locationX,
+    locationY : locationY,
+    locationZ : locationZ
+  };
+
+  const myObjectResult = await _this.saveWithoutId('my_object', myObjectData);
+  var result = null;
+  var objectInCategoryData = null;
+
+  if(myObjectResult.hasOwnProperty('err')){
+    return myObjectResult;
+  }
+
+  // save object_in_category
+  for(const categoryId of categoryList){
+    // create objectInCategoryData
+    objectInCategoryData ={
+      objectId : objectResult.id,
+      categoryId : categoryId
+    };
+
+    result = await _this.saveWithoutId('object_in_category', objectInCategoryData);
+  }
+
+  if(result.hasOwnProperty('err')){
+    return result;
+  }else{
+    return true;
+  }
 }
 
 // need collection's name as 'collectionName',
@@ -228,6 +287,10 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
     }).catch(err => {
       return {err: err};
     })
+
+    if(firstCollectionName == 'my_object' && secondCollectionName == 'object'){
+      second.push(first.length);
+    }
 
     //return to controller
     return second;
@@ -520,9 +583,12 @@ exports.searchObject = async(category, userId, objectId) => {
     }
 
     snapshot.forEach(doc => {
-      var document = doc.data()
+      var document = doc.data();
       resultArray.push(document.objectId);
     })
+
+    // return to userObject
+    return resultArray;
   }).catch(err => {
     return {err: err}
   })
@@ -544,8 +610,7 @@ exports.searchObject = async(category, userId, objectId) => {
           // judge containment
           var flag = false;
 
-          for(var i = 0; i < userObject.length && flag == false; i++){
-            // console.log(`userClan[${i}] => ${userClan[i]}`);
+          for(var i = 0; i < userObject.length - 1 && flag == false; i++){
             if(doc.id == userObject[i]){
               flag = true;
             }
@@ -561,6 +626,8 @@ exports.searchObject = async(category, userId, objectId) => {
             resultArray.push(data);
           }
         })
+
+        // resultArray.push(userObject[userObject.length - 1]);
 
         // return to object
         return resultArray;
@@ -589,7 +656,6 @@ exports.searchObject = async(category, userId, objectId) => {
           var flag = false;
 
           for(var i = 0; i < userObject.length && flag == false; i++){
-            // console.log(`userClan[${i}] => ${userClan[i]}`);
             if(doc.id == userObject[i]){
               flag = true;
             }
@@ -606,6 +672,8 @@ exports.searchObject = async(category, userId, objectId) => {
           }
         })
 
+        // resultArray.push(userObject[userObject.length - 1]);
+
         // return to object
         return resultArray;
       }).catch(err => {
@@ -613,6 +681,8 @@ exports.searchObject = async(category, userId, objectId) => {
       })
 
     }
+
+    object.push(userObject.length);
 
     // return to controller
     return object;
