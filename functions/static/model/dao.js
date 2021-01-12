@@ -572,7 +572,7 @@ exports.searchClan = async(searchWord, userId) => {
 //      user's id as 'userId'
 exports.searchObject = async(category, userId, objectId) => {
   // select user's object
-  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get().then(snapshot => {
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     // create result array
     let resultArray = [];
 
@@ -681,7 +681,9 @@ exports.searchObject = async(category, userId, objectId) => {
 
     }
 
-    object.push(userObject.length);
+    if(Array.isArray(object)){
+      object.push(userObject.length);
+    }
 
     // return to controller
     return object;
