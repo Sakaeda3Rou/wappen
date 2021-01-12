@@ -98,7 +98,7 @@ app.post('/login', async (req, res) => {
       // aタグ(キャンセルボタン)のリンク先をホーム画面に設定
       cancel_link_url: '/',
       form_action_url: '/resist_user',
-      marker_url: `${markerURL}`,
+      markerURL: `${markerURL}`,
     });
   }else{
     // not first login
@@ -202,7 +202,7 @@ app.get('/profile', async (req, res) => {
       // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
       cancel_link_url: '/my_page',
       form_action_url: '/profile',
-      marker_url: `${markerURL}`,
+      markerURL: `${markerURL}`,
     });
   }
 });
@@ -623,9 +623,16 @@ app.get('/test', async (req, res) => {
   // userId
   const userId = "q5GsxMu8h2OAkmqxEY6prVzWAVj2";
 
-  const result = await dao.selectDoubleTable(userId, 'containment_to_clan',  'clan');
-  console.log(`result => ${result}`);
-  console.dir(result)
+  // 所属クランを取得
+  // const result = await dao.selectDoubleTable(userId, 'containment_to_clan', 'clan');
+
+
+  // my_objectを取得
+  // const result = await dao.selectDocOneColumn('my_object', 'userId', '==', user.uid, null);
+  // console.log(`result => ${result}`);
+  // console.dir(result)
+
+  // res.render('ar_test');
 
   res.end();
 });
