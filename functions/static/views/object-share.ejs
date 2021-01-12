@@ -40,10 +40,6 @@
 
                             <!-- カテゴリリストを追加 -->
 
-                            <!-- example -->
-                            <!-- <div class="my-object-list__check">
-                                <label><input type="checkbox" checked="checked">カテゴリ</label>
-                            </div> -->
                         </div>
                         <!-- 共有するボタン -->
                         <div class="my-object-list__decision">
@@ -94,13 +90,15 @@
         <div class="inner">
             <div class="search">
                 <div class="search__container">
-                    <div class="search__area">:ここに検索のカテゴリ</div>
+                    <div class="search__area">
+                      <div class="search__category-item">カテゴリアイテム</div>　<!-- この行自体を生成 -->
+                    </div>
                     <div class="search__btn">
                         <div class="search__icon">
                             <span class="icon-line icon-line--line1"></span>
                             <span class="icon-line icon-line--line2"></span>
                         </div>
-		    </div>
+		                </div>
                 </div>
                 <div class="search__category">
                     <div class="category">
@@ -151,6 +149,16 @@
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
             </ul>
+        </div>
+        <div class="page__numbers">
+            <input class="page__button" type="button" value="＜">
+            <input class="page__button" type="button" value="1">
+            <input class="page__button" type="button" value="2">
+            <input class="page__button" type="button" value="3">
+            <input class="page__button" type="button" value="4">
+            <input class="page__button" type="button" value="5">
+            <input class="page__button" type="button" value="＞">
+            <br>
         </div>
     </main>
     <footer id="footer"></footer>

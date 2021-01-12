@@ -74,7 +74,11 @@
                 </div>
             </div>
             <!-- 現在ユーザが登録しているオブジェクトを取得して一覧表示 -->
-            <ul class="thumbnails">
+            <ul id="object_list" class="thumbnails">
+
+              <!-- オブジェクトリストを生成 -->
+
+                <!-- <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
@@ -87,8 +91,7 @@
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li> -->
             </ul>
         </div>
         <!-- 共有オブジェクトをダウンロードするmodalのコード -->
@@ -316,6 +319,47 @@
         // 検索結果を表示するdiv領域を取得
         const result_div_element = document.getElementById('#');
       }
+
+    </script>
+    <script>
+      // オブジェクリスト生成
+      // myObjectList[{objectId, objectURL}]
+
+      // オブジェクトリストを作成
+      const objectList = []
+
+      <% objectList.forEach(object => { %>
+        // urlを整形
+        var url = "<%= object.objectURL %>";
+        url = url.replace('amp;', '')
+
+        objectList.push({
+          objectId: "<%= object.objectId %>",
+          objectURL: url,
+        });
+      <% }); %>
+      console.dir(objectList);
+
+      // オブジェクトリストをセット
+      setObjectList();
+
+      function setObjectList() {
+        // オブジェクトリストを表示する領域を取得
+        const object_ul_element = document.getElementById('object_list');
+
+        // オブジェクトリストタグを生成
+        for (let object of objectList) {
+
+          // liタグを作成
+          const object_li_element = document.createElement('li')
+          object_li_element.setAttribute('class', 'thumbnails__item');
+          object_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
+
+          // ul領域に追加
+          object_ul_element.appendChild(object_li_element);
+        }
+      }
+
 
     </script>
 </body>

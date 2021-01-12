@@ -388,14 +388,15 @@ app.get('/my_object', async (req, res) => {
     let objectId = null
 
     // マイオブジェクトリストを取得
-    const myObjectList = [{myObjectId: 1, Name: "a"}];
+    let objectList = [{myObjectId: 1, Name: "a"}];
+    objectList = [{objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}, {objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}]
     // const myObjectList = dao.searchMyObject(user.uid, category, objectId);
-    // console.log(`myobjectList => ${myObjectList}`);
-    // console.dir(myObjectList);
+    // console.log(`objectList => ${objectList}`);
+    // console.dir(objectList);
 
     res.render('my-object', {
       categoryList: categoryList,
-      myObjectList: myObjectList,
+      objectList: objectList,
     });
   }
 });
