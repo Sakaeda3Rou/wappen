@@ -169,7 +169,7 @@ app.get('/my_page', async (req, res) => {
     const markerURL = user.markerURL;
 
 
-    // TODO: データベースから所属クランリストを取得
+    // データベースから所属クランリストを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
 
     res.render('my-page', {
@@ -383,8 +383,15 @@ app.get('/my_object', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
+    // TODO: bodyからカテゴリー、末尾のobjectIdを取得 →　分岐
+    let category = null
+    let objectId = null
+
     // マイオブジェクトリストを取得
     const myObjectList = [{myObjectId: 1, Name: "a"}];
+    // const myObjectList = dao.searchMyObject(user.uid, category, objectId);
+    // console.log(`myobjectList => ${myObjectList}`);
+    // console.dir(myObjectList);
 
     res.render('my-object', {
       categoryList: categoryList,
@@ -462,7 +469,9 @@ app.get('/object_share', async (req, res) => {
   } else {
 
     // カテゴリリストを取得
-    const categoryList = [{categoryId: 1, categoryName: "ほのお"}, {categoryId: 2, categoryName: "みず"}, {categoryId: 3, categoryName: "くさ"}];
+    // カテゴリーリストを取得
+    const categoryList = await dao.selectAll('category');
+    console.dir(categoryList)
 
     res.render('object-share', {
       categoryList: categoryList,
@@ -631,6 +640,13 @@ app.get('/test', async (req, res) => {
   // const result = await dao.selectDocOneColumn('my_object', 'userId', '==', user.uid, null);
   // console.log(`result => ${result}`);
   // console.dir(result)
+
+  const category = null
+  const objectId = null
+
+  const myObjectList = await dao.searchMyObject(userId, category, objectId);
+  console.log(`myobjectList => ${myObjectList}`);
+  console.dir(myObjectList);
 
   // res.render('ar_test');
 

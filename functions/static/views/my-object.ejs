@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="views/css/style.css" type="text/css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
     <nav id="set-hamburger"></nav>
     <header class="header">
@@ -24,9 +26,10 @@
                 <form id="upload_form" action="/object_upload" method="post" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="drop">
                         <div id="preview" class="drop__preview"></div>
-                        <div id="drop-zone" class="drop__zone">　<!-- ここに画像のドロップエリア -->
-                            <p class="drop__title">画像をドラッグ＆ドロップもしくは</p>
-                            <label class="drop__btn sub-btn"><input type="file" name="file" id="file-input" style="display: none;">画像を選択</label>
+                        <div id="drop-zone" class="drop__zone">
+                          <!-- ここに画像のドロップエリア -->
+                          <p class="drop__title">画像をドラッグ＆ドロップもしくは</p>
+                          <label class="drop__btn sub-btn"><input type="file" name="file" id="file-input" style="display: none;">画像を選択</label>
                         </div>
                     </div>
                     <!-- アップロードするオブジェクトのカテゴリ選択 -->
@@ -43,8 +46,16 @@
             <div class="search">
                 <div class="search__container">
                     <!-- 現在選択中のカテゴリをsearch-areaに並べる -->
-                    <div id="text_area" class="search__area">:ここに検索のカテゴリ</div>
-                    <div class="search__btn"><i class="fas fa-lg fa-angle-left search__icon"></i></div>
+                    <div class="search__area">
+                      <!-- TODO: この行を生成 -->
+                      <div class="search__category-item">カテゴリアイテム</div>
+                    </div>
+                    <div class="search__btn">
+                      <div class="search__icon">
+                        <span class="icon-line icon-line--line1"></span>
+                        <span class="icon-line icon-line--line2"></span>
+                      </div>
+                    </div>
                 </div>
                 <div class="search__category">
                     <div class="category">
@@ -80,6 +91,20 @@
                 <li class="thumbnails__item"></li>
             </ul>
         </div>
+        <!-- 共有オブジェクトをダウンロードするmodalのコード -->
+        <div class="object-modal js-modal">
+            <div class="object-modal__bg js-bg"></div>
+            <div class="object-modal__main">
+                <div class="object-modal__batu-btn">×</div>
+                <div class="object-modal__container">
+                    <!-- 選択中の画像を表示 -->
+                    <div class="object-modal__select"></div>
+                    <!-- 共有オブジェクトをマイオブジェクトに追加するボタン -->
+                    <div class="object-modal__btn">
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     <footer id="footer"></footer>
     <script src="views/js/include.js"></script>
@@ -87,18 +112,14 @@
     <script src="views/js/myObjectUpload.js"></script>
     <script>
 
-        function checkC(value){
-          document.getElementById('text_area').innerHTML = "<p>value</p>";
-        }
-
         // 検索コンテキストのアコーディオンを表示
         const search = document.querySelector('.search__btn');
         const category = document.querySelector('.search__category');
-        let i = document.querySelector('i');
+        let icon = document.querySelector('.search__icon');
 
         search.addEventListener('click', () => {
             category.classList.toggle('search-open');
-            i.classList.toggle('active__i');
+            icon.classList.toggle('active__i');
 
 
             if(category.classList.contains('search-open')){
