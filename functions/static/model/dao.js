@@ -572,7 +572,7 @@ exports.searchClan = async(searchWord, userId) => {
 //      user's id as 'userId'
 exports.searchObject = async(category, userId, objectId) => {
   // select user's object
-  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get().then(snapshot => {
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     // create result array
     let resultArray = [];
 
@@ -596,7 +596,7 @@ exports.searchObject = async(category, userId, objectId) => {
     // judge page number
     if(!objectId){
       // page 0
-      const object = await db.collection('object').where('category', 'array-contains', category).limit(20).get().then(snapshot => {
+      const object = await db.collection('object').where('category', 'array-contains-any', category).limit(20).get().then(snapshot => {
         // create array
         let resultArray = [];
 
@@ -638,7 +638,7 @@ exports.searchObject = async(category, userId, objectId) => {
     }else{
       // page 2 to n
       const object = await db.collection('object')
-                             .where('category', 'array-contains', category)
+                             .where('category', 'array-contains-any', category)
                              .orderBy(admin.firestore.FieldPath.documentId())
                              .startAfter(objectId)
                              .limit(20).get().then(snapshot => {
@@ -681,7 +681,9 @@ exports.searchObject = async(category, userId, objectId) => {
 
     }
 
-    object.push(userObject.length);
+    if(Array.isArray(object)){
+      object.push(userObject.length);
+    }
 
     // return to controller
     return object;
@@ -696,7 +698,7 @@ exports.searchObject = async(category, userId, objectId) => {
 //      user's id as 'userId'
 exports.searchMyObject = async(userId, category, objectId) => {
   // select user's object
-  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isShared', '==', true).get().then(snapshot => {
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     // create result array
     let resultArray = [];
 
@@ -808,7 +810,7 @@ exports.searchMyObject = async(userId, category, objectId) => {
         // not page 0
         const object = await db.collection('object')
                                .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .where('category', 'array-contains', category)
+                               .where('category', 'array-contains-any', category)
                                .orderBy('objectName', 'desc')
                                .startAfter(objectId)
                                .limit(20).get().then(snapshot => {

@@ -92,9 +92,44 @@ async function videoActive(auth, hostUserId){
         });
       }else if(auth == 'member'){
         // listen roomRef
-        // create answer
+        // get localstream for addTrack
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
 
-          
+        // create calleeCandidatesCollection and insert
+        const calleeCandidatesCollection = roomRef.collection('calleeCandidates');
+
+        peerConnection.addEventListener('icecandidate', event => {
+          if(!event.candidate){
+            return;
+          }
+
+          // insert
+          calleeCandidatesCollection.add(event.candidate.toJSON());
+        });
+
+        // get offer to create answer
+        const offer = roomSnapshot.data().offer;
+
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+        const answer = await peerConnection.createAnswer();
+
+        await peerConnection.setLocalDescription(answer);
+
+        await roomRef.add({answer : {type : answer.type, sdp : answer.sdp}});
+
+        // listen callerCandidatesCollection and update
+        roomRef.collection('callerCandidates').onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(async change => {
+            if(change.type === 'added'){
+              let data = change.doc.data();
+
+              await peerConnection.addIceCandidate(new RTCIceCandidate(data));
+            }
+          })
+        })
       }else{
         // ??????????        
       }
@@ -165,5 +200,3 @@ function registerPeerConnectionListeners() {
         `ICE connection state change: ${peerConnection.iceConnectionState}`);
   });
 }
-
-init();
