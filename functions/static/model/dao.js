@@ -187,11 +187,10 @@ exports.selectDocById = async (collectionName, id) => {
 //      column's name as 'columnName',
 //      operator for select as 'operator' (ex : "=="),
 //      word for select as 'word'
-//      number of pages as 'page' (ex : 0(non limit), 1, 2, ...)
 // NB: when select shared object
 //     operator = 'array-contains-any'
 //     word is array ex:['kawaii', 'kimoi']
-exports.selectDocOneColumn = async(collectionName, columnName, operator, word, page) => {
+exports.selectDocOneColumn = async(collectionName, columnName, operator, word) => {
   // get document with select
   const res = await db.collection(collectionName).where(columnName, operator, word).get().then(snapshot => {
     // create result array
@@ -226,7 +225,7 @@ exports.selectDocOneColumn = async(collectionName, columnName, operator, word, p
 // when you use : select double table (ex: my_object and object)
 // need user's Id as 'userId',
 //      first collection's name as 'firstCollectionName',
-//      second collection's name as 'firstColectionName'
+//      second collection's name as 'secondColectionName'
 // NB: return result by array
 exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionName) => {
   const firstRef = db.collection(firstCollectionName);
@@ -567,7 +566,7 @@ exports.searchClan = async(searchWord, userId) => {
 
 }
 
-// when you use : select boject
+// when you use : select object
 // need category as 'category' (ex: ['kawaii', 'kimoi'])
 //      last object's id as 'objectId'
 //      user's id as 'userId'
@@ -597,7 +596,7 @@ exports.searchObject = async(category, userId, objectId) => {
     // judge page number
     if(!objectId){
       // page 0
-      const object = await db.collection('object').where('category', 'array-contains', category).limit(20).get().then(snapshot => {
+      const object = await db.collection('object').where('category', 'array-contains-any', category).limit(20).get().then(snapshot => {
         // create array
         let resultArray = [];
 
@@ -639,7 +638,7 @@ exports.searchObject = async(category, userId, objectId) => {
     }else{
       // page 2 to n
       const object = await db.collection('object')
-                             .where('category', 'array-contains', category)
+                             .where('category', 'array-contains-any', category)
                              .orderBy(admin.firestore.FieldPath.documentId())
                              .startAfter(objectId)
                              .limit(20).get().then(snapshot => {
@@ -686,6 +685,209 @@ exports.searchObject = async(category, userId, objectId) => {
 
     // return to controller
     return object;
+  }else{
+    return userObject;
+  }
+}
+
+// when you use : select object
+// need category as 'category' (ex: ['kawaii', 'kimoi'])
+//      last object's id as 'objectId'
+//      user's id as 'userId'
+exports.searchMyObject = async(userId, category, objectId) => {
+  // select user's object
+  const userObject = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+    // create result array
+    let resultArray = [];
+
+    if(snapshot.empty){
+      // no document
+      return resultArray;
+    }
+
+    snapshot.forEach(doc => {
+      var document = doc.data();
+      resultArray.push(document.objectId);
+    })
+
+    // return to userObject
+    return resultArray;
+  }).catch(err => {
+    return {err: err}
+  })
+
+  if(Array.isArray(userObject)){
+    // judge page number
+    const length = userObject.length;
+    if(!objectId){
+      if(category){
+        // selected category
+        // page 0
+        const object = await db.collection('object')
+                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
+                               .where('category', 'array-contains-any', category)
+                               .orderBy('objectName', 'desc')
+                               .limit(20).get().then(snapshot => {
+          // create array
+          let resultArray = [];
+  
+          if(snapshot.empty){
+            // no document
+            return resultArray;
+          }
+  
+          snapshot.forEach(doc => {
+            let data = {objectId : doc.id};
+            let document = doc.data();
+
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          })
+  
+          // resultArray.push(userObject[userObject.length - 1]);
+  
+          // return to object
+          return resultArray;
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(Array.isArray(object)){
+          object.push(length);
+        }
+  
+        // return to controller
+        return object;
+      }else{
+        // not selected category
+        // page 0
+        const object = await db.collection('object')
+                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
+                               .orderBy('objectName', 'desc')
+                               .limit(20).get().then(snapshot => {
+          // create array
+          let resultArray = [];
+  
+          if(snapshot.empty){
+            // no document
+            return resultArray;
+          }
+  
+          snapshot.forEach(doc => {
+            let data = {objectId : doc.id};
+            let document = doc.data();
+
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          })
+  
+          // resultArray.push(userObject[userObject.length - 1]);
+  
+          // return to object
+          return resultArray;
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(Array.isArray(object)){
+          object.push(length);
+        }
+  
+        // return to controller
+        return object;
+      }
+    }else{
+      if(category){
+        // selected category
+        // not page 0
+        const object = await db.collection('object')
+                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
+                               .where('category', 'array-contains-any', category)
+                               .orderBy('objectName', 'desc')
+                               .startAfter(objectId)
+                               .limit(20).get().then(snapshot => {
+          // create array
+          let resultArray = [];
+  
+          if(snapshot.empty){
+            // no document
+            return resultArray;
+          }
+  
+          snapshot.forEach(doc => {
+            let data = {objectId : doc.id};
+            let document = doc.data();
+
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          })
+  
+          // resultArray.push(userObject[userObject.length - 1]);
+  
+          // return to object
+          return resultArray;
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(Array.isArray(object)){
+          object.push(length);
+        }
+  
+        // return to controller
+        return object;
+      }else{
+        // not selected category
+        // not page 0
+        const object = await db.collection('object')
+                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
+                               .orderBy('objectName', 'desc')
+                               .startAfter(objectId)
+                               .limit(20).get().then(snapshot => {
+          // create array
+          let resultArray = [];
+  
+          if(snapshot.empty){
+            // no document
+            return resultArray;
+          }
+  
+          snapshot.forEach(doc => {
+            let data = {objectId : doc.id};
+            let document = doc.data();
+
+            for(const key in document){
+              data[key] = document[key];
+            }
+
+            resultArray.push(data);
+          })
+  
+          // resultArray.push(userObject[userObject.length - 1]);
+  
+          // return to object
+          return resultArray;
+        }).catch(err => {
+          return {err: err};
+        })
+
+        if(Array.isArray(object)){
+          object.push(length);
+        }
+  
+        // return to controller
+        return object;
+      }
+    }
   }else{
     return userObject;
   }
