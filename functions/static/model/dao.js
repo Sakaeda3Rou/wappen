@@ -571,6 +571,8 @@ exports.searchClan = async(searchWord, userId) => {
 //      last object's id as 'objectId'
 //      user's id as 'userId'
 exports.searchObject = async(category, userId, objectId) => {
+  // create length
+  let length = 0;
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
     // create result array
@@ -585,6 +587,8 @@ exports.searchObject = async(category, userId, objectId) => {
       var document = doc.data();
       resultArray.push(document.objectId);
     })
+
+    length = resultArray.length;
 
     // return to userObject
     return resultArray;
@@ -612,7 +616,7 @@ exports.searchObject = async(category, userId, objectId) => {
           // judge containment
           var flag = false;
 
-          for(var i = 0; i < userObject.length - 1 && flag == false; i++){
+          for(var i = 0; i < userObject.length && flag == false; i++){
             if(doc.id == userObject[i]){
               flag = true;
             }
@@ -629,13 +633,15 @@ exports.searchObject = async(category, userId, objectId) => {
           }
         })
 
-        // resultArray.push(userObject[userObject.length - 1]);
-
         // return to object
         return resultArray;
       }).catch(err => {
         return {err: err};
       })
+
+      if(Array.isArray(object)){
+        object.push(length);
+      }
 
       return object;
     }else{
@@ -643,7 +649,6 @@ exports.searchObject = async(category, userId, objectId) => {
       const object = await db.collection('object')
                              .where('isShared', '==', 'true')
                              .where('category', 'array-contains-any', category)
-                             .orderBy(admin.firestore.FieldPath.documentId())
                              .startAfter(objectId)
                              .limit(20).get().then(snapshot => {
         // create array
@@ -686,7 +691,7 @@ exports.searchObject = async(category, userId, objectId) => {
     }
 
     if(Array.isArray(object)){
-      object.push(userObject.length);
+      object.push(length);
     }
 
     // return to controller
@@ -701,6 +706,8 @@ exports.searchObject = async(category, userId, objectId) => {
 //      last object's id as 'objectId'
 //      user's id as 'userId'
 exports.searchMyObject = async(userId, category, objectId) => {
+  // create length
+  let length = 0;
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
     // create result array
@@ -716,6 +723,8 @@ exports.searchMyObject = async(userId, category, objectId) => {
       resultArray.push(document.objectId);
     })
 
+    length = resultArray.length;
+
     // return to userObject
     return resultArray;
   }).catch(err => {
@@ -729,11 +738,10 @@ exports.searchMyObject = async(userId, category, objectId) => {
       if(category){
         // selected category
         // page 0
-        const object = await db.collection('object')
-                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .where('category', 'array-contains-any', category)
-                               .orderBy('objectURL', 'desc')
-                               .limit(20).get().then(snapshot => {
+        const objectSQL = db.collection('object')
+                            .where('category', 'array-contains-any', category)
+                            .limit(20);
+        const object = await objectSQL.get().then(snapshot => {
           // create array
           let resultArray = [];
   
@@ -743,17 +751,25 @@ exports.searchMyObject = async(userId, category, objectId) => {
           }
   
           snapshot.forEach(doc => {
-            let data = {objectId : doc.id};
-            let document = doc.data();
-
-            for(const key in document){
-              data[key] = document[key];
-            }
-
-            resultArray.push(data);
-          })
+            // judge containment
+            var flag = false;
   
-          // resultArray.push(userObject[userObject.length - 1]);
+            for(var i = 0; i < userObject.length && flag == false; i++){
+              if(doc.id == userObject[i]){
+                flag = true;
+              }
+            }
+  
+            if(flag == true){
+              let data = {id : doc.id};
+              let document = doc.data();
+              for(const key in document){
+                data[key] = document[key];
+              }
+  
+              resultArray.push(data);
+            }
+          })
   
           // return to object
           return resultArray;
@@ -770,10 +786,10 @@ exports.searchMyObject = async(userId, category, objectId) => {
       }else{
         // not selected category
         // page 0
-        const object = await db.collection('object')
+        const objectSQL = db.collection('object')
                                .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .orderBy('objectURL', 'desc')
-                               .limit(20).get().then(snapshot => {
+                               .limit(20);
+        const object = await objectSQL.get().then(snapshot => {
           // create array
           let resultArray = [];
   
@@ -783,17 +799,25 @@ exports.searchMyObject = async(userId, category, objectId) => {
           }
   
           snapshot.forEach(doc => {
-            let data = {objectId : doc.id};
-            let document = doc.data();
-
-            for(const key in document){
-              data[key] = document[key];
-            }
-
-            resultArray.push(data);
-          })
+            // judge containment
+            var flag = false;
   
-          // resultArray.push(userObject[userObject.length - 1]);
+            for(var i = 0; i < userObject.length && flag == false; i++){
+              if(doc.id == userObject[i]){
+                flag = true;
+              }
+            }
+  
+            if(flag == true){
+              let data = {id : doc.id};
+              let document = doc.data();
+              for(const key in document){
+                data[key] = document[key];
+              }
+  
+              resultArray.push(data);
+            }
+          })
   
           // return to object
           return resultArray;
@@ -812,12 +836,12 @@ exports.searchMyObject = async(userId, category, objectId) => {
       if(category){
         // selected category
         // not page 0
-        const object = await db.collection('object')
+        const objectSQL = db.collection('object')
                                .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
                                .where('category', 'array-contains-any', category)
-                               .orderBy('objectURL', 'desc')
                                .startAfter(objectId)
-                               .limit(20).get().then(snapshot => {
+                               .limit(20);
+        const object = objectSQL.get().then(snapshot => {
           // create array
           let resultArray = [];
   
@@ -827,17 +851,25 @@ exports.searchMyObject = async(userId, category, objectId) => {
           }
   
           snapshot.forEach(doc => {
-            let data = {objectId : doc.id};
-            let document = doc.data();
-
-            for(const key in document){
-              data[key] = document[key];
-            }
-
-            resultArray.push(data);
-          })
+            // judge containment
+            var flag = false;
   
-          // resultArray.push(userObject[userObject.length - 1]);
+            for(var i = 0; i < userObject.length && flag == false; i++){
+              if(doc.id == userObject[i]){
+                flag = true;
+              }
+            }
+  
+            if(flag == true){
+              let data = {id : doc.id};
+              let document = doc.data();
+              for(const key in document){
+                data[key] = document[key];
+              }
+  
+              resultArray.push(data);
+            }
+          })
   
           // return to object
           return resultArray;
@@ -854,11 +886,11 @@ exports.searchMyObject = async(userId, category, objectId) => {
       }else{
         // not selected category
         // not page 0
-        const object = await db.collection('object')
+        const objectSQL = db.collection('object')
                                .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .orderBy('objectURL', 'desc')
                                .startAfter(objectId)
-                               .limit(20).get().then(snapshot => {
+                               .limit(20);
+        const object = objectSQL.get().then(snapshot => {
           // create array
           let resultArray = [];
   
@@ -868,17 +900,25 @@ exports.searchMyObject = async(userId, category, objectId) => {
           }
   
           snapshot.forEach(doc => {
-            let data = {objectId : doc.id};
-            let document = doc.data();
-
-            for(const key in document){
-              data[key] = document[key];
-            }
-
-            resultArray.push(data);
-          })
+            // judge containment
+            var flag = false;
   
-          // resultArray.push(userObject[userObject.length - 1]);
+            for(var i = 0; i < userObject.length && flag == false; i++){
+              if(doc.id == userObject[i]){
+                flag = true;
+              }
+            }
+  
+            if(flag == true){
+              let data = {id : doc.id};
+              let document = doc.data();
+              for(const key in document){
+                data[key] = document[key];
+              }
+  
+              resultArray.push(data);
+            }
+          })
   
           // return to object
           return resultArray;
