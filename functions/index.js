@@ -531,54 +531,26 @@ app.get('/object_share', async (req, res) => {
   };
 });
 
-// get share_my_object
-app.get('/share_my_object', (req, res) => {
-  // return my_object table page
-  fs.readFile('views/my_object_table.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
+app.post('/object_shared', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
-// post share_my_object
-app.post('/share_my_object', (req, res) => {
-  // TODO: send id about my_object's documentId
-  const docId = req.body._docId;
+  if (!user) {
+    res.redirect('/');
+  } else {
 
-  const result = dao.selectDocById('my_object', docId);
+    // reqestbodyを取得
+    const body = JSON.parse(req.body)
 
-  if(result.hasOwnProperty(err) || result == null){
-    // has error
+    // シェアするオブジェクトのプロパティーを取得
+    const objectId = body.objectId;
+    const categoryList = body.categoryList;
+
+    // シェア設定
+    // await dao.updateObject(objectId, categoryList);
+
   }
-
-  // return config my_object page
-  fs.readFile('views/config_my_object.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
-
-// put share_my_object
-app.put('/share_my_object', (req, res) => {
-  // TODO: send id about my_object's objectId
-  //       and update 'isShared'
-  const objectId = req.body._objectId;
-
-  const result = dao.updateDoc('object', objectId, {isShared: true});
-
-  if(result.hasOwnProperty(err)){
-    // has error
-  }
-
-  // return my_object table page
-  fs.readFile('views/my_object_table.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
+});
 
 //get clan
 app.get('/clan', async (req, res) => {

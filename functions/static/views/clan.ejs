@@ -70,7 +70,7 @@
             if(xhr.readyState === 4 && xhr.status === 200){
               // clanリストを取得
               let clanList = JSON.parse(xhr.responseText);
-              
+
               console.log(`clanList => ${clanList}`);
               console.dir(clanList)
 
@@ -143,8 +143,8 @@
             clan_div_element.setAttribute('class', 'result__list--item');
             clan_div_element.innerHTML = clanName;
 
-            // 加入できるクランのみ加入ボタンを作成
-            if (!clan.propriety) {
+            if (clan.state == 'can') {
+              // 加入ボタンを表示
               const input_button_element = document.createElement('input');
               input_button_element.setAttribute('class', 'main-btn in-btn');
               input_button_element.setAttribute('type', 'button');
@@ -152,6 +152,10 @@
               input_button_element.setAttribute('value', '加入');
               input_button_element.setAttribute('onclick', `containment("${clan.id}")`);
               clan_div_element.appendChild(input_button_element);
+            } else if (clan.state == 'already') {
+              // 「加入済み」を表示
+            } else if (clan.state == 'over') {
+              // 「満員」を表示
             }
 
             // クランリストに要素を追加
