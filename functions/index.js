@@ -409,15 +409,19 @@ app.get('/my_object', async (req, res) => {
     let objectId = null
 
     // マイオブジェクトリストを取得
-    // objectList = [{objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}, {objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}]
     const result = await dao.searchMyObject(user.uid, category, objectId);
     console.log('result=>');
     console.dir(result);
 
+    if (result.objectList == undefined) {
+      result.objectList = [];
+      result.total = 0;
+    }
+
     res.render('my-object', {
       categoryList: categoryList,
       objectList: result.objectList,
-      page: total/20,
+      total: result.total,
     });
   }
 });
@@ -459,6 +463,7 @@ app.post('/object_upload', async (req, res) => {
     // パラメータを取得
     const body = JSON.parse(req.body._request_body);
 
+    const number = body.number;
     const image = body.image;
     const categoryList = body.uploadCategoryList;
 
@@ -468,7 +473,7 @@ app.post('/object_upload', async (req, res) => {
     const locationZ = 0;
 
     // 画像をストレージに保存 オブジェクトファイル名
-    const fileName = user.uid;
+    const fileName = user.uid + number;
 
     await sao.uploadObject(fileName, image);
     const objectURL = await sao.getObjectUrl(fileName);
