@@ -76,6 +76,7 @@
                         <script type="text/javascript">
                           function Aemail(){
                                 console.log("お問い合わせ送信");
+
                                 var mail1 = document.getElementById('email1').value;
                                 var mail2 = document.getElementById('email2').value;
                                 var body = document.getElementById('body').value;
@@ -84,6 +85,7 @@
                                   alert("メールアドレスを入力してください")
 
                               }else if(mail1 == mail2){
+
                                    var address = encodeURIComponent(functions.config().someservice.address);
                                    var pass  = encodeURIComponent(functions.config().someservice.pass);
                                    Email.send({
@@ -93,7 +95,9 @@
                                         To : address,
                                         From : address,
                                         Subject : "テスト",
+
                                         Body : "  "+mail1+"  "+body
+
                                     }).then(
                                       message => alert(message)
                                     );
