@@ -41,15 +41,17 @@ exports.saveWithoutId = async(collectionName, data) => {
 //      location's X as 'locationX'
 //                 Y as 'locationY'
 //                 Z as 'locationZ'
+//      object's name as 'objectName'
 //      can share or not as 'isShared'
-exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY, locationZ, isShared) => {
+exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY, locationZ, isShared, objectName) => {
   // save object
   // create objectData
   const objectData = {
     numberOfAdd : 0,
     objectURL : objectURL,
     isShared : isShared,
-    category : categoryList
+    category : categoryList,
+    objectName : objectName
   };
 
   const objectResult = await _this.saveWithoutId('object', objectData);
@@ -362,7 +364,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
 exports.selectMarkerList = async(userId, clanId) => {
   // create path to document
   const containmentToClanRef = db.collection('containment_to_clan');
-  const userDetailRef = db.collection('user_detail');
+  const userPatternRef = db.collection('user_detail');
   const myObjectRef = db.collection('my_object');
   const objectRef = db.collection('object');
 
@@ -389,7 +391,7 @@ exports.selectMarkerList = async(userId, clanId) => {
 
   if(Array.isArray(userIdList)){
     // select userDetail from user_detail by userIdList
-    const userDetailList = await userDetailRef.where('userId', 'in', userIdList).get().then(snapshot => {
+    const userPatternList = await userPatternRef.where('userId', 'in', userIdList).get().then(snapshot => {
       let returnArray = [];
 
       if(snapshot.empty){
@@ -397,8 +399,8 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const userDetailData = doc.data();
-        returnArray.push({userId: doc.id, markerURL: userDetailData.markerURL});
+        const userPatternData = doc.data();
+        returnArray.push({userId: doc.id, patternURL: userPatternData.patternURL});
       })
 
       // return to userDetailList
@@ -427,7 +429,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       return {err: err};
     })
 
-    if(Array.isArray(myObjectList) && Array.isArray(userDetailList)){
+    if(Array.isArray(myObjectList) && Array.isArray(userPatternList)){
       // create markerList
       let markerList = [];
       for(const myObject of myObjectList){
@@ -448,14 +450,14 @@ exports.selectMarkerList = async(userId, clanId) => {
           let flag = false;
 
           // loop userDetailList
-          for(let i = 0; i < userDetailList.length && flag == false; i++){
-            let userDetail = userDetailList[i];
-            if(userDetail.userId == myObject.userId){
+          for(let i = 0; i < userPatternList.length && flag == false; i++){
+            let userPattern = userPatternList[i];
+            if(userPattern.userId == myObject.userId){
               flag = true;
-              if(userDetail.userId == userId && myObject.userId == userId){
-                markerList.unshift({userId: userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              if(userPattern.userId == userId && myObject.userId == userId){
+                markerList.unshift({userId: userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }else{
-                markerList.push({userId: userDetail.userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+                markerList.push({userId: userDetail.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }
             }
           }
@@ -465,10 +467,10 @@ exports.selectMarkerList = async(userId, clanId) => {
       // return to controller
       console.log('success');
       return markerList;
-    }else if(!Array.isArray(userDetailList)){
+    }else if(!Array.isArray(userPatternList)){
       // has error
       // return to controller
-      console.log(`error in make userDetailList : ${userDetailList.err}`);
+      console.log(`error in make userDetailList : ${userPatternList.err}`);
       return userDetailList;
     }else if(!Array.isArray(myObjectList)){
       // has error
@@ -629,11 +631,11 @@ exports.searchClan = async(searchWord, userId) => {
 
 // when you use : select object
 // need category as 'category' (ex: ['kawaii', 'kimoi'])
-//      last object's id as 'objectId'
+//      page's number as 'page'
 //      user's id as 'userId'
-exports.searchObject = async(category, userId, objectId) => {
+exports.searchObject = async(category, userId, page) => {
   // create length
-  let length = 0;
+  let userLength = 0;
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
     // create result array
@@ -649,7 +651,7 @@ exports.searchObject = async(category, userId, objectId) => {
       resultArray.push(document.objectId);
     })
 
-    length = resultArray.length;
+    userLength = resultArray.length;
 
     // return to userObject
     return resultArray;
@@ -693,92 +695,61 @@ exports.searchObject = async(category, userId, objectId) => {
         objectIds.push(byCategory);
       }
     }
-    // judge page number
-    if(!objectId){
-      // page 0
-      const object = await db.collection('object')
-                             .where(admin.firestore.FieldPath.documentId(), 'in', objectIds)
-                             .where('isShared', '==', 'true')
-                             .limit(20).get().then(snapshot => {
-        // create array
-        let resultArray = [];
 
-        if(snapshot.empty){
-          // no document
-          return resultArray;
-        }
-
-        snapshot.forEach(doc => {
-          // let data = {id : doc.id};
-          let document = doc.data();
-          // for(const key in document){
-          //   data[key] = document[key];
-          // }
-          document['id'] = doc.id; 
-          resultArray.push(document);
-        })
-
-        // return to object
-        return resultArray;
+    if(objectIds.length == 0){
+      return [{
+        total : userLength,
+        searchResultLength : objectIds.length,
+        objectList : []
+      }];
+    }
+    
+    // search object
+    // create result
+    let result = null;
+    let resultArray = [];
+    for (const objectId of objectIds){
+      result = await db.collection('object').doc(objectId).get().then(doc => {
+        let document = doc.data();
+        document['id'] = doc.id;
+        return document;
       }).catch(err => {
-        return {err: err};
-      })
+        return {err : err};
+      });
 
-      if(Array.isArray(object)){
-        let data = {
-          objectList : object,
-          total : length
-        };
+      if(!result.hasOwnProperty('err')){
+        resultArray.push(result);
+      }  
+    }
 
-        // return to controller
-        return data;
+    resultArray.sort(function(a, b) {
+      if (a.objectName < b.objectName) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
+
+    if(page == 1){
+      let data = {
+        total : userLength,
+        searchResultLength : objectIds.length,
+        objectList : resultArray.slice(0, 20)
       }
 
       // return to controller
-      return object
+      return data;
+    }else if(page > 1){
+      let data = {
+        total : userLength,
+        searchResultLength : objectIds.length,
+        objectList : object.slice((20 * (page - 1))-1, page * 20)
+      }
+
+      // return to controller
+      return data;
     }else{
-      // page 2 to n
-      const object = await db.collection('object')
-                             .where(admin.firestore.FieldPath.documentId(), 'in', objectIds)
-                             .where('isShared', '==', 'true')
-                             .startAfter(objectId)
-                             .limit(20).get().then(snapshot => {
-        // create array
-        let resultArray = [];
-
-        if(snapshot.empty){
-          // no document
-          return resultArray;
-        }
-
-        snapshot.forEach(doc => {
-          let data = {id : doc.id};
-          let document = doc.data();
-          for(const key in document){
-            data[key] = document[key];
-          }
-
-          resultArray.push(data);
-        })
-
-        // return to object
-        return resultArray;
-      }).catch(err => {
-        return {err: err};
-      })
-
-      if(Array.isArray(object)){
-        let data = {
-          objectList : object,
-          total : length
-        };
-
-        // return to controller
-        return data;
-      }
-
-      // return to controller
-      return object
+      // ??????
     }
   }else{
     if(userObject.hasOwnProperty('err')){
@@ -793,11 +764,11 @@ exports.searchObject = async(category, userId, objectId) => {
 
 // when you use : select object
 // need category as 'category' (ex: ['kawaii', 'kimoi'])
-//      last object's id as 'objectId'
+//      page's number as 'page'
 //      user's id as 'userId'
-exports.searchMyObject = async(userId, category, objectId) => {
+exports.searchMyObject = async(userId, category, page) => {
   // create length
-  let length = 0;
+  let userLength = 0;
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
     // create result array
@@ -813,7 +784,7 @@ exports.searchMyObject = async(userId, category, objectId) => {
       resultArray.push(document.objectId);
     })
 
-    length = resultArray.length;
+    userLength = resultArray.length;
 
     // return to userObject
     return resultArray;
@@ -822,9 +793,13 @@ exports.searchMyObject = async(userId, category, objectId) => {
   })
 
   if(Array.isArray(userObject)){
-    if(userObject.length == 0){
+    if(userLength == 0){
       // user's object = 0
-      return userObject;
+      return [{
+        total : userLength,
+        searchResultLength : userLength,
+        objectList : []
+      }];
     }
     if(category){
       const categoryMyObject = await db.collection('object_in_category').where('objectId', 'in', userObject).get().then(snapshot => {
@@ -859,79 +834,59 @@ exports.searchMyObject = async(userId, category, objectId) => {
       if(Array.isArray(categoryMyObject)){
         if(categoryMyObject.length == 0){
           // don't match category
-          return categoryMyObject;
+          return [{
+            total : userLength,
+            searchResultLength : categoryMyObject.length,
+            objectList : []
+          }];
         }
-        if(!objectId){
-          // page 0
-          const object = await db.collection('object')
-                                 .where(admin.firestore.FieldPath.documentId(), 'in', categoryMyObject)
-                                 .limit(20).get().then(snapshot => {
-            // create resultArray
-            let resultArray = [];
 
-            if(snapshot.empty){
-              return resultArray;
-            }
-
-            snapshot.forEach(doc => {
-              let document = doc.data();
-              
-              document['id'] = doc.id;
-
-              resultArray.push(document);
-            })
-
-            return resultArray;
+        // search object
+        // create result
+        let result = null;
+        let resultArray = [];
+        for (const objectId of categoryMyObject){
+          result = await db.collection('object').doc(objectId).get().then(doc => {
+            let document = doc.data();
+            document['id'] = doc.id;
+            return document;
           }).catch(err => {
             return {err : err};
-          })
+          });
 
-          if(Array.isArray(object)){
-            let data = {
-              objectList : object,
-              total : length
-            }
+          if(!result.hasOwnProperty('err')){
+            resultArray.push(result);
+          }  
+        }
 
-            return data;
+        resultArray.sort(function(a, b) {
+          if (a.objectName < b.objectName) {
+            return 1;
+          } else {
+            return -1;
+          }
+        })
+
+        if(page == 1){
+          let data = {
+            total : userLength,
+            searchResultLength : resultArray.length,
+            objectList : resultArray.slice(0, 20)
           }
 
-          return object;
+          // return to controller
+          return data;
+        }else if(page > 1){
+          let data = {
+            total : userLength,
+            searchResultLength : resultArray.length,
+            objectList : resultArray.slice((20 * (page - 1))-1, page * 20)
+          }
+
+          // return to controller
+          return data;
         }else{
-          const startSnapShot = await db.collection('object').doc(objectId);
-          // not page 0
-          const object = await db.collection('object')
-                                 .where(admin.firestore.FieldPath.documentId(), 'in', categoryMyObject)
-                                 .startAfter(startSnapShot).limit(20).get().then(snapshot => {
-            // create resultArray
-            let resultArray = [];
-
-            if(snapshot.empty){
-              return resultArray;
-            }
-
-            snapshot.forEach(doc => {
-              let document = doc.data();
-              
-              document['id'] = doc.id;
-
-              resultArray.push(document);
-            })
-
-            return resultArray;
-          }).catch(err => {
-            return {err : err};
-          })
-
-          if(Array.isArray(object)){
-            let data = {
-              objectList : object,
-              total : length
-            }
-
-            return data;
-          }
-
-          return object;
+          // ??????
         }
       }else{
         // has error
@@ -939,77 +894,52 @@ exports.searchMyObject = async(userId, category, objectId) => {
       }
     }else{
       // not select category
-      if(!objectId){
-        // page 0
-        const object = await db.collection('object')
-                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .limit(20).get().then(snapshot => {
-          // create resultArray
-          let resultArray = [];
-
-          if(snapshot.empty){
-            return resultArray;
-          }
-
-          snapshot.forEach(doc => {
-            let document = doc.data();
-            
-            document['id'] = doc.id;
-
-            resultArray.push(document);
-          })
-
-          return resultArray;
+      // search object
+      // create result
+      let result = null;
+      let resultArray = [];
+      for (const objectId of userObject){
+        result = await db.collection('object').doc(objectId).get().then(doc => {
+          let document = doc.data();
+          document['id'] = doc.id;
+          return document;
         }).catch(err => {
           return {err : err};
-        })
+        });
 
-        if(Array.isArray(object)){
-          let data = {
-            objectList : object,
-            total : length
-          }
+        if(!result.hasOwnProperty('err')){
+          resultArray.push(result);
+        }  
+      }
 
-          return data;
+      resultArray.sort(function(a, b) {
+        if (a.objectName < b.objectName) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
+
+      if(page == 1){
+        let data = {
+          total : userLength,
+          searchResultLength : resultArray.length,
+          objectList : resultArray.slice(0, 20)
         }
 
-        return object;
+        // return to controller
+        return data;
+      }else if(page > 1){
+        let data = {
+          total : userLength,
+          searchResultLength : resultArray.length,
+          objectList : resultArray.slice((20 * (page - 1))-1, page * 20)
+        }
+
+        // return to controller
+        return data;
       }else{
-        const startSnapShot = await db.collection('object').doc(objectId);
-        // not page 0
-        const object = await db.collection('object')
-                               .where(admin.firestore.FieldPath.documentId(), 'in', userObject)
-                               .startAfter(startSnapShot).limit(20).get().then(snapshot => {
-          // create resultArray
-          let resultArray = [];
-
-          if(snapshot.empty){
-            return resultArray;
-          }
-
-          snapshot.forEach(doc => {
-            let document = doc.data();
-            
-            document['id'] = doc.id;
-
-            resultArray.push(document);
-          })
-
-          return resultArray;
-        }).catch(err => {
-          return {err : err};
-        })
-
-        if(Array.isArray(object)){
-          let data = {
-            objectList : object,
-            total : length
-          }
-
-          return data;
-        }
-
-        return object;
+        // ??????
       }
     }
   }else{
