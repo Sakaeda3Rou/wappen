@@ -334,7 +334,7 @@
         url = url.replace('amp;', '')
 
         objectList.push({
-          objectId: "<%= object.objectId %>",
+          objectId: "<%= object.id %>",
           objectURL: url,
         });
       <% }); %>
@@ -351,7 +351,7 @@
         for (let object of objectList) {
 
           // liタグを作成
-          const object_li_element = document.createElement('li')
+          const object_li_element = document.createElement('li');
           object_li_element.setAttribute('class', 'thumbnails__item');
           object_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
 

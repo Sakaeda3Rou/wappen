@@ -56,6 +56,15 @@ async function confirmUser(req) {
 
 exports.app = functions.https.onRequest(app);
 
+// logout
+app.get('/logout', async (req, res) => {
+  // cookieを削除
+  res.clearCookie('__session');
+
+  // ホーム画面にリダイレクト
+  res.redirect('/');
+});
+
 // post login
 app.post('/login', async (req, res) => {
 
@@ -275,9 +284,14 @@ app.get('/camera', async (req, res) => {
 
     // TODO: 必要なもの: 所属クラン、my_object
 
+    // 所属クランを取得
+    const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan', 'clan');
+
+    // TODO: マイオブジェクトリストを取得
+    // const objectList = await dao.searchMyObject(user.uid, null, null);
+    const objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
+
     // TODO: とりあえずリスト
-    const objectList = [{objectURL: "my_object/1"}, {objectURL: "my_object/2"}]
-    const clanList = [{clanId: 1, clanName: "ぴえん"}, {clanId: 2, clanName: "ぴっぴ"}];
     const markerList = [];
     // const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
 
@@ -388,15 +402,15 @@ app.get('/my_object', async (req, res) => {
     let objectId = null
 
     // マイオブジェクトリストを取得
-    let objectList = [{myObjectId: 1, Name: "a"}];
-    objectList = [{objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}, {objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}]
-    // const myObjectList = dao.searchMyObject(user.uid, category, objectId);
-    // console.log(`objectList => ${objectList}`);
-    // console.dir(objectList);
+    // objectList = [{objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}, {objectId: "oB7ZB1QtIQOQs35T9jm8", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}]
+    const result = await dao.searchMyObject(user.uid, category, objectId);
+    console.log('result=>');
+    console.dir(result);
 
     res.render('my-object', {
       categoryList: categoryList,
-      objectList: objectList,
+      objectList: result.objectList,
+      page: total/20,
     });
   }
 });
@@ -474,20 +488,21 @@ app.get('/object_share', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
+    // シェアオブジェクトリストを取得
+    const shareObjectList = [{id: 'a', objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media'}];
+
+    // マイオブジェクトリストを取得
+    const result = await dao.searchMyObject(user.uid, null, null);
+    result.objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
+
     res.render('object-share', {
       categoryList: categoryList,
+      myObjectList: result.objectList,
+      shareObjectList: shareObjectList,
+      total: result.total,
     });
-  }
+  };
 });
-
-// post share_object
-app.post('/object_share', (req, res) => {
-  // TODO: send word for search
-  //       and do search, return result
-
-  // return share_object
-  res.render('object-share');
-})
 
 // get share_my_object
 app.get('/share_my_object', (req, res) => {

@@ -80,8 +80,13 @@
       let objectList = []
 
       <% objectList.forEach((object) => { %>
+        // urlを整形
+        var url = "<%= object.objectURL %>";
+        url = url.replace('amp;', '')
+
         objectList.push({
-          objectURL: "<%= object.objectURL %>",
+          objectId: "<%= object.id %>",
+          objectURL: url,
         });
       <% }); %>
 
