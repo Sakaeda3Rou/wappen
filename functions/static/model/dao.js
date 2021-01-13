@@ -364,7 +364,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
 exports.selectMarkerList = async(userId, clanId) => {
   // create path to document
   const containmentToClanRef = db.collection('containment_to_clan');
-  const userPatternRef = db.collection('user_detail');
+  const userPatternRef = db.collection('my_pattern');
   const myObjectRef = db.collection('my_object');
   const objectRef = db.collection('object');
 
