@@ -91,8 +91,11 @@ app.post('/login', async (req, res) => {
     const orient = require('./static/model/orient_devil.js');
     markerURL = await orient.createImage(uid);
 
+    // パターンファイルのURLを取得
+    const patternURL = await sao.getPattUrl(uid);
+
     // markerURLをfirestoreに保存
-    dao.saveWithoutId('my_pattern', {userId: uid, patternURL: markerURL});
+    dao.saveWithoutId('my_pattern', {userId: uid, patternURL: patternURL});
 
     // markerURLをセッションに追加
     __session.user.markerURL = markerURL;
@@ -292,14 +295,18 @@ app.get('/camera', async (req, res) => {
     const objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
 
     // TODO: とりあえずリスト
-    const markerList = [];
+    const patternList = [{
+      id: "a",
+      patternURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/patterns%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.patt?generation=1608169696099129&alt=media",
+      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj21?generation=1610522777322361&alt=media",
+    }];
     // const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
 
 
     res.render('camera', {
       objectList: objectList,
       clanList: clanList,
-      markerList: markerList,
+      patternList: patternList,
     });
   }
 });
@@ -358,17 +365,17 @@ app.post('/clan_selected', async (req, res) => {
     // 選択したクランのIDを取得
     const clanId = JSON.parse(req.body).clanId;
 
-    // クランのマーカーリストを取得
-    // const markerList = await selectMarkerList(user.uid, clanId);
+    // クランのパターンリストを取得
+    // const patternList = await selectMarkerList(user.uid, clanId);
 
-    const markerList = [{
+    const patternList = [{
       id: "a",
-      markerURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/marker_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.png?generation=1608169696971073&alt=media",
-      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media",
+      patternURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/patterns%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.patt?generation=1608169696099129&alt=media",
+      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj21?generation=1610522777322361&alt=media",
     }]
 
 
-    res.write(`${JSON.stringify(markerList)}`);
+    res.write(`${JSON.stringify(patternList)}`);
     res.end();
   }
 })
@@ -505,7 +512,12 @@ app.get('/object_share', async (req, res) => {
 
     // マイオブジェクトリストを取得
     const result = await dao.searchMyObject(user.uid, null, null);
-    result.objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
+    // result.objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
+
+    // if (result.objectList == undefined) {
+    //   result.objectList = [];
+    //   result.total = 0;
+    // }
 
     res.render('object-share', {
       categoryList: categoryList,
@@ -662,17 +674,14 @@ app.get('/test', async (req, res) => {
   // const result = await dao.selectDoubleTable(userId, 'containment_to_clan', 'clan');
 
 
-  // my_objectを取得
-  // const result = await dao.selectDocOneColumn('my_object', 'userId', '==', user.uid, null);
-  // console.log(`result => ${result}`);
-  // console.dir(result)
-
   const category = null
   const objectId = null
 
-  const myObjectList = await dao.searchMyObject(userId, category, objectId);
-  console.log(`myobjectList => ${myObjectList}`);
-  console.dir(myObjectList);
+  // const myObjectList = await dao.searchMyObject(userId, category, objectId);
+  // console.log(`myobjectList => ${myObjectList}`);
+  // console.dir(myObjectList);
+
+  // const result = await dao.searchObject(category, userId, objectId)
 
   // res.render('ar_test');
 

@@ -54,7 +54,7 @@ exports.uploadObject = async (file_name, body) => {
 exports.getPattUrl = async (file_name) => {
 
   // 指定ファイルのメタデータを取得
-  const file = await buket.file(`patterns/${file_name}`).getMetadata();
+  const file = await bucket.file(`patterns/${file_name}.patt`).getMetadata();
 
   // メタデータからメディアURLを取得
   const file_url = file[0].mediaLink

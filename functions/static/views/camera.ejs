@@ -20,24 +20,10 @@
 
             <a-assets id="assets">
 
-              <!-- imgタグを生成 -->
-
             </a-assets>
 
-            <!-- <a-entity camera style="z-index: 0"> -->
             <a-entity id="marker_area" camera>
 
-                <!-- a-markerを生成 -->
-                <!-- example -->
-                <!-- <a-marker preset="hiro">
-                  <a-entity
-                    position="0 -1 0"
-                    scale="0.05 0.05 0.05"
-                    gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
-                  ></a-entity>
-                </a-marker> -->
-
-                <!-- <a-marker type="pattern" url="#"> -->
             </a-entity>
           </a-scene>
 
@@ -97,13 +83,13 @@
         });
       <% }); %>
 
-      // マーカーリストを作成
-      let markerList = []
+      // パターンリストを作成
+      let patternList = []
 
-      <% markerList.forEach((marker) => { %>
-        markerList.push({
-          markerURL: "<%= marker.markerURL %>",
-          objectURL: "<%= marker.objectURL %>",
+      <% patternList.forEach(pattern => { %>
+        patternList.push({
+          markerURL: "<%= pattern.patternURL %>",
+          objectURL: "<%= pattern.objectURL %>",
         })
       <% }); %>
 
@@ -125,11 +111,11 @@
           }
         }
 
-        for (let marker of markerList) {
+        for (let pattern of patternList) {
           // a-markerタグを作成
           const a_marker_element = document.createElement('a-marker');
           a_marker_element.setAttribute('type', 'pattern');
-          // a_marker_element.setAttribute('url', `${marker.markerURL}`);
+          // a_marker_element.setAttribute('url', `${pattern.patternURL}`);
 
           // a-entityタグを作成
           const a_entity_element = document.createElement('a-entity');
@@ -185,14 +171,14 @@
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
-                // マーカーリストを取得
-                let markerList = JSON.parse(xhr.responseText);
+                // パターンリストを取得
+                let patternList = JSON.parse(xhr.responseText);
 
-                console.log(`markerList => ${markerList}`);
-                console.dir(markerList);
+                console.log(`patternList => ${patternList}`);
+                console.dir(patternList);
 
                 // マーカーをセット
-                setMarker(markerList);
+                setPattern(patternList);
             }
         };
       }
@@ -204,66 +190,71 @@
 
     </script>
     <script>
-      // TODO
-      setMarker([]);
 
-      function setMarker(markerList) {
+      function setPattern(patternList) {
 
-        // マーカーリスト、imageタグを生成する領域を取得
+        // patternリスト、imageタグを生成する領域を取得
         const marker_area_element = document.getElementById('marker_area');
         const assets_element = document.getElementById('assets');
 
         // TODO: 既存のマーカー、assetsを削除
 
-        // マーカーリストを生成
-        for (let marker of markerList) {
+        // パターンリストを生成
+        for (let pattern of patternList) {
 
           // imgタグを作成
-          // const image_element = document.createElement('img');
-          // image_element.hidden = true;
-          // image_element.setAttribute('id', `${marker.id}`);
-          // image_element.setAttribute('src', `${marker.objectURL}`);
-          //
-          // // assets領域に追加
-          // assets_element.appendChild(image_element);
-          //
-          // // a-markerタグを作成
-          // const marker_element = document.createElement('a-marker');
-          // marker_element.setAttribute('type', 'pattern');
-          // marker_element.setAttribute('url', `${marker.markerURL}`);
-          //
-          // // a-planeタグを作成
-          // const plane_element = document.createElement('a-plane');
-          // plane_element.setAttribute('position', '0 0 0');
-          // plane_element.setAttribute('rotation', '-90 0 0');
-          // plane_element.setAttribute('material', `src: #${marker.id}`);
-          //
-          // // マーカーリスト領域に追加
-          // marker_element.appendChild(plane_element);
-          // marker_area_element.appendChild(marker_element);
+          const image_element = document.createElement('img');
+          image_element.hidden = true;
+          image_element.setAttribute('id', `${pattern.id}`);
+          image_element.setAttribute('src', `${pattern.objectURL}`);
+          image_element.setAttribute('crossorigin', 'anonymous')
+
+          // assets領域に追加
+          assets_element.appendChild(image_element);
+
+          // a-markerタグを作成
+          const marker_element = document.createElement('a-marker');
+          marker_element.setAttribute('type', 'pattern');
+          marker_element.setAttribute('url', `${pattern.patternURL}`);
+          // marker_element.setAttribute('preset', `${marker.markerURL}`);
+
+          // a-planeタグを作成
+          const plane_element = document.createElement('a-plane');
+          plane_element.setAttribute('position', '0 0 0');
+          plane_element.setAttribute('rotation', '-90 0 0');
+          plane_element.setAttribute('material', `src: #${pattern.id}`);
+
+          // マーカーリスト領域に追加
+          marker_element.appendChild(plane_element);
+          marker_area_element.appendChild(marker_element);
 
         }
 
         // TODO: hiroをセット
-        const hiro_image_element = document.createElement('img');
-        hiro_image_element.hidden = true;
-        hiro_image_element.setAttribute('id', 'hiro');
-        hiro_image_element.setAttribute('src', 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media');
-
-        assets_element.appendChild(hiro_image_element);
-
-        const hiro_marker_element = document.createElement('a-marker');
-        hiro_marker_element.setAttribute('preset', 'hiro');
-
+        // const hiro_image_element = document.createElement('img');
+        // hiro_image_element.hidden = true;
+        // hiro_image_element.setAttribute('id', 'hiro');
+        // hiro_image_element.setAttribute('src', 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj20?generation=1610522618769245&alt=media');
+        // hiro_image_element.setAttribute('crossorigin', 'anonymous');
+        //
+        // assets_element.appendChild(hiro_image_element);
+        //
+        // const hiro_marker_element = document.createElement('a-marker');
+        // hiro_marker_element.setAttribute('preset', 'hiro');
+        //
         // const hiro_plane_element = document.createElement('a-plane');
-        // hiro_plane_element.setAttribute('position', "0 0 0");
-        // hiro_plane_element.setAttribute('rotation', '-90 0 0');
+        // hiro_plane_element.setAttribute('position', {x: 0, y: 0, z: 0});
+        // hiro_plane_element.setAttribute('rotation', {x: -90, y: 0, z: 0});
         // hiro_plane_element.setAttribute('material', "src: #hiro;")
-
+        //
         // hiro_marker_element.appendChild(hiro_plane_element);
-        marker_area_element.appendChild(hiro_marker_element);
+        // marker_area_element.appendChild(hiro_marker_element);
 
-
+        // AFRAME.registerComponent('foo', {
+        //   init: function () {
+        //     console.log(`init`);
+        //   }
+        // });
       }
     </script>
 </body>
