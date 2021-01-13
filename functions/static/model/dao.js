@@ -364,7 +364,7 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
 exports.selectMarkerList = async(userId, clanId) => {
   // create path to document
   const containmentToClanRef = db.collection('containment_to_clan');
-  const userDetailRef = db.collection('user_detail');
+  const userPatternRef = db.collection('user_detail');
   const myObjectRef = db.collection('my_object');
   const objectRef = db.collection('object');
 
@@ -391,7 +391,7 @@ exports.selectMarkerList = async(userId, clanId) => {
 
   if(Array.isArray(userIdList)){
     // select userDetail from user_detail by userIdList
-    const userDetailList = await userDetailRef.where('userId', 'in', userIdList).get().then(snapshot => {
+    const userPatternList = await userPatternRef.where('userId', 'in', userIdList).get().then(snapshot => {
       let returnArray = [];
 
       if(snapshot.empty){
@@ -399,8 +399,8 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const userDetailData = doc.data();
-        returnArray.push({userId: doc.id, markerURL: userDetailData.markerURL});
+        const userPatternData = doc.data();
+        returnArray.push({userId: doc.id, patternURL: userPatternData.patternURL});
       })
 
       // return to userDetailList
@@ -429,7 +429,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       return {err: err};
     })
 
-    if(Array.isArray(myObjectList) && Array.isArray(userDetailList)){
+    if(Array.isArray(myObjectList) && Array.isArray(userPatternList)){
       // create markerList
       let markerList = [];
       for(const myObject of myObjectList){
@@ -450,14 +450,14 @@ exports.selectMarkerList = async(userId, clanId) => {
           let flag = false;
 
           // loop userDetailList
-          for(let i = 0; i < userDetailList.length && flag == false; i++){
-            let userDetail = userDetailList[i];
-            if(userDetail.userId == myObject.userId){
+          for(let i = 0; i < userPatternList.length && flag == false; i++){
+            let userPattern = userPatternList[i];
+            if(userPattern.userId == myObject.userId){
               flag = true;
-              if(userDetail.userId == userId && myObject.userId == userId){
-                markerList.unshift({userId: userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+              if(userPattern.userId == userId && myObject.userId == userId){
+                markerList.unshift({userId: userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }else{
-                markerList.push({userId: userDetail.userId, markerURL: userDetail.markerURL, objectURL: object.objectURL});
+                markerList.push({userId: userDetail.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }
             }
           }
@@ -467,10 +467,10 @@ exports.selectMarkerList = async(userId, clanId) => {
       // return to controller
       console.log('success');
       return markerList;
-    }else if(!Array.isArray(userDetailList)){
+    }else if(!Array.isArray(userPatternList)){
       // has error
       // return to controller
-      console.log(`error in make userDetailList : ${userDetailList.err}`);
+      console.log(`error in make userDetailList : ${userPatternList.err}`);
       return userDetailList;
     }else if(!Array.isArray(myObjectList)){
       // has error
