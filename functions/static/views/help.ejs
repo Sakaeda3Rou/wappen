@@ -76,14 +76,16 @@
                         <script type="text/javascript">
                           function Aemail(){
                                 console.log("お問い合わせ送信");
-                                var meil1 = document.getElementById('email1').value;
-                                var meil2 = document.getElementById('email2').value;
+
+                                var mail1 = document.getElementById('email1').value;
+                                var mail2 = document.getElementById('email2').value;
                                 var body = document.getElementById('body').value;
-                              if (meil1 == null || meil1 == "") {
+                              if (mail1 == null || mail1 == "") {
 
                                   alert("メールアドレスを入力してください")
 
-                              }else if(meil1 == mail2){
+                              }else if(mail1 == mail2){
+
                                    var address = encodeURIComponent(functions.config().someservice.address);
                                    var pass  = encodeURIComponent(functions.config().someservice.pass);
                                    Email.send({
@@ -93,7 +95,9 @@
                                         To : address,
                                         From : address,
                                         Subject : "テスト",
-                                        Body : "  "+meil1+"  "+body
+
+                                        Body : "  "+mail1+"  "+body
+
                                     }).then(
                                       message => alert(message)
                                     );
