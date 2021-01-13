@@ -81,7 +81,7 @@ app.post('/login', async (req, res) => {
   console.log(`login result => ${result}`);
   console.dir(result);
 
-  if(!result){
+  if(!result.length){
     // no document
 
     // TODO: 確認
@@ -134,7 +134,6 @@ app.post('/login', async (req, res) => {
 // post resist user
 app.post('/resist_user', async (req, res) => {
   // パラメータを取得
-  // FIXME: userName : {adana: 'UNC_Saikyouman'}
 
   // cookieからユーザーを取得
   let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
@@ -145,7 +144,7 @@ app.post('/resist_user', async (req, res) => {
   let markerURL = user.markerURL;
 
   // userDetailをfirestoreに格納
-  const result = await dao.saveWithId('user_detail', user.uid, {userName:userName , birthday:birthday, markerURL: markerURL});
+  const result = await dao.saveWithId('user_detail', user.uid, {uid: user.uid, userName:userName , birthday:birthday, markerURL: markerURL});
 
   // ユーザー情報をセッションに追加
   user.userName = userName;
@@ -162,6 +161,9 @@ app.post('/resist_user', async (req, res) => {
     // has error
     console.log(`hasOwnProperty error: ${result.err}`);
   }
+
+  // デフォルトクランに収容
+  await dao.saveWithoutId('containment_to_clan', {userId: user.uid, clanId: "B6wI5YBTHV5S5WBbQNEs"});
 
   // マイページへの遷移
   res.redirect('/my_page');
@@ -411,24 +413,25 @@ app.get('/my_object', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
-    // TODO: bodyからカテゴリー、末尾のobjectIdを取得 →　分岐
+    // カテゴリーを設定
     let category = null
-    let objectId = null
 
     // マイオブジェクトリストを取得
-    const result = await dao.searchMyObject(user.uid, category, objectId);
+    const result = await dao.searchMyObject(user.uid, category, 1);
     console.log('result=>');
     console.dir(result);
 
     if (result.objectList == undefined) {
-      result.objectList = [];
       result.total = 0;
+      result.objectList = [];
+      result.searchResultLength = 1;
     }
 
     res.render('my-object', {
       categoryList: categoryList,
-      objectList: result.objectList,
       total: result.total,
+      objectList: result.objectList,
+      page: Math.ceil(result.searchResultLength/20),
     });
   }
 });
@@ -511,13 +514,13 @@ app.get('/object_share', async (req, res) => {
     const shareObjectList = [{id: 'a', objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media'}];
 
     // マイオブジェクトリストを取得
-    const result = await dao.searchMyObject(user.uid, null, null);
+    const result = await dao.searchMyObject(user.uid, null, 1);
     // result.objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
 
-    // if (result.objectList == undefined) {
-    //   result.objectList = [];
-    //   result.total = 0;
-    // }
+    if (result.objectList == undefined) {
+      result.objectList = [];
+      result.total = 0;
+    }
 
     res.render('object-share', {
       categoryList: categoryList,
@@ -668,20 +671,31 @@ app.post('/clan_search', async (req, res) => {
 // TODO: test
 app.get('/test', async (req, res) => {
   // userId
-  const userId = "q5GsxMu8h2OAkmqxEY6prVzWAVj2";
+  const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
 
   // 所属クランを取得
   // const result = await dao.selectDoubleTable(userId, 'containment_to_clan', 'clan');
 
+  let result = null
 
   const category = null
-  const objectId = null
 
-  // const myObjectList = await dao.searchMyObject(userId, category, objectId);
-  // console.log(`myobjectList => ${myObjectList}`);
-  // console.dir(myObjectList);
+  // マイオブジェクト取得
+  // result = await dao.searchMyObject(user.uid, category, 1);
 
-  // const result = await dao.searchObject(category, userId, objectId)
+  // シェアオブジェクト取得
+  // result = await dao.searchObject(category, user.uid, 1)
+
+  // マーカーリスト取得
+  const clanId = "sWuyRFv3Co7I23VoAwTZ";
+  result = await dao.selectMarkerList(user.uid, clanId);
+
+  // マーカーURL取得
+  // result = await sao.getMarkerUrl(`${user.uid}.png`);
+
+  console.log(`result =>`);
+  console.dir(result);
+
 
   // res.render('ar_test');
 
