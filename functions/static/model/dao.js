@@ -389,7 +389,7 @@ exports.selectMarkerList = async(userId, clanId) => {
 
   if(Array.isArray(userIdList)){
     // select userDetail from user_detail by userIdList
-    const userDetailList = await userDetailRef.where('userId', 'array-contains', userIdList).get().then(snapshot => {
+    const userDetailList = await userDetailRef.where('userId', 'in', userIdList).get().then(snapshot => {
       let returnArray = [];
 
       if(snapshot.empty){
@@ -408,7 +408,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       return {err: err};
     })
 
-    const myObjectList = await myObjectRef.where('userId', 'array-contains', userIdList).where('isSelected', '==', true).get().then(snapshot => {
+    const myObjectList = await myObjectRef.where('userId', 'in', userIdList).where('isSelected', '==', true).get().then(snapshot => {
       let returnArray = [];
 
       if(snapshot.empty){
