@@ -69,11 +69,8 @@
           xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
               // clanリストを取得
-              let restxt = xhr.responseText;
-              console.log(`restxt => ${restxt}`);
-
-              // string => jsonに変換
-              let clanList = JSON.parse(restxt);
+              let clanList = JSON.parse(xhr.responseText);
+              
               console.log(`clanList => ${clanList}`);
               console.dir(clanList)
 

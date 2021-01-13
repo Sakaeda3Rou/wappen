@@ -160,14 +160,14 @@
         div_element.remove();
 
         // サーバーの応答を検知
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4 && xhr.status === 200){
-                // clanリストを取得
-                let restxt = xhr.responseText;
-                console.log(`restxt => ${restxt}`);
-
-            }
-        };
+        // xhr.onreadystatechange = function () {
+        //     if(xhr.readyState === 4 && xhr.status === 200){
+        //         // clanリストを取得
+        //         let restxt = xhr.responseText;
+        //         console.log(`restxt => ${restxt}`);
+        //
+        //     }
+        // };
       }
 
     </script>

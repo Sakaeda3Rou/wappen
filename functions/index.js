@@ -356,10 +356,17 @@ app.post('/clan_selected', async (req, res) => {
     res.redirect('/');
   } else {
     // 選択したクランのIDを取得
-    const clanId = req.body;
+    const clanId = JSON.parse(req.body).clanId;
 
     // クランのマーカーリストを取得
-    const markerList = await selectMarkerList(user.uid, clanId);
+    // const markerList = await selectMarkerList(user.uid, clanId);
+
+    const markerList = [{
+      id: "a",
+      markerURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/marker_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.png?generation=1608169696971073&alt=media",
+      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media",
+    }]
+
 
     res.write(`${JSON.stringify(markerList)}`);
     res.end();
@@ -618,11 +625,9 @@ app.post('/clan_out', async (req, res) => {
     // クランIDを取得
     const clanId = JSON.parse(req.body).clanId;
 
-    // TODO: 脱退処理
-    console.log(clanId);
+    // 脱退処理
     dao.prisonBreak(user.uid, clanId);
 
-    res.write('out clan');
     res.end();
   }
 });

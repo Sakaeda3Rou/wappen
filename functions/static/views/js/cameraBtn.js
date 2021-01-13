@@ -5,6 +5,10 @@ const modalList = document.getElementById('modal__list');
 cameraBtns.forEach(btn => {
     btn.addEventListener('click', () => { //js-btn一つ一つにclickイベントを設定
         if(btn.classList.contains('btns__btn--clan') === true){　//クラン選択ボタンを押されたらモーダルの中身をクラン選択に変更
+
+            // クラン選択
+            selectType = 0;
+
             modalList.innerHTML = '';
             modalTitle.innerText = '表示するクランを選択';
             clanList.forEach(clan => {
@@ -13,6 +17,7 @@ cameraBtns.forEach(btn => {
                 const label = document.createElement('label');
                 check.setAttribute('type', 'radio');
                 check.setAttribute('name', 'clanRadio');
+                check.setAttribute('value', `${clan.clanId}`);
 
                 li.appendChild(label);
                 label.appendChild(check);
@@ -20,6 +25,10 @@ cameraBtns.forEach(btn => {
                 modalList.appendChild(li);
             });
         } else { //マイオブジェクトボタンを押されたらmodalの中身をマイオブジェクト選択に変更
+
+            // オブジェクト選択
+            selectType = 1;
+
             modalList.innerHTML = '';
             modalTitle.innerText = 'マイオブジェクトから選択';
             objectList.forEach(object => {
