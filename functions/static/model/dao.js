@@ -511,46 +511,51 @@ exports.selectMarkerList = async(userId, clanId) => {
 exports.changeSelected = async(userId, newObjectId) => {
   const myObjectRef = db.collection('my_object');
 
-  // select object's id what you want to change status to false
-  const first = await myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+  const myTrueObject = await myObjectRef.where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+    // create resultArray
+    let resultArray = [];
+
     if(snapshot.empty){
-      return {result: null};
+      return resultArray;
     }
+
     snapshot.forEach(doc => {
-      // change status to false
-      const second = _this.updateDoc('my_object', doc.id, {isSelected: false});
-      if(second.hasOwnProperty('err')){
-        return {err: second.err};
-      }
+      resultArray.push(doc.id);
     })
-    const third = myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
-      snapshot.forEach(doc => {
-        // change status to true
-        const four = _this.updateDoc('my_object', doc.id, {isSelected: true});
-        if(four.hasOwnProperty('err')){
-          return {err: four.err};
-        }
-      })
-    }).catch(err => {
-      return {err: err};
-    })
-
-    if(third.hasOwnProperty('err')){
-      return {err: err};
-    }
-
-    // return to first
-    return {result: success};
-  }).catch(err => {
-    return {err: err};
   })
 
-  if(first.hasOwnProperty('err')){
-    return {err: err};
+  if(Array.isArray(myTrueObject)){
+    let toFalseResult = null;
+    for(const myTrue of myTrueObject){
+      toFalseResult = await _this.updateDoc('my_object', myTrue, {isSelected : false});
+
+      if(toFalseResult.hasOwnProperty('err')){
+        return toFalseResult;
+      }
+    }
   }
 
-  // return to controller
-  return first;
+  const newObject = await myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
+    // create resultArray
+    if(snapshot.empty){
+      return resultArray;
+    }
+
+    snapshot.forEach(doc => {
+      resultArray.push(doc.id);
+    })
+  })
+
+  if(Array.isArray(myTrueObject)){
+    let updateResult = null;
+    for(const obj of newObject){
+      updateResult = await _this.updateDoc('my_object', obj, {isSelected : true});
+
+      if(updateResult.hasOwnProperty('err')){
+        return updateResult;
+      }
+    }
+  }
 }
 
 // when you use : for search clan
