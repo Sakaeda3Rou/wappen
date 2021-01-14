@@ -32,7 +32,7 @@
                     <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
                     <div class="category__my-object">
                         <!-- 選択中の画像を表示 -->
-                        <div class="my-object-list__select">
+                        <div id="select_image" class="my-object-list__select">
 
                         </div>
 
@@ -43,7 +43,7 @@
                         </div>
                         <!-- 共有するボタン -->
                         <div class="my-object-list__decision">
-                            <input type="submit" value="マイオブジェクトを共有する" class="main-btn my-object-list__submit">
+                            <input id="share_button" type="button" value="マイオブジェクトを共有する" class="main-btn my-object-list__submit">
                             <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel" id="js-category-cansel">
                         </div>
                     </div>
@@ -126,21 +126,6 @@
 
               <!-- シェアオブジェクトリストを生成 -->
 
-                <!-- <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li> -->
             </ul>
         </div>
         <div class="page__numbers">
@@ -172,7 +157,7 @@
         const shareobject_ul_element = document.getElementById('shareobject_list');
 
         // オブジェクトリストタグを生成
-        for (let object of shareObjectList) {
+        for (let [index, object] of shareObjectList.entries()) {
 
           // liタグを作成
           const object_li_element = document.createElement('li');
@@ -198,108 +183,8 @@
         });
       <% }); %>
 
-      setMyObjectList();
-
-      function setMyObjectList() {
-        // オブジェクトリストを表示する領域を取得
-        const myobject_ul_element = document.getElementById('myobject_list');
-
-        // オブジェクトリストタグを作成
-        for (let object of myObjectList) {
-
-          // liタグを作成
-          const myobject_li_element = document.createElement('li');
-          myobject_li_element.setAttribute('class', 'my-object-list__item');
-          myobject_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
-
-          // ul領域に追加
-          myobject_ul_element.appendChild(myobject_li_element);
-        }
-      }
-
     </script>
-    <script>
 
-//マイオブジェクト一覧を表示するボタンの変化
-        const add_btn = document.getElementById('js-add-btn');
-        const share_bg = document.querySelector('.js-bg');
-        const line1 = document.querySelector('.add-btn__line--1');
-        const line2 = document.querySelector('.add-btn__line--2');
-
-        add_btn.addEventListener('click', function () {
-            line1.classList.toggle('active__line1');
-            line2.classList.toggle('active__line2');
-        });
-
-        share_bg.addEventListener('click', function () {
-            line1.classList.toggle('active__line1');
-            line2.classList.toggle('active__line2');
-        });
-
-//マイオブジェクト一覧を表示
-        const items = document.querySelectorAll('.my-object-list__item');
-        const categoryMyObject = document.querySelector('.category__my-object');
-        const myObjectListItems = document.querySelector('.my-object-list__items');
-        const categoryCansel = document.querySelector('.my-object-list__cansel');
-        const categorySubmit= document.querySelector('.my-object-list__submit');
-    //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
-        items.forEach(item => {
-            item.addEventListener('click', () => {
-                categoryMyObject.classList.toggle('category-open');
-                myObjectListItems.classList.toggle('my-object-list__items--close');
-
-                if (categoryMyObject.classList.contains('category-open')) {
-                    categoryMyObject.style.height = '90%';
-                } else {
-                    categoryMyObject.style.height = 0;
-                }
-
-                if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                    myObjectListItems.style.height = 0;
-                } else {
-                    myObjectListItems.style.height = '90%';
-                }
-            });
-        });
-    //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
-        categoryCansel.addEventListener('click', () => {
-            categoryMyObject.classList.toggle('category-open');
-            myObjectListItems.classList.toggle('my-object-list__items--close');
-
-            if (categoryMyObject.classList.contains('category-open')) {
-                categoryMyObject.style.height = '90%';
-            } else {
-                categoryMyObject.style.height = 0;
-            }
-
-            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                myObjectListItems.style.height = 0;
-            } else {
-                myObjectListItems.style.height = '90%';
-            }
-        });
-    //マイオブジェクト一覧の"マイオブジェクトを共有する"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
-        categorySubmit.addEventListener('click', () => {
-            modal.classList.remove('open');
-            line1.classList.toggle('active__line1');
-            line2.classList.toggle('active__line2');
-            categoryCansel.click();
-        });
-
-    //modalを閉じる
-        objectModalBg.addEventListener('click', () => {
-            objectModal.classList.remove('object-modal__open');
-            objectModalBtn.innerHTML = "";
-            objectModalBtn.classList.remove('object-modal__btn--circle');
-
-        });
-        batuBtn.addEventListener('click', () => {
-            objectModal.classList.remove('object-modal__open');
-            objectModalBtn.innerHTML = "";
-            objectModalBtn.classList.remove('object-modal__btn--circle');
-        });
-
-    </script>
 	<!-- 検索script -->
 	<script>
       // カテゴリーリストを作成
@@ -307,7 +192,7 @@
 
       <% categoryList.forEach((category) => { %>
         categoryList.push({
-          categoryId: "<%= category.categoryId %>",
+          categoryId: "<%= category.id %>",
           categoryName: "<%= category.categoryName %>",
           // カテゴリ検索の選択フラグ
           isSearchSelected: false,
@@ -401,6 +286,7 @@
       shareCategoryList = [];
       for (let category of categoryList) {
         if (category.isSharedCategorySwitch) {
+          console.log(`categorySwitch => ${category.categoryId}`);
           shareCategoryList.push(category.categoryId);
         }
       }

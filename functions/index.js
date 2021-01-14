@@ -515,7 +515,6 @@ app.get('/object_share', async (req, res) => {
 
     // マイオブジェクトリストを取得
     const result = await dao.searchMyObject(user.uid, null, 1);
-    // result.objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
 
     if (result.objectList == undefined) {
       result.objectList = [];
@@ -541,6 +540,8 @@ app.post('/object_shared', async (req, res) => {
 
     // reqestbodyを取得
     const body = JSON.parse(req.body)
+    console.log(`body => `)
+    console.dir(body);
 
     // シェアするオブジェクトのプロパティーを取得
     const objectId = body.objectId;
@@ -550,6 +551,8 @@ app.post('/object_shared', async (req, res) => {
     // await dao.updateObject(objectId, categoryList);
 
   }
+
+  res.end();
 });
 
 //get clan
