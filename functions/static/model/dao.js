@@ -399,8 +399,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const userPatternData = doc.data();
-        returnArray.push({userId: doc.id, patternURL: userPatternData.patternURL});
+        returnArray.push(doc.data());
       })
 
       // return to userDetailList
@@ -418,8 +417,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const myObjectData = doc.data();
-        returnArray.push(myObjectData);
+        returnArray.push(doc.data());
       })
 
       // return to myObjectList
@@ -457,7 +455,7 @@ exports.selectMarkerList = async(userId, clanId) => {
               if(userPattern.userId == userId && myObject.userId == userId){
                 markerList.unshift({userId: userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }else{
-                markerList.push({userId: userDetail.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
+                markerList.push({userId: userPattern.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }
             }
           }
