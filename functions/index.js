@@ -483,13 +483,13 @@ app.post('/object_upload', async (req, res) => {
     const locationZ = 0;
 
     // 画像をストレージに保存 オブジェクトファイル名
-    const fileName = user.uid + number;
+    const objectName = user.uid + number;
 
-    await sao.uploadObject(fileName, image);
-    const objectURL = await sao.getObjectUrl(fileName);
+    await sao.uploadObject(objectName, image);
+    const objectURL = await sao.getObjectUrl(objectName);
 
     // オブジェクトコレクションに登録
-    const result = await dao.saveObject(user.uid, objectURL, categoryList, locationX, locationY, locationZ, false);
+    const result = await dao.saveObject(user.uid, objectURL, categoryList, locationX, locationY, locationZ, false, objectName);
 
     // マイオブジェクト画面にリダイレクト
     res.redirect('/my_object');
