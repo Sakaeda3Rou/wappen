@@ -8,22 +8,76 @@
   </head>
   <body>
 
+    <div id="aframe">
+
+    </div>
+
     <a-scene vr-mode-ui="enabled: false">
-      <a-assets>
-        <img id="image_element" src="https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media" hidden />
+      <a-assets id="assets">
+        <img id="image_element" src="https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj20?generation=1610522618769245&alt=media" hidden />
       </a-assets>
 
-      <a-entity camera>
+      <a-entity id="marker_area" camera>
         <a-marker preset="hiro">
-          <!-- <a-box
-            position="0 0.5 0"
-            material="color: red; transparent: true; opacity: 0.50;">
-          </a-box> -->
+          <a-plane position="0 0 0"
+          rotation="-90 0 0"
+          material="src: #image_element;">
+        </a-marker>
+        <a-marker preset="hiro">
           <a-plane position="0 0 0"
           rotation="-90 0 0"
           material="src: #image_element;">
         </a-marker>
       </a-entity>
     </a-scene>
+
+    <script>
+      console.log(`THREEX => ${THREEx}`)
+      console.dir(THREEx)
+
+      // create();
+
+      function create() {
+
+        const frame = document.getElementById('aframe');
+
+        // a-sceneを作成
+        const scene = document.createElement('a-scene');
+        scene.setAttribute('vr-mode-ui', 'enabled: false');
+
+        // a-assets
+        const assets = document.createElement('a-assets');
+        assets.setAttribute('id', 'assets');
+
+        // img
+        const img = document.createElement('img');
+        img.hidden = true
+        img.setAttribute('id', 'image_element');
+        img.setAttribute('src', 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj20?generation=1610522618769245&alt=media')
+
+        // a-entity
+        const entity = document.createElement('a-entity');
+        entity.setAttribute('id', 'marker_area');
+
+        // marker
+        const marker = document.createElement('a-marker');
+        marker.setAttribute('preset', 'hiro');
+
+        // plane
+        const plane = document.createElement('a-plane');
+        plane.setAttribute('position', '0 0 0');
+        plane.setAttribute('rotation', '-90 0 0');
+        plane.setAttribute('material', 'src: #image_element;')
+
+        // 要素に追加
+        assets.appendChild(img)
+        scene.appendChild(assets)
+        marker.appendChild(plane)
+        entity.appendChild(marker)
+        scene.appendChild(entity)
+        frame.appendChild(scene)
+
+      }
+    </script>
   </body>
 </html>

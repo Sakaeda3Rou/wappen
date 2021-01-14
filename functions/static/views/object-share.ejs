@@ -49,23 +49,13 @@
                     </div>
 
                     <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
-                    <ul class="my-object-list__items">
-                        <li class="my-object-list__item" id="my-object-list__item1"></li>
+                    <ul id="myobject_list" class="my-object-list__items">
+
+                      <!-- マイオブジェクトリストを生成 -->
+
+                        <!-- <li class="my-object-list__item" id="my-object-list__item1"></li>
                         <li class="my-object-list__item" id="my-object-list__item2"></li>
-                        <li class="my-object-list__item" id="my-object-list__item3"></li>
-                        <li class="my-object-list__item" id="my-object-list__item4"></li>
-                        <li class="my-object-list__item" id="my-object-list__item5"></li>
-                        <li class="my-object-list__item" id="my-object-list__item6"></li>
-                        <li class="my-object-list__item" id="my-object-list__item7"></li>
-                        <li class="my-object-list__item" id="my-object-list__item8"></li>
-                        <li class="my-object-list__item" id="my-object-list__item9"></li>
-                        <li class="my-object-list__item" id="my-object-list__item10"></li>
-                        <li class="my-object-list__item" id="my-object-list__item11"></li>
-                        <li class="my-object-list__item" id="my-object-list__item12"></li>
-                        <li class="my-object-list__item" id="my-object-list__item13"></li>
-                        <li class="my-object-list__item" id="my-object-list__item14"></li>
-                        <li class="my-object-list__item" id="my-object-list__item15"></li>
-                        <li class="my-object-list__item" id="my-object-list__item16"></li>
+                        <li class="my-object-list__item" id="my-object-list__item3"></li> -->
                     </ul>
                 </div>
             </div>
@@ -132,7 +122,11 @@
             </div>
 
             <!-- サーバーから取得した検索後のオブジェクト一覧を表示 -->
-            <ul class="thumbnails">
+            <ul id="shareobject_list" class="thumbnails">
+
+              <!-- シェアオブジェクトリストを生成 -->
+
+                <!-- <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
@@ -146,8 +140,7 @@
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
                 <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
+                <li class="thumbnails__item"></li> -->
             </ul>
         </div>
         <div class="page__numbers">
@@ -165,6 +158,66 @@
     <script src="views/js/include.js"></script>
     <script src="views/js/modal.js"></script>
     <script src="views/js/objectShare.js"></script>
+    <script>
+
+      // シェアオブジェクトリストを作成
+      const shareObjectList = [];
+
+
+
+      setShareObjectList();
+
+      function setShareObjectList() {
+        // オブジェクトリストを表示する領域を取得
+        const shareobject_ul_element = document.getElementById('shareobject_list');
+
+        // オブジェクトリストタグを生成
+        for (let object of shareObjectList) {
+
+          // liタグを作成
+          const object_li_element = document.createElement('li');
+          shareobject_li_element.setAttribute('class', 'thumbnails__item');
+          shareobject_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
+
+          // ul領域に追加
+          shareobject_ul_element.appendChild(shareobject_li_element);
+        }
+      }
+
+      // マイオブジェクトリストを作成
+      const myObjectList = [];
+
+      <% myObjectList.forEach(object => { %>
+        // urlを整形
+        var url = "<%= object.objectURL %>";
+        url = url.replace('amp;', '')
+
+        myObjectList.push({
+          objectId: "<%= object.id %>",
+          objectURL: url,
+        });
+      <% }); %>
+
+      setMyObjectList();
+
+      function setMyObjectList() {
+        // オブジェクトリストを表示する領域を取得
+        const myobject_ul_element = document.getElementById('myobject_list');
+
+        // オブジェクトリストタグを作成
+        for (let object of myObjectList) {
+
+          // liタグを作成
+          const myobject_li_element = document.createElement('li');
+          myobject_li_element.setAttribute('class', 'my-object-list__item');
+          myobject_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
+
+          // ul領域に追加
+          myobject_ul_element.appendChild(myobject_li_element);
+        }
+      }
+
+    </script>
     <script>
 
 //マイオブジェクト一覧を表示するボタンの変化
@@ -338,8 +391,26 @@
         console.log(`categoryList {index: ${index}, isSharedCategorySwitch: ${categoryList[index].isSharedCategorySwitch}}`);
       }
   </script>
+  <script>
+    // オブジェクトをシェア
+    function objectShared(objectId) {
 
+      xhr = new XMLHttpRequest();
 
+      // カテゴリリストを作成
+      shareCategoryList = [];
+      for (let category of categoryList) {
+        if (category.isSharedCategorySwitch) {
+          shareCategoryList.push(category.categoryId);
+        }
+      }
+
+      // サーバーに送信
+      xhr.open('post', '/object_shared');
+      xhr.send(JSON.stringify({objectId: objectId, categoryList: shareCategoryList}));
+
+    }
+  </script>
 
 </body>
 </html>
