@@ -699,11 +699,11 @@ exports.searchObject = async(category, userId, page) => {
   
       snapshot.forEach(doc => {
         var document = doc.data();
-        resutltArray.push(document.objectId);
+        resultArray.push(document.objectId);
       })
   
       // return to categoryObject
-      return categoryObject;
+      return resultArray;
     }).catch(err => {
       return {err : err};
     })
@@ -739,7 +739,7 @@ exports.searchObject = async(category, userId, page) => {
       let result = null;
       let resultArray = [];
       for (const objectId of objectIds){
-        result = await db.collection('object').doc(objectId).where('isShared', '==', true).get().then(doc => {
+        result = await db.collection('object').doc(objectId).get().then(doc => {
           let document = doc.data();
           document['id'] = doc.id;
           return document;
@@ -747,7 +747,7 @@ exports.searchObject = async(category, userId, page) => {
           return {err : err};
         });
   
-        if(!result.hasOwnProperty('err')){
+        if(!result.hasOwnProperty('err') && result.isShared == true){
           resultArray.push(result);
         }  
       }
@@ -762,8 +762,8 @@ exports.searchObject = async(category, userId, page) => {
   
       let data = {
         total : userLength,
-        searchResultLength : objectsLength,
-        objectList : objects.slice(start, end)
+        searchResultLength : resultArray.length,
+        objectList : resultArray.slice(start, end)
       }
 
       // return to controller
@@ -797,7 +797,7 @@ exports.searchObject = async(category, userId, page) => {
 
         flag = false;
         for(var i = 0; i < userObject.length && flag == false; i++){
-          if(document.id == userObject[i]){
+          if(doc.id == userObject[i]){
             flag = true;
           }
         }
