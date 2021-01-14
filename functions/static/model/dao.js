@@ -739,7 +739,7 @@ exports.searchObject = async(category, userId, page) => {
       let result = null;
       let resultArray = [];
       for (const objectId of objectIds){
-        result = await db.collection('object').doc(objectId).get().then(doc => {
+        result = await db.collection('object').doc(objectId).where('isShared', '==', true).get().then(doc => {
           let document = doc.data();
           document['id'] = doc.id;
           return document;
@@ -782,7 +782,7 @@ exports.searchObject = async(category, userId, page) => {
     let objectsLength = 0;
 
     // get object orderBy objectName
-    const objects = await db.collection('object').orderBy('objectName').get().then(snapshot => {
+    const objects = await db.collection('object').where('isShared', '==', true).orderBy('objectName', 'desc').get().then(snapshot => {
       // create resultArray
       let resultArray = [];
 
