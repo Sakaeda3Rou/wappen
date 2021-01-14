@@ -145,7 +145,7 @@ exports.updateObject = async(objectId, category) => {
     // create delete result
     var deleteResult = null;
     for(const forDelete of selectResult){
-      deleteResult = await _this.deleteDoc('object_in_category', forDelete);
+      deleteResult = await _this.deleteDoc('object_in_category', forDelete.id);
     }
 
     // create update result
@@ -650,8 +650,19 @@ exports.searchClan = async(searchWord, userId) => {
 //      page's number as 'page'
 //      user's id as 'userId'
 exports.searchObject = async(category, userId, page) => {
+  // create for start to use slice
+  let start = 0;
+  // create for end to slice
+  let end = 20;
+  
+  if(page > 1){
+    start = (20 * (page - 1))-1;
+    end = page * 20;
+  }
+
   // create length
   let userLength = 0;
+
   // select user's object
   const userObject = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
     // create result array
@@ -675,106 +686,142 @@ exports.searchObject = async(category, userId, page) => {
     return {err: err};
   })
 
-  const categoryObject = await db.collection('object_in_category').where('categoryId', 'in', category).get().then(snapshot => {
-    // create result array
-    let resultArray = [];
-
-    if(snapshot.empty){
-      // no document
-      return resultArray;
-    }
-
-    snapshot.forEach(doc => {
-      var document = doc.data();
-      resutltArray.push(document.objectId);
+  if(category){
+    // if selected category
+    const categoryObject = await db.collection('object_in_category').where('categoryId', 'in', category).get().then(snapshot => {
+      // create result array
+      let resultArray = [];
+  
+      if(snapshot.empty){
+        // no document
+        return resultArray;
+      }
+  
+      snapshot.forEach(doc => {
+        var document = doc.data();
+        resutltArray.push(document.objectId);
+      })
+  
+      // return to categoryObject
+      return categoryObject;
+    }).catch(err => {
+      return {err : err};
     })
-
-    // return to categoryObject
-    return categoryObject;
-  }).catch(err => {
-    return {err : err};
-  })
-
-  if(Array.isArray(userObject) && Array.isArray(categoryObject)){
-    // create objectIds
-    let objectIds = [];
-    // not user's but match category
-    for(const byCategory of categoryObject){
-      var flag = false;
-      for(var i = 0; i < userObject.length && flag == false; i++){
-        if(byCategory == userObject[i]){
-          flag == true
+  
+    if(Array.isArray(userObject) && Array.isArray(categoryObject)){
+      // if result = []
+      if(categoryObject.length == 0){
+        return [{
+          total : userLength,
+          searchResultLength : categoryObject.length,
+          objectList : []
+        }];
+      }
+  
+      // create objectIds
+      let objectIds = [];
+      // not user's but match category
+      for(const byCategory of categoryObject){
+        var flag = false;
+        for(var i = 0; i < userObject.length && flag == false; i++){
+          if(byCategory == userObject[i]){
+            flag == true
+          }
+        }
+  
+        if(flag != true){
+          objectIds.push(byCategory);
         }
       }
-
-      if(flag != true){
-        objectIds.push(byCategory);
+      
+      // search object
+      // create result
+      let result = null;
+      let resultArray = [];
+      for (const objectId of objectIds){
+        result = await db.collection('object').doc(objectId).get().then(doc => {
+          let document = doc.data();
+          document['id'] = doc.id;
+          return document;
+        }).catch(err => {
+          return {err : err};
+        });
+  
+        if(!result.hasOwnProperty('err')){
+          resultArray.push(result);
+        }  
       }
-    }
-
-    if(objectIds.length == 0){
-      return [{
-        total : userLength,
-        searchResultLength : objectIds.length,
-        objectList : []
-      }];
-    }
-    
-    // search object
-    // create result
-    let result = null;
-    let resultArray = [];
-    for (const objectId of objectIds){
-      result = await db.collection('object').doc(objectId).get().then(doc => {
-        let document = doc.data();
-        document['id'] = doc.id;
-        return document;
-      }).catch(err => {
-        return {err : err};
-      });
-
-      if(!result.hasOwnProperty('err')){
-        resultArray.push(result);
-      }  
-    }
-
-    resultArray.sort(function(a, b) {
-      if (a.objectName < b.objectName) {
-        return 1;
-      } else {
-        return -1;
-      }
-    })
-
-    if(page == 1){
+  
+      resultArray.sort(function(a, b) {
+        if (a.objectName < b.objectName) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
+  
       let data = {
         total : userLength,
-        searchResultLength : objectIds.length,
-        objectList : resultArray.slice(0, 20)
-      }
-
-      // return to controller
-      return data;
-    }else if(page > 1){
-      let data = {
-        total : userLength,
-        searchResultLength : objectIds.length,
-        objectList : object.slice((20 * (page - 1))-1, page * 20)
+        searchResultLength : objectsLength,
+        objectList : objects.slice(start, end)
       }
 
       // return to controller
       return data;
     }else{
-      // ??????
+      if(userObject.hasOwnProperty('err')){
+        return userObject;
+      }
+  
+      if(categoryObject.hasOwnProperty('err')){
+        return categoryObject;
+      }
     }
   }else{
-    if(userObject.hasOwnProperty('err')){
-      return userObject;
+    // create objectsLength
+    let objectsLength = 0;
+
+    // get object orderBy objectName
+    const objects = await db.collection('object').orderBy('objectName').get().then(snapshot => {
+      // create resultArray
+      let resultArray = [];
+
+      if(snapshot.empty){
+        return resultArray;
+      }
+
+      let document = null;
+      let flag = false;
+      snapshot.forEach(doc => {
+        document = doc.data();
+
+        flag = false;
+        for(var i = 0; i < userObject.length && flag == false; i++){
+          if(document.id == userObject[i]){
+            flag = true;
+          }
+        }
+
+        if(flag != true){
+          document['id'] = doc.id;
+          resultArray.push(document);
+        }
+      })
+
+      objectsLength = resultArray.length;
+
+      // return to objects
+      return resultArray;
+    })
+
+    let data = {
+      total : userLength,
+      searchResultLength : objectsLength,
+      objectList : objects.slice(start, end)
     }
 
-    if(categoryObject.hasOwnProperty('err')){
-      return categoryObject;
-    }
+    // return to controller
+    return data;
   }
 }
 
