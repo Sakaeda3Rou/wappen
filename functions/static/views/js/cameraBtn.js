@@ -11,7 +11,7 @@ cameraBtns.forEach(btn => {
       modalList.innerHTML = '';
       modalTitle.innerText = '表示するクランを選択';
 
-      for (let [index, clan] of clanList) {
+      for (let [index, clan] of clanList.entries()) {
         const clan_li_element = document.createElement('li');
         clan_li_element.classList.add('my-object-list__clan');
         const check = document.createElement('input');
@@ -33,7 +33,7 @@ cameraBtns.forEach(btn => {
       modalList.innerHTML = '';
       modalTitle.innerText = 'マイオブジェクトから選択';
 
-      for (let [index, object] of objectList) {
+      for (let [index, object] of objectList.entries()) {
         const object_li_element = document.createElement('li');
 
         object_li_element.classList.add('my-object-list__item');
