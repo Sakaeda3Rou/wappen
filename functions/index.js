@@ -648,13 +648,13 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = null
+  const category = 'aaj'
 
   // マイオブジェクト取得
-  // result = await dao.searchMyObject(user.uid, category, 1);
+  result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  result = await dao.searchObject(category, user.uid, 1)
+  // result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
   // const clanId = "sWuyRFv3Co7I23VoAwTZ";
