@@ -144,7 +144,7 @@
             clan_div_element.innerHTML = clanName;
 
             if (clan.state == 'can') {
-              // 加入ボタンを表示
+              // 加入ボタンを作成
               const input_button_element = document.createElement('input');
               input_button_element.setAttribute('class', 'main-btn in-btn');
               input_button_element.setAttribute('type', 'button');
@@ -153,9 +153,18 @@
               input_button_element.setAttribute('onclick', `containment("${clan.id}")`);
               clan_div_element.appendChild(input_button_element);
             } else if (clan.state == 'already') {
-              // 「加入済み」を表示
+              // 「加入済み」を作成
+              const input_button_element = document.createElement('div');
+              input_button_element.setAttribute('class', 'main-btn in-btn clan-after');
+              input_button_element.insertAdjacentHTML('beforeend', '加入済み');
+              // input_button_element.setAttribute('value', '加入済み');
+              clan_div_element.appendChild(input_button_element);
             } else if (clan.state == 'over') {
-              // 「満員」を表示
+              // 「満員」を作成
+              const input_button_element = document.createElement('div');
+              input_button_element.setAttribute('class', 'main-btn in-btn clan-after');
+              input_button_element.setAttribute('value', '満員');
+              clan_div_element.appendChild(input_button_element);
             }
 
             // クランリストに要素を追加

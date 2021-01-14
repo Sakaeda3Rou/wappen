@@ -511,21 +511,24 @@ app.get('/object_share', async (req, res) => {
     console.dir(categoryList)
 
     // シェアオブジェクトリストを取得
-    const shareObjectList = [{id: 'a', objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media'}];
+    const share_result = await dao.searchObject(null, user.uid, 1);
+    // const shareObjectList = [{id: 'a', objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media'}];
+    console.log('share_result =>')
+    console.dir(share_result);
 
     // マイオブジェクトリストを取得
-    const result = await dao.searchMyObject(user.uid, null, 1);
+    const my_result = await dao.searchMyObject(user.uid, null, 1);
 
-    if (result.objectList == undefined) {
-      result.objectList = [];
-      result.total = 0;
+    if (my_result.objectList == undefined) {
+      my_result.objectList = [];
+      my_result.total = 0;
     }
 
     res.render('object-share', {
       categoryList: categoryList,
-      myObjectList: result.objectList,
+      myObjectList: my_result.objectList,
       shareObjectList: shareObjectList,
-      total: result.total,
+      total: my_result.total,
     });
   };
 });
@@ -548,7 +551,7 @@ app.post('/object_shared', async (req, res) => {
     const categoryList = body.categoryList;
 
     // シェア設定
-    // await dao.updateObject(objectId, categoryList);
+    await dao.updateObject(objectId, categoryList);
 
   }
 

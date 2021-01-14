@@ -60,6 +60,24 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
     return objectResult;
   }
 
+  const oldObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', 'true').get().then(snapshot => {
+    let returnId = null;
+    snapshot.forEach(doc => {
+      let document = doc.data();
+      returnId = document.objectId;
+    })
+
+    return returnId;
+  })
+
+  if(oldObjectId){
+    const changeResult = await _this.updateDoc('my_object', oldObjectId, {isSelected : false});
+
+    if(changeResult.hasOwnProperty('err')){
+      return changeResult;
+    }
+  }
+
   // save my_object
   // create myObjectData
   const myObjectData = {
@@ -399,8 +417,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const userPatternData = doc.data();
-        returnArray.push({userId: doc.id, patternURL: userPatternData.patternURL});
+        returnArray.push(doc.data());
       })
 
       // return to userDetailList
@@ -418,8 +435,7 @@ exports.selectMarkerList = async(userId, clanId) => {
       }
 
       snapshot.forEach(doc => {
-        const myObjectData = doc.data();
-        returnArray.push(myObjectData);
+        returnArray.push(doc.data());
       })
 
       // return to myObjectList
@@ -457,7 +473,7 @@ exports.selectMarkerList = async(userId, clanId) => {
               if(userPattern.userId == userId && myObject.userId == userId){
                 markerList.unshift({userId: userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }else{
-                markerList.push({userId: userDetail.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
+                markerList.push({userId: userPattern.userId, patternURL: userPattern.patternURL, objectURL: object.objectURL});
               }
             }
           }
