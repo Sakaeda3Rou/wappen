@@ -46,11 +46,24 @@
         <div class="modal js-modal">
             <div class="modal__bg js-bg"></div>
             <div class="modal__main">
-                <h3 id="modal__title"></h3>
-                <div class="modal__form">
-                    <!-- modal__listにクランかオブジェクトの一覧を表示 -->
-                    <ul id="modal__list"></ul>
-                    <input id="decision_button" type="button" value="決定" class="main-btn" onclick="selectButtonAction()">
+                <div class="my-object-list">
+                    <h2 class="my-object-list__title"></h2>
+
+                    <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
+                    <div class="category__my-object">
+                        <!-- 選択中の画像を表示 -->
+                        <div class="my-object-list__select"></div>
+                        <!-- 共有するボタン -->
+                        <div class="my-object-list__decision">
+                            <input type="submit" value="決定" class="main-btn my-object-list__submit">
+                            <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel"
+                                id="js-category-cansel">
+                        </div>
+                    </div>
+
+                    <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
+                    <ul class="my-object-list__items">
+                    </ul>
                 </div>
             </div>
         </div>
@@ -79,6 +92,7 @@
 
         objectList.push({
           objectId: "<%= object.id %>",
+          objectName: "<%= object.objectName %>",
           objectURL: url,
         });
       <% }); %>
@@ -135,7 +149,6 @@
       // 開いているモーダルを判定
       let selectType = null;
 
-
       function selectButtonAction() {
         console.log(`selecttype => ${selectType}`);
 
@@ -184,7 +197,21 @@
       }
 
       // TODO: オブジェクトが選択された時
-      function selectedObject() {
+      function selectedObject(index) {
+        // imageタグを取得
+        const image_element = document.getElementById('<%= userId %>');
+
+
+        // objectURLを変更する
+        image_element.setAttribute('src', `${objectList[index].objectURL}`);
+
+        const xhr = new XMLHttpRequest();
+
+        // サーバーに送信
+        xhr.open('post', '/object_selected');
+        xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
+
+        // モーダルを閉じる
 
       }
 
@@ -229,33 +256,8 @@
           marker_area_element.appendChild(marker_element);
 
         }
-
-        // TODO: hiroをセット
-        // const hiro_image_element = document.createElement('img');
-        // hiro_image_element.hidden = true;
-        // hiro_image_element.setAttribute('id', 'hiro');
-        // hiro_image_element.setAttribute('src', 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj20?generation=1610522618769245&alt=media');
-        // hiro_image_element.setAttribute('crossorigin', 'anonymous');
-        //
-        // assets_element.appendChild(hiro_image_element);
-        //
-        // const hiro_marker_element = document.createElement('a-marker');
-        // hiro_marker_element.setAttribute('preset', 'hiro');
-        //
-        // const hiro_plane_element = document.createElement('a-plane');
-        // hiro_plane_element.setAttribute('position', {x: 0, y: 0, z: 0});
-        // hiro_plane_element.setAttribute('rotation', {x: -90, y: 0, z: 0});
-        // hiro_plane_element.setAttribute('material', "src: #hiro;")
-        //
-        // hiro_marker_element.appendChild(hiro_plane_element);
-        // marker_area_element.appendChild(hiro_marker_element);
-
-        // AFRAME.registerComponent('foo', {
-        //   init: function () {
-        //     console.log(`init`);
-        //   }
-        // });
       }
+
     </script>
 </body>
 </html>

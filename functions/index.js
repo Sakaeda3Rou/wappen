@@ -290,14 +290,11 @@ app.get('/camera', async (req, res) => {
     // 所属クランを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan', 'clan');
 
-    // TODO: マイオブジェクトリストを取得
+    // マイオブジェクトリストを取得
     const my_result = await dao.searchMyObject(user.uid, null, 1);
-    // const objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
 
-    // TODO: とりあえずリスト
+    // 空パターンリスト
     const patternList = [];
-    // const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
-
 
     res.render('camera', {
       userId: user.uid,
@@ -309,23 +306,23 @@ app.get('/camera', async (req, res) => {
 });
 
 // post object_selected
-app.post('/object_selected', (req, res) => {
-  // TODO: send parameter about object
-  const newObjectId = req.body._newObjectId;
+app.post('/object_selected', async (req, res) => {
+  // ユーザー認証
+  const user = await confirmUser(req);
 
-  const result = dao.changeSelected(req.session.user.uid, newObjectId);
+  if (!user) {
+    res.redirect('/');
+  } else {
 
-  if(result.hasOwnProperty(err)){
-    // has error
-  }
+    // オブジェクトIdを取得
+    const objectId = JSON.parse(req.body).objectId;
 
-  // return camera
-  fs.readFile('views/camera.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
+    // 選択オブジェクトを切り替え
+    // await dao.changeSelected(user.uid, objectId);
+
     res.end();
-  });
-})
+  }
+});
 
 // post clan_selected
 app.post('/clan_selected', async (req, res) => {
