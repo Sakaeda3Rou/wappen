@@ -145,7 +145,7 @@ exports.updateObject = async(objectId, category) => {
     // create delete result
     var deleteResult = null;
     for(const forDelete of selectResult){
-      deleteResult = await _this.deleteDoc('object_in_category', forDelete);
+      deleteResult = await _this.deleteDoc('object_in_category', forDelete.id);
     }
 
     // create update result
