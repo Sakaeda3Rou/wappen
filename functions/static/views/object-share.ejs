@@ -53,9 +53,6 @@
 
                       <!-- マイオブジェクトリストを生成 -->
 
-                        <!-- <li class="my-object-list__item" id="my-object-list__item1"></li>
-                        <li class="my-object-list__item" id="my-object-list__item2"></li>
-                        <li class="my-object-list__item" id="my-object-list__item3"></li> -->
                     </ul>
                 </div>
             </div>
@@ -68,7 +65,7 @@
                 <div class="object-modal__batu-btn">×</div>
                 <div class="object-modal__container">
                     <!-- 選択中の画像を表示 -->
-                    <div class="object-modal__select"></div>
+                    <div id="select_object" class="object-modal__select"></div>
                     <!-- 共有オブジェクトをマイオブジェクトに追加するボタン -->
                     <div class="object-modal__btn">
                     </div>
@@ -142,13 +139,22 @@
     <footer id="footer"></footer>
     <script src="views/js/include.js"></script>
     <script src="views/js/modal.js"></script>
-    <script src="views/js/objectShare.js"></script>
     <script>
 
       // シェアオブジェクトリストを作成
       const shareObjectList = [];
 
+      <% shareObjectList.forEach(object => { %>
+        // urlを整形
+        var url = "<%= object.objectURL %>";
+        url = url.replace('amp;', '')
 
+        shareObjectList.push({
+          objectId: "<%= object.id %>",
+          objectName: "<%= object.objectName %>",
+          objectURL: url,
+        })
+      <% }); %>
 
       setShareObjectList();
 
@@ -160,9 +166,11 @@
         for (let [index, object] of shareObjectList.entries()) {
 
           // liタグを作成
-          const object_li_element = document.createElement('li');
+          const shareobject_li_element = document.createElement('li');
           shareobject_li_element.setAttribute('class', 'thumbnails__item');
           shareobject_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
+          shareobject_li_element.setAttribute('onclick', `setShareModal(${index})`);
+
 
           // ul領域に追加
           shareobject_ul_element.appendChild(shareobject_li_element);
@@ -295,8 +303,28 @@
       xhr.open('post', '/object_shared');
       xhr.send(JSON.stringify({objectId: objectId, categoryList: shareCategoryList}));
 
+      // モーダルを閉じる
+      const categoryCansel = document.querySelector('.my-object-list__cansel');
+      categoryCansel.click();
+
     }
+
+    // マイオブジェクトに追加
+    function appendMyObject(objectId) {
+
+      xhr = new XMLHttpRequest();
+
+      // サーバーに送信
+      xhr.open('post', '/append_my_object');
+      xhr.send(JSON.stringify({objectId: objectId}));
+
+      // モーダルを閉じる
+      const objectModal = document.querySelector('.object-modal');
+      objectModal.classList.remove('object-modal__open');
+    }
+
   </script>
+  <script src="views/js/objectShare.js"></script>
 
 </body>
 </html>

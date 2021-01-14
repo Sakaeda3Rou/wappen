@@ -26,35 +26,7 @@ const objectModalBtn = document.querySelector('.object-modal__btn');
 const modalContainer = document.querySelector('.object-modal__container');
 
 const tickMark = "<i class=\"fas fa-check fa-lg\"></i>";
-//共有オブジェクトそれぞれにクリックイベントをつける
-thumbnailsItems.forEach(thumbnailsItem => {
-    thumbnailsItem.addEventListener('click', () => {
-        objectModal.classList.toggle('object-modal__open');
-        const img = document.createElement('img');
-        img.classList.add('object-modal__select');
-        img.src = "キャプチャ.PNG";
-        if(document.querySelector('.object-modal__select')){
-            objectModalBtn.previousElementSibling.remove();
-        }
-        modalContainer.prepend(img);
-// マイオブジェクトに追加するボタンを動的に生成
-        const mainBtn = document.createElement("div");
-        mainBtn.className = "main-btn";
-        mainBtn.appendChild(document.createTextNode("マイオブジェクトに追加する"));
-        objectModalBtn.innerHTML = "";
-        objectModalBtn.appendChild(mainBtn);
-//共有されているオブジェクトをマイオブジェクトに追加するボタンの処理（サーバーに接続し、アップデート処理が必要）
-        objectModalBtn.addEventListener('click', () => {
-            objectModalBtn.classList.add('object-modal__btn--circle');
-            if (objectModalBtn.classList.contains('object-modal__btn--circle') === true) {
-                mainBtn.innerHTML = tickMark;
-                mainBtn.classList.remove('main-btn');
-            }
-        });
-    });
-});
 
-//変更:2021.01.13下記すべて
 //マイオブジェクト一覧を表示
 const modalList = document.querySelector('.my-object-list__items');
 const modalTitle = document.querySelector('.my-object-list__title');
@@ -68,7 +40,7 @@ addBtn.addEventListener('click', () => {
     for (let [index, object] of myObjectList.entries()) {
       const li = document.createElement('li');
       li.setAttribute('style', `background-image: url("${object.objectURL}")`);
-      li.setAttribute('onclick', `setModal(${index})`);
+      li.setAttribute('onclick', `setMyModal(${index})`);
 
       li.classList.add('my-object-list__item');
       //li.appendChild(document.createTextNode(object));
@@ -80,26 +52,8 @@ addBtn.addEventListener('click', () => {
     const categoryMyObject = document.querySelector('.category__my-object');
     const categoryCansel = document.querySelector('.my-object-list__cansel');
     const categorySubmit = document.querySelector('.my-object-list__submit');
-    //
-    // items.forEach(item => {
-    //     item.addEventListener('click', () => {
-            // categoryMyObject.classList.toggle('category-open');
-            // myObjectListItems.classList.toggle('my-object-list__items--close');
-            //
-            // if (categoryMyObject.classList.contains('category-open')) {
-            //     categoryMyObject.style.height = '80%';
-            // } else {
-            //     categoryMyObject.style.height = 0;
-            // }
-            //
-            // if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-            //     myObjectListItems.style.height = 0;
-            // } else {
-            //     myObjectListItems.style.height = '80%';
-            // }
-    //     });
-    // });
-    // //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
+
+    //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
     categoryCansel.addEventListener('click', () => {
         categoryMyObject.classList.remove('category-open');
         myObjectListItems.classList.remove('my-object-list__items--close');
@@ -116,16 +70,35 @@ addBtn.addEventListener('click', () => {
             myObjectListItems.style.height = '80%';
         }
     });
-    // //マイオブジェクト一覧の"マイオブジェクトを共有する"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
-    // categorySubmit.addEventListener('click', () => {
-    //     modal.classList.remove('open');
-    //     line1.classList.toggle('active__line1');
-    //     line2.classList.toggle('active__line2');
-    //     categoryCansel.click();
-    // });
 });
 
-function setModal(index) {
+function setShareModal(index) {
+  const objectModal = document.querySelector('.object-modal');
+  const objectModalBg = document.querySelector('.object-modal__bg');
+  const batuBtn = document.querySelector('.object-modal__batu-btn');
+  const objectModalBtn = document.querySelector('.object-modal__btn');
+  const modalContainer = document.querySelector('.object-modal__container');
+
+  objectModal.classList.toggle('object-modal__open');
+
+  // 画像を表示する領域を取得
+  const image_div_element = document.getElementById('select_object');
+  image_div_element.setAttribute('style', `background-image: url("${shareObjectList[index].objectURL}")`);
+
+  const mainBtn = document.createElement('div');
+  mainBtn.className = 'main-btn';
+  mainBtn.appendChild(document.createTextNode('マイオブジェクトに追加する'));
+  objectModalBtn.innerHTML = "";
+  objectModalBtn.appendChild(mainBtn);
+  objectModalBtn.setAttribute('onclick', `appendMyObject("${shareObjectList[index].objectId}")`);
+
+  // ✗ボタンを押した時、モーダルを閉じる
+  batuBtn.addEventListener('click', () => {
+    objectModal.classList.remove('object-modal__open');
+  });
+}
+
+function setMyModal(index) {
   const myObjectListItems = document.querySelector('.my-object-list__items');
   const categoryMyObject = document.querySelector('.category__my-object');
   const categoryCansel = document.querySelector('.my-object-list__cansel');

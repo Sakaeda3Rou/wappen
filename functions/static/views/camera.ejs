@@ -205,7 +205,7 @@
           // imgタグを作成
           const image_element = document.createElement('img');
           image_element.hidden = true;
-          image_element.setAttribute('id', `${pattern.id}`);
+          image_element.setAttribute('id', `${pattern.userId}`);
           image_element.setAttribute('src', `${pattern.objectURL}`);
           image_element.setAttribute('crossorigin', 'anonymous')
 
@@ -222,7 +222,7 @@
           const plane_element = document.createElement('a-plane');
           plane_element.setAttribute('position', '0 0 0');
           plane_element.setAttribute('rotation', '-90 0 0');
-          plane_element.setAttribute('material', `src: #${pattern.id}`);
+          plane_element.setAttribute('material', `src: #${pattern.userId}`);
 
           // マーカーリスト領域に追加
           marker_element.appendChild(plane_element);

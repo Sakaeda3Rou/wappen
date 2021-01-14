@@ -287,54 +287,26 @@ app.get('/camera', async (req, res) => {
     // get parameter and prepare camera session
     const camera = require('./static/model/camera.js');
 
-    // TODO: 必要なもの: 所属クラン、my_object
-
     // 所属クランを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan', 'clan');
 
     // TODO: マイオブジェクトリストを取得
-    // const objectList = await dao.searchMyObject(user.uid, null, null);
-    const objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
+    const my_result = await dao.searchMyObject(user.uid, null, 1);
+    // const objectList = [{id: "a", objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2?generation=1610430596097215&alt=media"}];
 
     // TODO: とりあえずリスト
-    const patternList = [{
-      id: "a",
-      patternURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/patterns%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.patt?generation=1608169696099129&alt=media",
-      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj21?generation=1610522777322361&alt=media",
-    }];
+    const patternList = [];
     // const markerList = [{markerURL: "marker/1", objectURL: "object/1"}, {markerURL: "marker/2", objectURL: "object/2"}];
 
 
     res.render('camera', {
-      objectList: objectList,
+      userId: user.uid,
+      objectList: my_result.objectList,
       clanList: clanList,
       patternList: patternList,
     });
   }
 });
-
-// post camera
-app.post('/camera', async (req, res) => {
-  // cookieからユーザーを取得
-  const user = await confirmUser(req);
-
-  if (!user) {
-    res.redirect('/');
-  } else {
-
-    res.render('camera');
-    res.end();
-  }
-})
-
-// get object_selected
-app.get('/object_selected', (req, res) => {
-  fs.readFile('views/object_selected.html', 'utf-8', (err, data) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    res.end();
-  });
-})
 
 // post object_selected
 app.post('/object_selected', (req, res) => {
@@ -368,14 +340,7 @@ app.post('/clan_selected', async (req, res) => {
     const clanId = JSON.parse(req.body).clanId;
 
     // クランのパターンリストを取得
-    // const patternList = await selectMarkerList(user.uid, clanId);
-
-    const patternList = [{
-      id: "a",
-      patternURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/patterns%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj2.patt?generation=1608169696099129&alt=media",
-      objectURL: "https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj21?generation=1610522777322361&alt=media",
-    }]
-
+    const patternList = await dao.selectMarkerList(user.uid, clanId);
 
     res.write(`${JSON.stringify(patternList)}`);
     res.end();
@@ -516,8 +481,16 @@ app.get('/object_share', async (req, res) => {
     console.log('share_result =>')
     console.dir(share_result);
 
+    if (share_result.objectList == undefined) {
+      share_result.objectList = [];
+      share_result.total = 0;
+      share_result.searchResultLength = 0;
+    }
+
     // マイオブジェクトリストを取得
     const my_result = await dao.searchMyObject(user.uid, null, 1);
+    console.log('my_result =>')
+    console.dir(my_result)
 
     if (my_result.objectList == undefined) {
       my_result.objectList = [];
@@ -527,8 +500,9 @@ app.get('/object_share', async (req, res) => {
     res.render('object-share', {
       categoryList: categoryList,
       myObjectList: my_result.objectList,
-      shareObjectList: shareObjectList,
+      shareObjectList: share_result.objectList,
       total: my_result.total,
+      page: Math.ceil(share_result.searchResultLength/20),
     });
   };
 });
@@ -556,6 +530,25 @@ app.post('/object_shared', async (req, res) => {
   }
 
   res.end();
+});
+
+app.post('/append_my_object', async (req, res) => {
+  // ユーザー認証
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // マイオブジェクトに追加するオブジェクトを取得
+    const objectId = JSON.parse(req.body).objectId;
+    console.log(`share => ${objectId}`);
+
+    // マイオブジェクトに追加
+    await dao.saveWithoutId('my_object', {userId: user.uid, objectId: objectId, isSelected: false, locationX: 0, locationY: 0, locationZ: 0})
+
+    res.end();
+  }
 });
 
 //get clan
@@ -649,7 +642,9 @@ app.post('/clan_search', async (req, res) => {
 // TODO: test
 app.get('/test', async (req, res) => {
   // userId
-  const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
+  // const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
+  const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
+
 
   // 所属クランを取得
   // const result = await dao.selectDoubleTable(userId, 'containment_to_clan', 'clan');
@@ -662,11 +657,11 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  // result = await dao.searchObject(category, user.uid, 1)
+  result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
-  const clanId = "sWuyRFv3Co7I23VoAwTZ";
-  result = await dao.selectMarkerList(user.uid, clanId);
+  // const clanId = "sWuyRFv3Co7I23VoAwTZ";
+  // result = await dao.selectMarkerList(user.uid, clanId);
 
   // マーカーURL取得
   // result = await sao.getMarkerUrl(`${user.uid}.png`);
