@@ -546,7 +546,7 @@ exports.changeSelected = async(userId, newObjectId) => {
     })
   })
 
-  if(Array.isArray(myTrueObject)){
+  if(Array.isArray(newObject)){
     let updateResult = null;
     for(const obj of newObject){
       updateResult = await _this.updateDoc('my_object', obj, {isSelected : true});
