@@ -77,8 +77,10 @@
         <div class="inner">
             <div class="search">
                 <div class="search__container">
-                    <div class="search__area">
-                      <div class="search__category-item">カテゴリアイテム</div>　<!-- この行自体を生成 -->
+                    <div id="search_area" class="search__area">
+
+                      <!-- 選択カテゴリアイテムを表示 -->
+
                     </div>
                     <div class="search__btn">
                         <div class="search__icon">
@@ -125,14 +127,17 @@
 
             </ul>
         </div>
-        <div class="page__numbers">
-            <input class="page__button" type="button" value="＜">
+        <div id="page_numbers" class="page__numbers">
+
+          <!-- ページボタンを生成 -->
+
+            <!-- <input class="page__button" type="button" value="＜">
             <input class="page__button" type="button" value="1">
             <input class="page__button" type="button" value="2">
             <input class="page__button" type="button" value="3">
             <input class="page__button" type="button" value="4">
             <input class="page__button" type="button" value="5">
-            <input class="page__button" type="button" value="＞">
+            <input class="page__button" type="button" value="＞"> -->
             <br>
         </div>
     </main>
@@ -267,14 +272,6 @@
 
       }
 
-      // カテゴリ検索のチェックボックスが変更された時
-      function searchCategorySwitch(index) {
-
-        categoryList[index].isSearchSelected = !(categoryList[index].isSearchSelected)
-
-        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
-      }
-
       // オブジェクト登録時のカテゴリチェックボックスが変更された時
       function shareCategorySwitch(index) {
         console.log(`addSwitch => ${index}`);
@@ -283,6 +280,19 @@
 
         console.log(`categoryList {index: ${index}, isSharedCategorySwitch: ${categoryList[index].isSharedCategorySwitch}}`);
       }
+  </script>
+  <script src="views/js/searchCategory.js"></script>
+  <script src="views/js/page.js"></script>
+  <script>
+    // ページを作成
+    // 今居るページ
+    const nowPage = <%= nowPage %>;
+    const maxPage = <%= maxPage %>;
+    console.log(`nowPage => ${nowPage}`);
+    console.log(`page => ${maxPage}`);
+    createPage();
+  </script>
+
   </script>
   <script>
     // オブジェクトをシェア

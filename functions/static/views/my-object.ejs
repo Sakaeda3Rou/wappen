@@ -46,9 +46,10 @@
             <div class="search">
                 <div class="search__container">
                     <!-- 現在選択中のカテゴリをsearch-areaに並べる -->
-                    <div class="search__area">
-                      <!-- TODO: この行を生成 -->
-                      <div class="search__category-item">カテゴリアイテム</div>
+                    <div id="search_area" class="search__area">
+
+                      <!-- 選択カテゴリアイテムを表示 -->
+
                     </div>
                     <div class="search__btn">
                       <div class="search__icon">
@@ -78,20 +79,6 @@
 
               <!-- オブジェクトリストを生成 -->
 
-                <!-- <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li>
-                <li class="thumbnails__item"></li> -->
             </ul>
         </div>
         <!-- 共有オブジェクトをダウンロードするmodalのコード -->
@@ -220,14 +207,6 @@
 
       }
 
-      // カテゴリ検索のチェックボックスが変更された時
-      function searchCategorySwitch(index) {
-
-        categoryList[index].isSearchSelected = !(categoryList[index].isSearchSelected)
-
-        console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
-      }
-
       // オブジェクト登録時のカテゴリチェックボックスが変更された時
       function addObjectCategorySwitch(index) {
         console.log(`addSwitch => ${index}`);
@@ -237,6 +216,7 @@
         console.log(`categoryList {index: ${index}, isAddObjectSelected: ${categoryList[index].isAddObjectSelected}}`);
       }
     </script>
+    <script src="views/js/searchCategory.js"></script>
     <script>
 
       // 検索ボタンにclickイベントを追加
@@ -322,9 +302,6 @@
 
     </script>
     <script>
-      // オブジェクリスト生成
-      // myObjectList[{objectId, objectURL}]
-
       // オブジェクトリストを作成
       const objectList = []
 

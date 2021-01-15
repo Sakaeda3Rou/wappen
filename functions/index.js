@@ -494,12 +494,19 @@ app.get('/object_share', async (req, res) => {
       my_result.total = 0;
     }
 
+    // 最大ページ
+    let maxPage = Math.ceil(share_result.searchResultLength/20)
+    if (maxPage == 0) {
+      maxPage = 1;
+    }
+
     res.render('object-share', {
       categoryList: categoryList,
       myObjectList: my_result.objectList,
       shareObjectList: share_result.objectList,
       total: my_result.total,
-      page: Math.ceil(share_result.searchResultLength/20),
+      nowPage: 1,
+      maxPage: maxPage,
     });
   };
 });
