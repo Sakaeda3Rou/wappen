@@ -653,8 +653,8 @@ app.post('/clan_search', async (req, res) => {
 // TODO: test
 app.get('/test', async (req, res) => {
   // userId
-  const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
-  // const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
+  // const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
+  const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
 
 
   // 所属クランを取得
@@ -662,13 +662,13 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = 'aaj'
+  const category = ['aai'];
 
   // マイオブジェクト取得
-  result = await dao.searchMyObject(user.uid, category, 1);
+  // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  // result = await dao.searchObject(category, user.uid, 1)
+  result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
   // const clanId = "sWuyRFv3Co7I23VoAwTZ";
@@ -678,7 +678,7 @@ app.get('/test', async (req, res) => {
   // result = await sao.getMarkerUrl(`${user.uid}.png`);
 
   // カテゴリを絞って取得
-  result = await dao.searchMyObject(user.uid, ['aah'], 1);
+  // result = await dao.searchMyObject(user.uid, ['aaj'], 1);
 
   console.log(`result =>`);
   console.dir(result);

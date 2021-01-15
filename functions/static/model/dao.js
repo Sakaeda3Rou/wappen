@@ -729,20 +729,35 @@ exports.searchObject = async(category, userId, page) => {
       for(const byCategory of categoryObject){
         var flag = false;
         for(var i = 0; i < userObject.length && flag == false; i++){
+          // console.log(`i => ${i}`);
           if(byCategory == userObject[i]){
-            flag == true
+            flag = true
           }
         }
   
         if(flag != true){
+          // console.log(`push => ${byCategory}`);
           objectIds.push(byCategory);
         }
       }
+
+      // console.dir(`userObject => ${userObject}`);
+
+      // console.dir(`categoryObject => ${categoryObject}`);
       
       // search object
       // create result
       let result = null;
       let resultArray = [];
+
+      if(objectIds.length == 0){
+        return [{
+          total : userLength,
+          searchResultLength : objectIds.length,
+          objectList : []
+        }];
+      }
+
       for (const objectId of objectIds){
         result = await db.collection('object').doc(objectId).get().then(doc => {
           let document = doc.data();
@@ -753,6 +768,7 @@ exports.searchObject = async(category, userId, page) => {
         });
   
         if(!result.hasOwnProperty('err') && result.isShared == true){
+          // console.log('!!!!!!!!!true!!!!!!!!!!');
           resultArray.push(result);
         }  
       }
@@ -803,11 +819,12 @@ exports.searchObject = async(category, userId, page) => {
         flag = false;
         for(var i = 0; i < userObject.length && flag == false; i++){
           if(doc.id == userObject[i]){
+            // console.log('!!!!!!!!!true!!!!!!!!!')
             flag = true;
           }
         }
 
-        if(flag != true){
+        if(flag == true){
           document['id'] = doc.id;
           resultArray.push(document);
         }
@@ -835,6 +852,16 @@ exports.searchObject = async(category, userId, page) => {
 //      page's number as 'page'
 //      user's id as 'userId'
 exports.searchMyObject = async(userId, category, page) => {
+  // create for start to use slice
+  let start = 0;
+  // create for end to slice
+  let end = 20;
+  
+  if(page > 1){
+    start = (20 * (page - 1))-1;
+    end = page * 20;
+  }
+
   // create length
   let userLength = 0;
   // select user's object
@@ -866,7 +893,7 @@ exports.searchMyObject = async(userId, category, page) => {
       return [{
         total : userLength,
         searchResultLength : userLength,
-        objectList : []
+        objectList : ["user's 0"]
       }];
     }
     if(category){
@@ -875,6 +902,7 @@ exports.searchMyObject = async(userId, category, page) => {
         let resultArray = [];
 
         if(snapshot.empty){
+          // console.log('!!!!!!!!!!!!!empty!!!!!!!!!!!!!!!');
           return resultArray;
         }
 
@@ -884,7 +912,8 @@ exports.searchMyObject = async(userId, category, page) => {
 
           for(var i = 0; i < category.length && flag == false; i++){
             if(document.categoryId == category[i]){
-              flag == true;
+              // console.log('!!!!!!!!true!!!!!!!!!');
+              flag = true;
             }
           }
 
@@ -905,7 +934,7 @@ exports.searchMyObject = async(userId, category, page) => {
           return [{
             total : userLength,
             searchResultLength : categoryMyObject.length,
-            objectList : []
+            objectList : ['not match']
           }];
         }
 
@@ -935,27 +964,14 @@ exports.searchMyObject = async(userId, category, page) => {
           }
         })
 
-        if(page == 1){
-          let data = {
-            total : userLength,
-            searchResultLength : resultArray.length,
-            objectList : resultArray.slice(0, 20)
-          }
-
-          // return to controller
-          return data;
-        }else if(page > 1){
-          let data = {
-            total : userLength,
-            searchResultLength : resultArray.length,
-            objectList : resultArray.slice((20 * (page - 1))-1, page * 20)
-          }
-
-          // return to controller
-          return data;
-        }else{
-          // ??????
+        let data = {
+          total : userLength,
+          searchResultLength : resultArray.length,
+          objectList : resultArray.slice(start, end)
         }
+  
+        // return to controller
+        return data;
       }else{
         // has error
         return categoryMyObject
@@ -988,27 +1004,14 @@ exports.searchMyObject = async(userId, category, page) => {
         }
       })
 
-      if(page == 1){
-        let data = {
-          total : userLength,
-          searchResultLength : resultArray.length,
-          objectList : resultArray.slice(0, 20)
-        }
-
-        // return to controller
-        return data;
-      }else if(page > 1){
-        let data = {
-          total : userLength,
-          searchResultLength : resultArray.length,
-          objectList : resultArray.slice((20 * (page - 1))-1, page * 20)
-        }
-
-        // return to controller
-        return data;
-      }else{
-        // ??????
+      let data = {
+        total : userLength,
+        searchResultLength : resultArray.length,
+        objectList : resultArray.slice(start, end)
       }
+
+      // return to controller
+      return data;
     }
   }else{
     return userObject;
