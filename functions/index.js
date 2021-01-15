@@ -653,8 +653,8 @@ app.post('/clan_search', async (req, res) => {
 // TODO: test
 app.get('/test', async (req, res) => {
   // userId
-  // const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
-  const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
+  const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
+  // const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
 
 
   // 所属クランを取得
@@ -682,9 +682,6 @@ app.get('/test', async (req, res) => {
 
   console.log(`result =>`);
   console.dir(result);
-
-
-  // res.render('ar_test');
 
   res.end();
 });

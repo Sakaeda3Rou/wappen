@@ -222,7 +222,19 @@
         const marker_area_element = document.getElementById('marker_area');
         const assets_element = document.getElementById('assets');
 
-        // TODO: 既存のマーカー、assetsを削除
+        // 既存のマーカー、assetsを削除
+        if (marker_area_element.hasChildNodes) {
+          // 子要素を削除
+          while (marker_area_element.firstChild) {
+            marker_area_element.removeChild(marker_area_element.firstChild);
+          }
+        }
+        if (assets_element.hasChildNodes) {
+          // 子要素を削除
+          while (assets_element.firstChild) {
+            assets_element.removeChild(assets_element.firstChild);
+          }
+        }
 
         // パターンリストを生成
         for (let pattern of patternList) {
