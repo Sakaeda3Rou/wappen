@@ -30,5 +30,5 @@ function searchCategorySwitch(index) {
     } catch {}
   }
 
-  console.log(`categoryList {index: ${index}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
+  console.log(`categoryList {index: ${index},categoryID: ${categoryList[index].categoryId}, categoryName: ${categoryList[index].categoryName}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
 }

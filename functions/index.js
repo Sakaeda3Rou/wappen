@@ -375,11 +375,8 @@ app.get('/my_object', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
-    // カテゴリーを設定
-    let category = null
-
     // マイオブジェクトリストを取得
-    const result = await dao.searchMyObject(user.uid, category, 1);
+    const result = await dao.searchMyObject(user.uid, null, 1);
     console.log('result=>');
     console.dir(result);
 
@@ -393,7 +390,6 @@ app.get('/my_object', async (req, res) => {
       categoryList: categoryList,
       total: result.total,
       objectList: result.objectList,
-      page: Math.ceil(result.searchResultLength/20),
     });
   }
 });
@@ -407,19 +403,30 @@ app.post('/search_object', async (req, res) => {
     res.redirect('/');
   } else {
     // プロパティーを取得
-    const body = JSON.parse(req.body)
-    const objectList = body.objectList
-    const searchCategoryList = body.searchCategoryList
-
-    console.log(`objectList => ${objectList}`);
-    console.dir(objectList);
-    console.log(`searchCategoryList => ${searchCategoryList}`);
+    const searchCategoryList = JSON.parse(req.body._request_body).searchCategoryList;
+    console.log('searchCategoryList =>');
     console.dir(searchCategoryList);
 
-    // TODO: 検索結果リストを取得
+    // カテゴリーリストを取得
+    const categoryList = await dao.selectAll('category');
+    console.dir(categoryList)
 
+    // カテゴリを絞ってマイオブジェクトを取得
+    const result = await dao.searchMyObject(user.uid, searchCategoryList, 1);
+    console.log('result =>');
+    console.dir(result);
 
-    res.end();
+    if (result.objectList == undefined) {
+      result.total = 0;
+      result.objectList = [];
+      result.searchResultLength = 1;
+    }
+
+    res.render('my-object', {
+      categoryList: categoryList,
+      total: result.total,
+      objectList: result.objectList,
+    });
   }
 });
 
@@ -669,6 +676,9 @@ app.get('/test', async (req, res) => {
 
   // マーカーURL取得
   // result = await sao.getMarkerUrl(`${user.uid}.png`);
+
+  // カテゴリを絞って取得
+  result = await dao.searchMyObject(user.uid, ['aah'], 1);
 
   console.log(`result =>`);
   console.dir(result);

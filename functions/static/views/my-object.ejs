@@ -63,7 +63,7 @@
                         <h3 class="category__title">
                             カテゴリ検索
                         </h3>
-                        <form action="#" style="display: flex; flex-direction: column;">
+                        <form id="search_object" action="/search_object" method="post" style="display: flex; flex-direction: column;">
                             <div id="category_search_form" class="category__checks">
 
                               <!-- カテゴリーリストを生成 -->
@@ -234,25 +234,27 @@
           }
         }
 
-        // XMLHttpRequestを作成
-        let xhr = new XMLHttpRequest();
+        // カテゴリリストが空の場合、アラートを表示
+        if (searchCategoryList.length == 0) {
+          window.alert('カテゴリが選択されていません。');
+          return;
+        }
 
-        xhr.open('post', '/search_object');
+        // formを取得
+        const form_element = document.getElementById('search_object');
 
-        // オブジェクトリストと、検索カテゴリリストを渡す
-        xhr.send(JSON.stringify({objectList: [{}], searchCategoryList: searchCategoryList}));
+        // リクエストボディを作成
+        const request_body = {searchCategoryList: searchCategoryList};
 
-        // サーバーの応答を検知
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4 && xhr.status === 200){
-                // オブジェクトリストを取得
-                let restxt = xhr.responseText;
-                console.log(`restxt => ${restxt}`);
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
 
-                // TODO: オブジェクトを再表示
-
-            }
-        };
+        // formを送信
+        form_element.submit();
 
       }, false);
 
