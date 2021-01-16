@@ -662,7 +662,7 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = ['aai'];
+  const category = ['aaj'];
 
   // マイオブジェクト取得
   // result = await dao.searchMyObject(user.uid, category, 1);

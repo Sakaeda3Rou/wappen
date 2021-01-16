@@ -76,6 +76,7 @@
 
     <script src="js/include.js"></script>
     <script src="js/modal.js"></script>
+    <script src="js/videoActive.js"></script>
     <script>
         const videoArea = document.querySelector('.video-area');
         const videoMenu = document.querySelector('.video-menu');
@@ -87,18 +88,54 @@
         const videoTwo = ['item1', 'item2'];
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
         let people = videoFour;
+        let micFlag = true;
+        let videoFlag = true;
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
         videoBtn.addEventListener('click', () => {
             iconVideo.classList.toggle('fa-video');
             iconVideo.classList.toggle('fa-video-slash');
+
+            // videoを切るように設定されていた場合
+            if(iconVideo.classList.contains('fa-video-slash')){
+                videoFlag = false;
+            }
+
+            // stream を一時中断
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
+
+            // stream を設定通りに再開
+            openUserMedia();
         });
 
         micBtn.addEventListener('click', () => {
             iconMic.classList.toggle('fa-microphone');
             iconMic.classList.toggle('fa-microphone-slash');
+
+            // videoを切るように設定されていた場合
+            if(iconMic.classList.contains('fa-microphone-slash')){
+                micFlag = false;
+            }
+
+            // stream を一時中断
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
+
+            // stream を設定通りに再開
+            openUserMedia();
         });
+
+        // use micFlag and videoFlag to get userMedia
+        async function openUserMedia(){
+            const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
+            document.querySelector('#localVideo').srcObject = stream;
+        }
 
         window.onload = function () {
             //getパラメータを取得
@@ -151,6 +188,8 @@
                     videoArea.style.display = 'flex';
                 });
             }
+
+            openUserMedia();
         };
 
         //マイオブジェクト一覧を表示

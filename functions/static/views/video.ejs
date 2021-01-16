@@ -86,10 +86,7 @@
 
     <script src="js/include.js"></script>
     <script src="js/modal.js"></script>
-<<<<<<< HEAD
     <script src="js/videoChat.js"></script>
-=======
->>>>>>> 5319b43163a14e5402095e6051250307fb4b4c87
     <script>
         const btnTwo = document.getElementById('js-select-btn-two');
         const btnFour = document.getElementById('js-select-btn-four');
@@ -104,16 +101,56 @@
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
         const videoStart = document.querySelector('.video-menu__start');
         const videoForm = document.querySelector('.video-menu__form');
+        let micFlag = true;
+        let videoFlag = true;
+
+        // TODO: think about necessary of user's video
+        // if need : create <video> to insert localStream
 
         videoBtn.addEventListener('click', () => {
             iconVideo.classList.toggle('fa-video');
             iconVideo.classList.toggle('fa-video-slash');
+
+            // videoを切るように設定されていた場合
+            if(iconVideo.classList.contains('fa-video-slash')){
+                videoFlag = false;
+            }
+
+            // stream を一時中断
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
+
+            // stream を設定通りに再開
+            openUserMedia();
         });
 
         micBtn.addEventListener('click', () => {
             iconMic.classList.toggle('fa-microphone');
             iconMic.classList.toggle('fa-microphone-slash');
+
+            // videoを切るように設定されていた場合
+            if(iconMic.classList.contains('fa-microphone-slash')){
+                micFlag = false;
+            }
+
+            // stream を一時中断
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
+
+            // stream を設定通りに再開
+            openUserMedia();
         });
+
+        // use micFlag and videoFlag to get userMedia
+        async function openUserMedia(){
+            const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
+            document.querySelector('#localVideo').srcObject = stream;
+        } 
+
 
         btnTwo.addEventListener('click', () => {
             videoMenu.style.display = 'flex';
@@ -238,8 +275,4 @@
     </script>
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> 5319b43163a14e5402095e6051250307fb4b4c87
