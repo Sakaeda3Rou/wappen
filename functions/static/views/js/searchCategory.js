@@ -32,3 +32,42 @@ function searchCategorySwitch(index) {
 
   console.log(`categoryList {index: ${index},categoryID: ${categoryList[index].categoryId}, categoryName: ${categoryList[index].categoryName}, isSearchSelected: ${categoryList[index].isSearchSelected}}`);
 }
+
+// 検索ボタンにclickイベントを追加
+let search_btn = document.getElementById('search_btn');
+
+// 検索ボタンを押した時
+search_btn.addEventListener('click', () => {
+
+  // 検索するカテゴリリストを作成
+  let searchCategoryList = [];
+
+  for (let category of categoryList) {
+    if (category.isSearchSelected) {
+      searchCategoryList.push(category.categoryId);
+    }
+  }
+
+  // カテゴリリストが空の場合、アラートを表示
+  if (searchCategoryList.length == 0) {
+    window.alert('カテゴリが選択されていません。');
+    return;
+  }
+
+  // formを取得
+  const form_element = document.getElementById('search_object');
+
+  // リクエストボディを作成
+  const request_body = {searchCategoryList: searchCategoryList};
+
+  // text要素を作成
+  const text_element = document.createElement('input');
+  text_element.hidden = true;
+  text_element.setAttribute('name', '_request_body');
+  text_element.setAttribute('value', JSON.stringify(request_body));
+  form_element.appendChild(text_element);
+
+  // formを送信
+  form_element.submit();
+
+}, false);

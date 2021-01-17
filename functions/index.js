@@ -371,49 +371,22 @@ app.get('/my_object', async (req, res) => {
     res.redirect('/');
   } else {
 
+
     // カテゴリーリストを取得
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
-    // マイオブジェクトリストを取得
-    const result = await dao.searchMyObject(user.uid, null, 1);
-    console.log('result=>');
-    console.dir(result);
-
-    if (result.objectList == undefined) {
-      result.total = 0;
-      result.objectList = [];
-      result.searchResultLength = 1;
+    // カテゴリーを設定
+    let category = null;
+    console.log('query =>');
+    console.dir(req.query)
+    if (req.query._request_body != undefined) {
+      category = JSON.parse(req.query._request_body).searchCategoryList;
     }
 
-    res.render('my-object', {
-      categoryList: categoryList,
-      total: result.total,
-      objectList: result.objectList,
-    });
-  }
-});
-
-app.post('/search_object', async (req, res) => {
-
-  // ユーザーを取得
-  const user = await confirmUser(req);
-
-  if (!user) {
-    res.redirect('/');
-  } else {
-    // プロパティーを取得
-    const searchCategoryList = JSON.parse(req.body._request_body).searchCategoryList;
-    console.log('searchCategoryList =>');
-    console.dir(searchCategoryList);
-
-    // カテゴリーリストを取得
-    const categoryList = await dao.selectAll('category');
-    console.dir(categoryList)
-
-    // カテゴリを絞ってマイオブジェクトを取得
-    const result = await dao.searchMyObject(user.uid, searchCategoryList, 1);
-    console.log('result =>');
+    // マイオブジェクトリストを取得
+    const result = await dao.searchMyObject(user.uid, category, 1);
+    console.log('result=>');
     console.dir(result);
 
     if (result.objectList == undefined) {
@@ -479,8 +452,16 @@ app.get('/object_share', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
+    // カテゴリーを設定
+    let category = null;
+    console.log('query =>');
+    console.dir(req.query)
+    if (req.query._request_body != undefined) {
+      category = JSON.parse(req.query._request_body).searchCategoryList;
+    }
+
     // シェアオブジェクトリストを取得
-    const share_result = await dao.searchObject(null, user.uid, 1);
+    const share_result = await dao.searchObject(category, user.uid, 1);
     console.log('share result =>')
     console.dir(share_result);
 
@@ -515,62 +496,6 @@ app.get('/object_share', async (req, res) => {
       maxPage: maxPage,
     });
   };
-});
-
-app.post('/search_share_object', async (req, res) => {
-  // ユーザーを取得
-  const user = await confirmUser(req);
-
-  if (!user) {
-    res.redirect('/');
-  } else {
-
-    // requestbodyを取得
-    const searchCategoryList = JSON.parse(req.body._request_body).searchCategoryList;
-    console.log('searchCategoryList =>')
-    console.dir(searchCategoryList);
-
-    // カテゴリーリストを取得
-    const categoryList = await dao.selectAll('category');
-    console.dir(categoryList)
-
-    // カテゴリを絞ってシェアオブジェクトを取得
-    const share_result = await dao.searchObject(searchCategoryList, user.uid, 1);
-    console.log('share result =>');
-    console.dir(share_result);
-
-    if (share_result.objectList == undefined) {
-      share_result.objectList = [];
-      share_result.total = 0;
-      share_result.searchResultLength = 0;
-    }
-
-    // マイオブジェクトリストを取得
-    const my_result = await dao.searchMyObject(user.uid, null, 1);
-    console.log('my_result =>')
-    console.dir(my_result)
-
-    if (my_result.objectList == undefined) {
-      my_result.objectList = [];
-      my_result.total = 0;
-    }
-
-    // 最大ページ
-    let maxPage = Math.ceil(share_result.searchResultLength/20)
-    if (maxPage == 0) {
-      maxPage = 1;
-    }
-
-    res.render('object-share', {
-      categoryList: categoryList,
-      myObjectList: my_result.objectList,
-      shareObjectList: share_result.objectList,
-      total: my_result.total,
-      nowPage: 1,
-      maxPage: maxPage,
-    });
-
-  }
 });
 
 app.post('/object_shared', async (req, res) => {
