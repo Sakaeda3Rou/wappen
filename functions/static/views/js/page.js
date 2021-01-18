@@ -93,8 +93,3 @@ function createInput(value, isDisabled) {
 
   return input_element;
 }
-
-function pageSelected(value) {
-  console.log(`select page => ${value}`);
-  
-}

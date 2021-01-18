@@ -127,12 +127,12 @@
 
             </ul>
         </div>
-        <div id="page_numbers" class="page__numbers">
+        <form id="page_numbers" class="page__numbers" action="/object_share" method="get">
 
           <!-- ページボタンを生成 -->
 
-            <br>
-        </div>
+        <br>
+        </form>
     </main>
     <footer id="footer"></footer>
     <script src="views/js/include.js"></script>
@@ -285,7 +285,49 @@
     console.log(`page => ${maxPage}`);
     createPage();
   </script>
+  <script>
+    // ページが選択された時
+    function pageSelected(value) {
+      console.log(`select page => ${value}`);
 
+      // フォームを取得
+      const form_element = document.getElementById('page_numbers');
+
+      // カテゴリーリストを作成
+      const searchCategoryList = "<% category %>"
+
+      console.log(`category => ${searchCategoryList}`);
+
+      // ページを設定
+      let page = 1;
+      switch (value) {
+        case '<':
+          page = Number("<%= nowPage %>") -1;
+          break;
+        case '>':
+          page = Number("<%= nowPage %>") + 1;
+          console.log(`page => ${page}`);
+          break;
+        default:
+          page = Number(value);
+          break;
+      }
+
+
+      // リクエストボディを作成
+      const request_body = {searchCategoryList: searchCategoryList, page: page}
+
+      // text要素を作成
+      const text_element = document.createElement('input');
+      text_element.hidden = true;
+      text_element.setAttribute('name', '_request_body');
+      text_element.setAttribute('value', JSON.stringify(request_body));
+      form_element.appendChild(text_element);
+
+      // formを送信
+      // form_element.submit();
+
+    }
   </script>
   <script>
     // オブジェクトをシェア

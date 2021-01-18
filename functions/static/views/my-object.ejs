@@ -302,5 +302,24 @@
 
 
     </script>
+    <script>
+      // オブジェクトを削除
+      function objectDelete(index) {
+        // TODO: フォームを取得
+
+        // リクエストボディを作成
+        const request_body = objectList[index].objectId
+
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
+
+        // フォームを送信
+        form_element.submit();
+      }
+    </script>
 </body>
 </html>
