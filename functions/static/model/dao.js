@@ -1046,6 +1046,125 @@ exports.prisonBreak = async(userId, clanId) => {
   return true;
 }
 
+// when you use : select my object
+// need user's id as 'userId'
+exports.selectMyObject = async(userId) => {
+  let objectURLs = [];
+  const myObjects = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', 'true').get().then(snapshot => {
+    // create resultArray
+    let resultArray = [];
+
+    if(snapshot.empty){
+      // if empty
+      return resultArray;
+    }
+
+    snapshot.forEach(doc => {
+      let document = doc.data();
+
+      resultArray.push(document.objectId);
+    })
+
+    return resultArray;
+  }).catch(err => {
+    return {err: err};
+  })
+
+  if(Array.isArray(myObjects)){
+    for(const myObject of myObjects){
+      const objectData = await db.collection('object').doc(myObject.objectId).get().then(doc => {
+        let document = doc.data();
+
+        return {objectURL: document.objectURL};
+      }).catch(err => {
+        return {err: err};
+      })
+
+      if(!objectData.hasOwnProperty('err')){
+        objectURLs.push(objectData);
+      }else{
+        // objectData has error
+        return objectData;
+      }
+
+    }
+
+    // return to controller
+    return objectURLs;
+  }else{
+    // myObjects has error
+    return myObjects;
+  }
+}
+
+// when you use : delete my Object
+// need user's id as 'userId'
+//      object's id as 'objectId'
+exports.deleteMyObject = async(userId, objectId) => {
+  let updateResult = null;
+  const myDeletes = await db.collection('my_object').where('userId', '==', userId).where('objectId', '==', objectId).get().then(snapshot => {
+    // create resultArray
+    let resultArray = [];
+
+    if(snapshot.empty){
+      return resultArray;
+    }
+
+    snapshot.forEach(doc => {
+      let document = doc.data();
+      document['id'] = doc.id;
+
+      resultArray.push(document);
+    }).catch(err => {
+      return {err: err};
+    })
+
+    return resultArray;
+  })
+
+  if(Array.isArray(myDeletes)){
+    for(const myDelete of myDeletes){
+      let deleteResult = await _this.deleteDoc('my_object', myDelete.id);
+
+      if(!deleteResult.hasOwnProperty('err')){
+        if(myDelete.isSelected == true){
+          const myFirst = await db.collection('my_object').where('userId', '==', userId).orderBy('objectName', 'desc').limit(1).get().then(snapshot => {
+            let firstId = null;
+    
+            if(snapshot.empty){
+              return firstId;
+            }
+    
+            snapshot.forEach(doc => {
+              firstId = doc.id;
+            })
+    
+            return firstId;
+          }).catch(err => {
+            return {err: err};
+          })
+    
+          updateResult = await _this.updateDoc('my_object', myFirst, {isSelected : true});
+
+          if(updateResult.hasOwnProperty('err')){
+            // updateResult has error
+            return updateResult;
+          }
+        }
+      }else{
+        // deleteResult has error
+        return deleteResult;
+      }
+    }
+  }else{
+    // select delete object has error
+    return myDeletes;
+  }
+
+  // success
+  return true;
+}
+
 // when you use : for increment numberOfAdd
 // need object's id as 'objectId'
 exports.incrementNumberOfAdd = async(objectId) => {
