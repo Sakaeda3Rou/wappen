@@ -154,17 +154,17 @@
               clan_div_element.appendChild(input_button_element);
             } else if (clan.state == 'already') {
               // 「加入済み」を作成
-              const input_button_element = document.createElement('input');
+              const input_button_element = document.createElement('div');
               input_button_element.disabled = true;
               input_button_element.setAttribute('class', 'main-btn in-btn clan-after');
-              input_button_element.setAttribute('value', '加入済み');
+              input_button_element.innerHTML = '加入済み'
               clan_div_element.appendChild(input_button_element);
             } else if (clan.state == 'over') {
               // 「満員」を作成
-              const input_button_element = document.createElement('input');
+              const input_button_element = document.createElement('div');
               input_button_element.disabled = true;
               input_button_element.setAttribute('class', 'main-btn in-btn clan-after');
-              input_button_element.setAttribute('value', '満員');
+              input_button_element.innerHTML = '満員'
               clan_div_element.appendChild(input_button_element);
             }
 

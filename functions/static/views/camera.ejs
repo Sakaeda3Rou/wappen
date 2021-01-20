@@ -52,10 +52,10 @@
                     <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
                     <div class="category__my-object">
                         <!-- 選択中の画像を表示 -->
-                        <div class="my-object-list__select"></div>
+                        <div id="select_image" class="my-object-list__select"></div>
                         <!-- 共有するボタン -->
                         <div class="my-object-list__decision">
-                            <input type="submit" value="決定" class="main-btn my-object-list__submit">
+                            <input id="decision_button" type="button" value="決定" class="main-btn my-object-list__submit">
                             <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel"
                                 id="js-category-cansel">
                         </div>
@@ -94,8 +94,10 @@
           objectId: "<%= object.id %>",
           objectName: "<%= object.objectName %>",
           objectURL: url,
+          objectSelected: "<%= object.objectSelected %>"
         });
       <% }); %>
+      console.dir(objectList)
 
       // パターンリストを作成
       let patternList = []
@@ -115,10 +117,10 @@
 
       function setARMarker() {
         // マーカーを生成する領域を取得
-        const marker_area = document.getElementById('marker-area');
+        const marker_area = document.getElementById('marker_area');
 
         // すでにマーカーが存在していた場合、削除する
-        if (marker_area.hasChildNodes) {
+        if (marker_area.hasChildNodes()) {
           // 子要素を削除
           while (marker_area.firstChild) {
             marker_area.removeChild(marker_area.firstChild);
@@ -161,7 +163,7 @@
         }
       }
 
-      // TODO: クランが選択された時
+      // クランが選択された時
 
       function selectedClan() {
         // 選択されたクランのIDを取得
@@ -196,7 +198,7 @@
         };
       }
 
-      // TODO: オブジェクトが選択された時
+      // オブジェクトが選択された時
       function selectedObject(index) {
         // imageタグを取得
         const image_element = document.getElementById('<%= userId %>');
@@ -208,8 +210,9 @@
         const xhr = new XMLHttpRequest();
 
         // サーバーに送信
-        xhr.open('post', '/object_selected');
-        xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
+        console.log(`send objectId => ${objectList[index].objectId}`);
+        // xhr.open('post', '/object_selected');
+        // xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
 
       }
 

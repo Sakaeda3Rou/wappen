@@ -37,6 +37,8 @@ cameraBtns.forEach(btn => {
         const object_li_element = document.createElement('li');
 
         object_li_element.classList.add('my-object-list__item');
+        object_li_element.setAttribute('style', `background-image: url(${object.objectURL})`);
+        object_li_element.setAttribute('onclick', `setMyModal(${index})`);
 
         modalList.appendChild(object_li_element);
       }
@@ -46,25 +48,6 @@ cameraBtns.forEach(btn => {
       const myObjectListItems = document.querySelector('.my-object-list__items');
       const categoryCansel = document.querySelector('.my-object-list__cansel');
       const categorySubmit = document.querySelector('.my-object-list__submit');
-
-      items.forEach(item => {
-        item.addEventListener('click', () => {
-          categoryMyObject.classList.toggle('category-open');
-          myObjectListItems.classList.toggle('my-object-list__items--close');
-
-          if (categoryMyObject.classList.contains('category-open')) {
-            categoryMyObject.style.height = '80%';
-          } else {
-            categoryMyObject.style.height = 0;
-          }
-
-          if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-            myObjectListItems.style.height = 0;
-          } else {
-            myObjectListItems.style.height = '80%';
-          }
-        });
-      });
 
       //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
       categoryCansel.addEventListener('click', () => {
@@ -92,3 +75,38 @@ cameraBtns.forEach(btn => {
     };
   });
 });
+
+function setMyModal(index) {
+  const items = document.querySelectorAll('.my-object-list__item');
+  const categoryMyObject = document.querySelector('.category__my-object');
+  const myObjectListItems = document.querySelector('.my-object-list__items');
+  const categoryCansel = document.querySelector('.my-object-list__cansel');
+  const categorySubmit = document.querySelector('.my-object-list__submit');
+
+
+  categoryMyObject.classList.toggle('category-open');
+  myObjectListItems.classList.toggle('my-object-list__items--close');
+
+  if (categoryMyObject.classList.contains('category-open')) {
+    categoryMyObject.style.height = '80%';
+  } else {
+    categoryMyObject.style.height = 0;
+  }
+
+  if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+    myObjectListItems.style.height = 0;
+  } else {
+    myObjectListItems.style.height = '80%';
+  }
+
+  // 画像を表示する領域を取得
+  const image_div_element = document.getElementById('select_image');
+
+  image_div_element.setAttribute('style', `background-image: url(${objectList[index].objectURL})`);
+
+  // 決定ボタンを取得
+  const share_button_element = document.getElementById('decision_button');
+
+  share_button_element.setAttribute('onclick', `selectedObject(${index})`);
+
+}
