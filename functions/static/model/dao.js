@@ -1154,11 +1154,11 @@ exports.deleteMyObject = async(userId, objectId) => {
           if(myFirst){
             // console.log(myFirst);
             updateResult = await _this.updateDoc('my_object', myFirst, {isSelected : true});
-          }
 
-          if(updateResult.hasOwnProperty('err')){
-            // updateResult has error
-            return updateResult;
+            if(updateResult.hasOwnProperty('err')){
+              // updateResult has error
+              return updateResult;
+            }
           }
         }
       }else{
