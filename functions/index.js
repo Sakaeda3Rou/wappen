@@ -416,7 +416,10 @@ app.post('/object_delete', async (req, res) => {
 
     const objectId = body.objectId;
 
+    console.log(`delete => ${objectId}`);
+
     // TODO: オブジェクトを削除
+    
 
     // マイオブジェクトにリダイレクト
     res.redirect('/my_object');
