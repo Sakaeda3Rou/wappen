@@ -1050,7 +1050,7 @@ exports.prisonBreak = async(userId, clanId) => {
 // need user's id as 'userId'
 exports.selectMyObject = async(userId) => {
   let objectURLs = [];
-  const myObjects = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', 'true').get().then(snapshot => {
+  const myObjects = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     // create resultArray
     let resultArray = [];
 
@@ -1070,24 +1070,31 @@ exports.selectMyObject = async(userId) => {
     return {err: err};
   })
 
+  // console.log('myObjects =>');
+  // console.dir(myObjects);
+
   if(Array.isArray(myObjects)){
     for(const myObject of myObjects){
-      const objectData = await db.collection('object').doc(myObject.objectId).get().then(doc => {
+      const objectData = await db.collection('object').doc(myObject).get().then(doc => {
         let document = doc.data();
 
-        return {objectURL: document.objectURL};
+        objectURLs.push({objectURL: document.objectURL});
+
+        console.log(document.objectURL);
+
+        return {result: 'success'}
       }).catch(err => {
         return {err: err};
       })
 
-      if(!objectData.hasOwnProperty('err')){
-        objectURLs.push(objectData);
-      }else{
+      if(objectData.hasOwnProperty('err')){
         // objectData has error
         return objectData;
       }
-
     }
+
+    // console.log('objectURLs =>');
+    // console.dir(objectURLs);
 
     // return to controller
     return objectURLs;
@@ -1115,11 +1122,11 @@ exports.deleteMyObject = async(userId, objectId) => {
       document['id'] = doc.id;
 
       resultArray.push(document);
-    }).catch(err => {
-      return {err: err};
     })
 
     return resultArray;
+  }).catch(err => {
+    return {err: err};
   })
 
   if(Array.isArray(myDeletes)){
@@ -1128,7 +1135,7 @@ exports.deleteMyObject = async(userId, objectId) => {
 
       if(!deleteResult.hasOwnProperty('err')){
         if(myDelete.isSelected == true){
-          const myFirst = await db.collection('my_object').where('userId', '==', userId).orderBy('objectName', 'desc').limit(1).get().then(snapshot => {
+          const myFirst = await db.collection('my_object').where('userId', '==', userId).limit(1).get().then(snapshot => {
             let firstId = null;
     
             if(snapshot.empty){
@@ -1143,8 +1150,11 @@ exports.deleteMyObject = async(userId, objectId) => {
           }).catch(err => {
             return {err: err};
           })
-    
-          updateResult = await _this.updateDoc('my_object', myFirst, {isSelected : true});
+
+          if(myFirst){
+            // console.log(myFirst);
+            updateResult = await _this.updateDoc('my_object', myFirst, {isSelected : true});
+          }
 
           if(updateResult.hasOwnProperty('err')){
             // updateResult has error

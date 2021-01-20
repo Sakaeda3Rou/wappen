@@ -644,11 +644,14 @@ app.get('/test', async (req, res) => {
 
   const category = ['aaj'];
 
+  // const objectId = 'kXK3nIvG6QBxvEhpG22G';
+  const objectId = 'BDVQ4Ruj9LNb4unuNKO4';
+
   // マイオブジェクト取得
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  result = await dao.searchObject(category, user.uid, 1)
+  // result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
   // const clanId = "sWuyRFv3Co7I23VoAwTZ";
@@ -659,6 +662,12 @@ app.get('/test', async (req, res) => {
 
   // カテゴリを絞って取得
   // result = await dao.searchMyObject(user.uid, ['aaj'], 1);
+
+  // selectMyObject test
+  // result = await dao.selectMyObject(user.uid);
+
+  // deleteMyObject test
+  result = await dao.deleteMyObject(user.uid, objectId);
 
   console.log(`result =>`);
   console.dir(result);
