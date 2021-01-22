@@ -293,8 +293,14 @@ app.get('/camera', async (req, res) => {
     // マイオブジェクトリストを取得
     const my_result = await dao.searchMyObject(user.uid, null, 1);
 
-    // 空パターンリスト
-    const patternList = [];
+    // ユーザーの初期オブジェクトのURLを取得
+    const objectURL = await dao.selectMyObject(user.uid).objectURL;
+
+    // ユーザーのパターンURLを取得
+    const patternURL = await sao.getPattUrl(user.uid);
+
+    // 初期パターンリスト
+    const patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
 
     res.render('camera', {
       userId: user.uid,
@@ -318,7 +324,7 @@ app.post('/object_selected', async (req, res) => {
     const objectId = JSON.parse(req.body).objectId;
 
     // 選択オブジェクトを切り替え
-    // await dao.changeSelected(user.uid, objectId);
+    await dao.changeSelected(user.uid, objectId);
 
     res.end();
   }
@@ -418,8 +424,8 @@ app.post('/object_delete', async (req, res) => {
 
     console.log(`delete => ${objectId}`);
 
-    // TODO: オブジェクトを削除
-    
+    // オブジェクトを削除
+    await dao.deleteMyObject(user.uid, objectId);
 
     // マイオブジェクトにリダイレクト
     res.redirect('/my_object');
@@ -692,8 +698,8 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
-  // const clanId = "sWuyRFv3Co7I23VoAwTZ";
-  // result = await dao.selectMarkerList(user.uid, clanId);
+  const clanId = "sWuyRFv3Co7I23VoAwTZ";
+  result = await dao.selectMarkerList(user.uid, clanId);
 
   // マーカーURL取得
   // result = await sao.getMarkerUrl(`${user.uid}.png`);
@@ -705,7 +711,7 @@ app.get('/test', async (req, res) => {
   // result = await dao.selectMyObject(user.uid);
 
   // deleteMyObject test
-  result = await dao.deleteMyObject(user.uid, objectId);
+  // result = await dao.deleteMyObject(user.uid, objectId);
 
   console.log(`result =>`);
   console.dir(result);

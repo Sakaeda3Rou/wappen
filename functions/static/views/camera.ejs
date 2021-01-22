@@ -103,11 +103,18 @@
       let patternList = []
 
       <% patternList.forEach(pattern => { %>
+        var object_url = "<%= pattern.objectURL %>";
+        object_url = url.replace('amp;', '')
+        var pattern_url = "<%= pattern.patternURL%>";
+        pattern_url = url.replace('amp;', '')
+
         patternList.push({
-          markerURL: "<%= pattern.patternURL %>",
-          objectURL: "<%= pattern.objectURL %>",
+          userId: "<%= pattern.userId %>",
+          patternURL: pattern_url,
+          objectURL: object_url,
         })
       <% }); %>
+      console.dir(patternList)
 
     </script>
     <script src="views/js/cameraBtn.js"></script>
@@ -219,6 +226,8 @@
     </script>
     <script>
 
+      setPattern(patternList)
+
       function setPattern(patternList) {
 
         // patternリスト、imageタグを生成する領域を取得
@@ -256,7 +265,6 @@
           const marker_element = document.createElement('a-marker');
           marker_element.setAttribute('type', 'pattern');
           marker_element.setAttribute('url', `${pattern.patternURL}`);
-          // marker_element.setAttribute('preset', `${marker.markerURL}`);
 
           // a-planeタグを作成
           const plane_element = document.createElement('a-plane');

@@ -187,11 +187,8 @@
         // 加入ボタンを加入済みに変更
         const button_element = document.getElementById(clanId);
         button_element.disabled = true;
-        input_button_element.setAttribute('class', 'main-btn in-btn clan-after');
+        button_element.setAttribute('class', 'main-btn in-btn clan-after');
         button_element.setAttribute('value', '加入済み');
-
-
-        button_element.remove();
 
         // サーバーの応答を検知
         xhr.onreadystatechange = function () {

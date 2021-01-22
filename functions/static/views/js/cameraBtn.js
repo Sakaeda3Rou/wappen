@@ -18,13 +18,20 @@ cameraBtns.forEach(btn => {
         const label = document.createElement('label');
         check.setAttribute('type', 'radio');
         check.setAttribute('name', 'clanRadio');
-        check.setAttribute('value', `${index}`);
+        check.setAttribute('value', `${clan.clanId}`);
 
         clan_li_element.appendChild(label);
         label.appendChild(check);
         label.appendChild(document.createTextNode(clan.clanName));
         modalList.appendChild(clan_li_element);
       }
+
+      const div = document.createElement('div');
+      div.classList.add('main-btn');
+      div.id = 'clan-select-btn';
+      div.appendChild(document.createTextNode('決定'));
+      modalList.appendChild(div);
+      div.setAttribute('onclick', 'selectedClan()');
 
     } else { //マイオブジェクトボタンを押されたらmodalの中身をマイオブジェクト選択に変更
 
