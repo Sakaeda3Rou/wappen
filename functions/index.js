@@ -294,13 +294,23 @@ app.get('/camera', async (req, res) => {
     const my_result = await dao.searchMyObject(user.uid, null, 1);
 
     // ユーザーの初期オブジェクトのURLを取得
-    const objectURL = await dao.selectMyObject(user.uid).objectURL;
+    const result = await dao.selectMyObject(user.uid);
+
+    const objectURL = result[0].objectURL;
 
     // ユーザーのパターンURLを取得
     const patternURL = await sao.getPattUrl(user.uid);
 
     // 初期パターンリスト
     const patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
+    // const patternList = []
+    console.log('patternList');
+    console.dir(patternList);
+
+    console.log(`patternURL: `)
+    console.log(patternURL);
+    console.log('objectURL: ')
+    console.log(objectURL)
 
     res.render('camera', {
       userId: user.uid,
@@ -322,6 +332,7 @@ app.post('/object_selected', async (req, res) => {
 
     // オブジェクトIdを取得
     const objectId = JSON.parse(req.body).objectId;
+    console.log(`objectId => ${objectId}`);
 
     // 選択オブジェクトを切り替え
     await dao.changeSelected(user.uid, objectId);

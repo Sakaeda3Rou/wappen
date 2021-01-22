@@ -104,9 +104,9 @@
 
       <% patternList.forEach(pattern => { %>
         var object_url = "<%= pattern.objectURL %>";
-        object_url = url.replace('amp;', '')
-        var pattern_url = "<%= pattern.patternURL%>";
-        pattern_url = url.replace('amp;', '')
+        object_url = object_url.replace('amp;', '')
+        var pattern_url = "<%= pattern.patternURL %>";
+        pattern_url = pattern_url.replace('amp;', '')
 
         patternList.push({
           userId: "<%= pattern.userId %>",
@@ -118,42 +118,6 @@
 
     </script>
     <script src="views/js/cameraBtn.js"></script>
-    <script>
-      // a-markerを生成
-      // setARMarker();
-
-      function setARMarker() {
-        // マーカーを生成する領域を取得
-        const marker_area = document.getElementById('marker_area');
-
-        // すでにマーカーが存在していた場合、削除する
-        if (marker_area.hasChildNodes()) {
-          // 子要素を削除
-          while (marker_area.firstChild) {
-            marker_area.removeChild(marker_area.firstChild);
-          }
-        }
-
-        for (let pattern of patternList) {
-          // a-markerタグを作成
-          const a_marker_element = document.createElement('a-marker');
-          a_marker_element.setAttribute('type', 'pattern');
-          // a_marker_element.setAttribute('url', `${pattern.patternURL}`);
-
-          // a-entityタグを作成
-          const a_entity_element = document.createElement('a-entity');
-          a_entity_element.setAttribute('position', '0 -1 0');
-          a_entity_element.setAttribute('scale', '0.05 0.05 0.05');
-          // a_entity_element.setAttribute('gltf-model', `${marker.objectURL}`);
-
-          // divに追加
-          a_marker_element.appendChild(a_entity_element);
-          marker_area.appendChild(a_marker_element);
-
-        }
-      }
-
-    </script>
     <script>
       // 開いているモーダルを判定
       let selectType = null;
@@ -173,6 +137,10 @@
       // クランが選択された時
 
       function selectedClan() {
+
+        // モーダルを閉じる
+        modal.classList.remove('open');
+
         // 選択されたクランのIDを取得
         let clanId = null;
         const radio_element = document.getElementsByName('clanRadio');
@@ -194,7 +162,7 @@
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
                 // パターンリストを取得
-                let patternList = JSON.parse(xhr.responseText);
+                patternList = JSON.parse(xhr.responseText);
 
                 console.log(`patternList => ${patternList}`);
                 console.dir(patternList);
@@ -210,16 +178,42 @@
         // imageタグを取得
         const image_element = document.getElementById('<%= userId %>');
 
+        // ユーザーIDを取得
+        const userId = "<%= userId %>";
 
-        // objectURLを変更する
-        image_element.setAttribute('src', `${objectList[index].objectURL}`);
+        // パターンリストの自分のオブジェクトURLを差し替える
+        for (let pattern of patternList) {
+
+          console.log(`1: ${pattern.userId} == 2: ${userId}`);
+          if (pattern.userId == userId) {
+            console.log('userId true')
+            pattern.objectURL = objectList[index].objectURL
+            break;
+          } else {
+            console.log('userId false');
+          }
+        }
+
+
+        // パターンリストの確認
+        console.log('patternList');
+        console.dir(patternList);
+
+        // パターンの更新
+        setPattern(patternList)
 
         const xhr = new XMLHttpRequest();
 
         // サーバーに送信
         console.log(`send objectId => ${objectList[index].objectId}`);
-        // xhr.open('post', '/object_selected');
-        // xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
+        xhr.open('post', '/object_selected');
+        xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
+
+        // サーバーの応答を検知
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200){
+            }
+        };
 
       }
 
