@@ -293,8 +293,24 @@ app.get('/camera', async (req, res) => {
     // マイオブジェクトリストを取得
     const my_result = await dao.searchMyObject(user.uid, null, 1);
 
-    // 空パターンリスト
-    const patternList = [];
+    // ユーザーの初期オブジェクトのURLを取得
+    const result = await dao.selectMyObject(user.uid);
+
+    const objectURL = result[0].objectURL;
+
+    // ユーザーのパターンURLを取得
+    const patternURL = await sao.getPattUrl(user.uid);
+
+    // 初期パターンリスト
+    const patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
+    // const patternList = []
+    console.log('patternList');
+    console.dir(patternList);
+
+    console.log(`patternURL: `)
+    console.log(patternURL);
+    console.log('objectURL: ')
+    console.log(objectURL)
 
     res.render('camera', {
       userId: user.uid,
@@ -316,9 +332,10 @@ app.post('/object_selected', async (req, res) => {
 
     // オブジェクトIdを取得
     const objectId = JSON.parse(req.body).objectId;
+    console.log(`objectId => ${objectId}`);
 
     // 選択オブジェクトを切り替え
-    // await dao.changeSelected(user.uid, objectId);
+    await dao.changeSelected(user.uid, objectId);
 
     res.end();
   }
@@ -403,6 +420,29 @@ app.get('/my_object', async (req, res) => {
   }
 });
 
+app.post('/object_delete', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // パラメータを取得
+    const body = JSON.parse(req.body._request_body);
+
+    const objectId = body.objectId;
+
+    console.log(`delete => ${objectId}`);
+
+    // オブジェクトを削除
+    await dao.deleteMyObject(user.uid, objectId);
+
+    // マイオブジェクトにリダイレクト
+    res.redirect('/my_object');
+  }
+});
+
 // post add_object
 app.post('/object_upload', async (req, res) => {
   // ユーザーを取得
@@ -419,7 +459,7 @@ app.post('/object_upload', async (req, res) => {
     const image = body.image;
     const categoryList = body.uploadCategoryList;
 
-    // TODO: send data about my_object and save
+    // オブジェクトの位置を設定
     const locationX = 0;
     const locationY = 0;
     const locationZ = 0;
@@ -452,16 +492,30 @@ app.get('/object_share', async (req, res) => {
     const categoryList = await dao.selectAll('category');
     console.dir(categoryList)
 
-    // カテゴリーを設定
+    // カテゴリー、ページを設定
     let category = null;
+    let page = 1;
     console.log('query =>');
     console.dir(req.query)
     if (req.query._request_body != undefined) {
-      category = JSON.parse(req.query._request_body).searchCategoryList;
+      const body = JSON.parse(req.query._request_body);
+
+      console.log(`body =>`);
+      console.dir(body);
+
+      if (body.searchCategoryList.length != 0) {
+        //カテゴリーを設定
+        category = body.searchCategoryList;
+      }
+
+      if (body.page != undefined) {
+        // ページを設定
+        page = Number(body.page);
+      }
     }
 
     // シェアオブジェクトリストを取得
-    const share_result = await dao.searchObject(category, user.uid, 1);
+    const share_result = await dao.searchObject(category, user.uid, page);
     console.log('share result =>')
     console.dir(share_result);
 
@@ -489,6 +543,7 @@ app.get('/object_share', async (req, res) => {
 
     res.render('object-share', {
       categoryList: categoryList,
+      category: category,
       myObjectList: my_result.objectList,
       shareObjectList: share_result.objectList,
       total: my_result.total,
@@ -655,8 +710,8 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchObject(category, user.uid, 1)
 
   // マーカーリスト取得
-  // const clanId = "sWuyRFv3Co7I23VoAwTZ";
-  // result = await dao.selectMarkerList(user.uid, clanId);
+  const clanId = "sWuyRFv3Co7I23VoAwTZ";
+  result = await dao.selectMarkerList(user.uid, clanId);
 
   // マーカーURL取得
   // result = await sao.getMarkerUrl(`${user.uid}.png`);

@@ -45,3 +45,80 @@ function previewFile(file) {
         img.id = 'drop-zone';
     };
 }
+// マイオブジェクトを削除するmodalのコード
+// const thumbnailsItems = document.querySelectorAll('.thumbnails__item');
+// const objectModal = document.querySelector('.object-modal');
+// const objectModalBg = document.querySelector('.object-modal__bg');
+// const batuBtn = document.querySelector('.object-modal__batu-btn');
+// const objectModalBtn = document.querySelector('.object-modal__btn');
+// const modalContainer = document.querySelector('.object-modal__container');
+
+const tickMark = "<i class=\"fas fa-check fa-lg\"></i>";
+//共有オブジェクトそれぞれにクリックイベントをつける
+// thumbnailsItems.forEach(thumbnailsItem => {
+//     thumbnailsItem.addEventListener('click', () => {
+        // objectModal.classList.toggle('object-modal__open');
+        // const img = document.createElement('img');
+        // img.classList.add('object-modal__select');
+        // img.src = "キャプチャ.PNG";
+        // if(document.querySelector('.object-modal__select')){
+        //     objectModalBtn.previousElementSibling.remove();
+        // }
+        // modalContainer.prepend(img);
+// マイオブジェクトから削除ボタンを動的に生成
+        // const mainBtn = document.createElement("div");
+        // mainBtn.className = "main-btn";
+        // mainBtn.appendChild(document.createTextNode("マイオブジェクトから削除"));
+        // objectModalBtn.innerHTML = "";
+        // objectModalBtn.appendChild(mainBtn);
+//共有されているオブジェクトをマイオブジェクトから削除ボタンの処理
+//         objectModalBtn.addEventListener('click', () => {
+//             objectModalBtn.classList.add('object-modal__btn--circle');
+//             if (objectModalBtn.classList.contains('object-modal__btn--circle') === true) {
+//                 mainBtn.innerHTML = tickMark;
+//                 mainBtn.classList.remove('main-btn');
+//             }
+//         });
+//     });
+// });
+
+function setMyModal(index) {
+  // モーダル要素を取得
+  const objectModal = document.querySelector('.object-modal');
+  const objectModalBtn = document.querySelector('.object-modal__btn');
+  const batuBtn = document.querySelector('.object-modal__batu-btn');
+
+  // モーダルを開く
+  objectModal.classList.toggle('object-modal__open');
+
+  // 画像を表示する領域を取得
+  const image_div_element = document.getElementById('select_image');
+
+  image_div_element.setAttribute('style', `background-image: url("${objectList[index].objectURL}")`);
+
+  const mainBtn = document.createElement("div");
+  mainBtn.setAttribute('onclick', `objectDelete(${index})`);
+  mainBtn.className = "main-btn";
+  mainBtn.appendChild(document.createTextNode("マイオブジェクトから削除"));
+  objectModalBtn.innerHTML = "";
+  objectModalBtn.appendChild(mainBtn);
+
+
+
+  // モーダルを閉じるボタンのアクションを追加
+  batuBtn.setAttribute('onclick', 'closeModal()')
+
+  // ボタンを取得
+  // const button_element = document.getElementById('delete_button');
+  //
+  // button_element.setAttribute('onclick', `objectDelete("${objectList[index].objectId}")`);
+  // button_element.innerHTML ='マイオブジェクトから削除';
+}
+
+function closeModal() {
+  // モーダル要素を取得
+  const objectModal = document.querySelector('.object-modal');
+
+  // モーダルを閉じる
+  objectModal.classList.remove('object-modal__open');
+}

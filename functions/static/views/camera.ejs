@@ -52,10 +52,10 @@
                     <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
                     <div class="category__my-object">
                         <!-- 選択中の画像を表示 -->
-                        <div class="my-object-list__select"></div>
+                        <div id="select_image" class="my-object-list__select"></div>
                         <!-- 共有するボタン -->
                         <div class="my-object-list__decision">
-                            <input type="submit" value="決定" class="main-btn my-object-list__submit">
+                            <input id="decision_button" type="button" value="決定" class="main-btn my-object-list__submit">
                             <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel"
                                 id="js-category-cansel">
                         </div>
@@ -94,57 +94,30 @@
           objectId: "<%= object.id %>",
           objectName: "<%= object.objectName %>",
           objectURL: url,
+          objectSelected: "<%= object.objectSelected %>"
         });
       <% }); %>
+      console.dir(objectList)
 
       // パターンリストを作成
       let patternList = []
 
       <% patternList.forEach(pattern => { %>
+        var object_url = "<%= pattern.objectURL %>";
+        object_url = object_url.replace('amp;', '')
+        var pattern_url = "<%= pattern.patternURL %>";
+        pattern_url = pattern_url.replace('amp;', '')
+
         patternList.push({
-          markerURL: "<%= pattern.patternURL %>",
-          objectURL: "<%= pattern.objectURL %>",
+          userId: "<%= pattern.userId %>",
+          patternURL: pattern_url,
+          objectURL: object_url,
         })
       <% }); %>
+      console.dir(patternList)
 
     </script>
     <script src="views/js/cameraBtn.js"></script>
-    <script>
-      // a-markerを生成
-      // setARMarker();
-
-      function setARMarker() {
-        // マーカーを生成する領域を取得
-        const marker_area = document.getElementById('marker-area');
-
-        // すでにマーカーが存在していた場合、削除する
-        if (marker_area.hasChildNodes) {
-          // 子要素を削除
-          while (marker_area.firstChild) {
-            marker_area.removeChild(marker_area.firstChild);
-          }
-        }
-
-        for (let pattern of patternList) {
-          // a-markerタグを作成
-          const a_marker_element = document.createElement('a-marker');
-          a_marker_element.setAttribute('type', 'pattern');
-          // a_marker_element.setAttribute('url', `${pattern.patternURL}`);
-
-          // a-entityタグを作成
-          const a_entity_element = document.createElement('a-entity');
-          a_entity_element.setAttribute('position', '0 -1 0');
-          a_entity_element.setAttribute('scale', '0.05 0.05 0.05');
-          // a_entity_element.setAttribute('gltf-model', `${marker.objectURL}`);
-
-          // divに追加
-          a_marker_element.appendChild(a_entity_element);
-          marker_area.appendChild(a_marker_element);
-
-        }
-      }
-
-    </script>
     <script>
       // 開いているモーダルを判定
       let selectType = null;
@@ -161,9 +134,13 @@
         }
       }
 
-      // TODO: クランが選択された時
+      // クランが選択された時
 
       function selectedClan() {
+
+        // モーダルを閉じる
+        modal.classList.remove('open');
+
         // 選択されたクランのIDを取得
         let clanId = null;
         const radio_element = document.getElementsByName('clanRadio');
@@ -185,7 +162,7 @@
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200){
                 // パターンリストを取得
-                let patternList = JSON.parse(xhr.responseText);
+                patternList = JSON.parse(xhr.responseText);
 
                 console.log(`patternList => ${patternList}`);
                 console.dir(patternList);
@@ -196,25 +173,54 @@
         };
       }
 
-      // TODO: オブジェクトが選択された時
+      // オブジェクトが選択された時
       function selectedObject(index) {
         // imageタグを取得
         const image_element = document.getElementById('<%= userId %>');
 
+        // ユーザーIDを取得
+        const userId = "<%= userId %>";
 
-        // objectURLを変更する
-        image_element.setAttribute('src', `${objectList[index].objectURL}`);
+        // パターンリストの自分のオブジェクトURLを差し替える
+        for (let pattern of patternList) {
+
+          console.log(`1: ${pattern.userId} == 2: ${userId}`);
+          if (pattern.userId == userId) {
+            console.log('userId true')
+            pattern.objectURL = objectList[index].objectURL
+            break;
+          } else {
+            console.log('userId false');
+          }
+        }
+
+
+        // パターンリストの確認
+        console.log('patternList');
+        console.dir(patternList);
+
+        // パターンの更新
+        setPattern(patternList)
 
         const xhr = new XMLHttpRequest();
 
         // サーバーに送信
+        console.log(`send objectId => ${objectList[index].objectId}`);
         xhr.open('post', '/object_selected');
         xhr.send(JSON.stringify({objectId: objectList[index].objectId}));
+
+        // サーバーの応答を検知
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200){
+            }
+        };
 
       }
 
     </script>
     <script>
+
+      setPattern(patternList)
 
       function setPattern(patternList) {
 
@@ -253,7 +259,6 @@
           const marker_element = document.createElement('a-marker');
           marker_element.setAttribute('type', 'pattern');
           marker_element.setAttribute('url', `${pattern.patternURL}`);
-          // marker_element.setAttribute('preset', `${marker.markerURL}`);
 
           // a-planeタグを作成
           const plane_element = document.createElement('a-plane');

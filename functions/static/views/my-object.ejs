@@ -87,10 +87,11 @@
             <div class="object-modal__main">
                 <div class="object-modal__batu-btn">×</div>
                 <div class="object-modal__container">
+                  <form id="delete_form" action="/object_delete" method="post"></form>
                     <!-- 選択中の画像を表示 -->
-                    <div class="object-modal__select"></div>
+                    <div id="select_image" class="object-modal__select"></div>
                     <!-- 共有オブジェクトをマイオブジェクトに追加するボタン -->
-                    <div class="object-modal__btn">
+                    <div id="delete_button" class="object-modal__btn">
                     </div>
                 </div>
             </div>
@@ -288,12 +289,13 @@
         const object_ul_element = document.getElementById('object_list');
 
         // オブジェクトリストタグを生成
-        for (let object of objectList) {
+        for (let [index, object] of objectList.entries()) {
 
           // liタグを作成
           const object_li_element = document.createElement('li');
           object_li_element.setAttribute('class', 'thumbnails__item');
           object_li_element.setAttribute('style', `background-image: url("${object.objectURL}")`);
+          object_li_element.setAttribute('onclick', `setMyModal(${index})`);
 
           // ul領域に追加
           object_ul_element.appendChild(object_li_element);
@@ -301,6 +303,26 @@
       }
 
 
+    </script>
+    <script>
+      // オブジェクトを削除
+      function objectDelete(index) {
+        // フォームを取得
+        const form_element = document.getElementById('delete_form');
+
+        // リクエストボディを作成
+        const request_body = {objectId: objectList[index].objectId}
+
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
+
+        // フォームを送信
+        form_element.submit();
+      }
     </script>
 </body>
 </html>
