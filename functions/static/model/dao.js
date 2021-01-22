@@ -536,6 +536,7 @@ exports.changeSelected = async(userId, newObjectId) => {
   }
 
   const newObject = await myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
+    let resultArray = [];
     // create resultArray
     if(snapshot.empty){
       return resultArray;
