@@ -131,12 +131,6 @@
             openUserMedia();
         });
 
-        // use micFlag and videoFlag to get userMedia
-        async function openUserMedia(){
-            const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
-            document.querySelector('#localVideo').srcObject = stream;
-        }
-
         window.onload = function () {
             //getパラメータを取得
             var params = (new URL(document.location)).searchParams;

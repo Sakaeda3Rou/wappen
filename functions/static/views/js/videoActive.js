@@ -139,6 +139,13 @@ async function videoActive(auth, hostUserId){
 }
 
 // get userMedia and AR to localStream
+// use micFlag and videoFlag to get userMedia
+async function openUserMedia(arStream){
+  const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
+  document.querySelector('#localVideo').srcObject = stream;
+  remoteStream = new MediaStream();
+  document.querySelector('#remoteVideo').srcObject = remoteStream;
+}
 
 // hangup
 async function hangUp(e) {
