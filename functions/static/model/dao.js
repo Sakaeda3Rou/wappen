@@ -516,46 +516,66 @@ exports.changeSelected = async(userId, newObjectId) => {
     let resultArray = [];
 
     if(snapshot.empty){
+      // console.log('aaaaa');
       return resultArray;
     }
 
     snapshot.forEach(doc => {
+      // console.log('iiiii');
       resultArray.push(doc.id);
     })
+
+    return resultArray;
   })
 
   if(Array.isArray(myTrueObject)){
     let toFalseResult = null;
     for(const myTrue of myTrueObject){
+      // console.log('uuuuu');
       toFalseResult = await _this.updateDoc('my_object', myTrue, {isSelected : false});
 
       if(toFalseResult.hasOwnProperty('err')){
+        // console.log('eeeee');
         return toFalseResult;
       }
     }
-  }
+  
 
-  const newObject = await myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
-    let resultArray = [];
-    // create resultArray
-    if(snapshot.empty){
-      return resultArray;
-    }
-
-    snapshot.forEach(doc => {
-      resultArray.push(doc.id);
-    })
-  })
-
-  if(Array.isArray(newObject)){
-    let updateResult = null;
-    for(const obj of newObject){
-      updateResult = await _this.updateDoc('my_object', obj, {isSelected : true});
-
-      if(updateResult.hasOwnProperty('err')){
-        return updateResult;
+    const newObject = await myObjectRef.where('userId', '==', userId).where('objectId', '==', newObjectId).get().then(snapshot => {
+      let resultArray = [];
+      // create resultArray
+      if(snapshot.empty){
+        // console.log('ooooo');
+        return resultArray;
       }
+
+      snapshot.forEach(doc => {
+        // console.log('kakakakaka');
+        resultArray.push(doc.id);
+      })
+
+      return resultArray;
+    })
+
+    if(Array.isArray(newObject)){
+      let updateResult = null;
+      for(const obj of newObject){
+        // console.log('kukukukuku');
+        updateResult = await _this.updateDoc('my_object', obj, {isSelected : true});
+
+        if(updateResult.hasOwnProperty('err')){
+          // console.log('kekekekeke');
+          return updateResult;
+        }
+      }
+
+      // return to controller
+      return [{result: 'success'}];
+    }else{
+      return newObject;
     }
+  }else{
+    return myTrueObject;
   }
 }
 
