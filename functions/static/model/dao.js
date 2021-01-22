@@ -824,7 +824,7 @@ exports.searchObject = async(category, userId, page) => {
           }
         }
 
-        if(flag == true){
+        if(flag != true){
           document['id'] = doc.id;
           resultArray.push(document);
         }
