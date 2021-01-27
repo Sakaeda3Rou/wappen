@@ -44,7 +44,6 @@ exports.uploadObject = async (file_name, body) => {
   await upload_file.save(body, {
     predefinedAcl: 'publicRead',
     metadata: {
-      // TODO: contentTypeを設定
       contentType: 'image/png',
     },
   });

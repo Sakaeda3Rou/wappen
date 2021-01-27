@@ -23,7 +23,6 @@ app.use(express.static('static'));
 
 async function confirmUser(req) {
   // cookieからユーザーを取得
-  // TODO: cookieになかった場合にデータベースから取得すべきか
   try {
     let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user;
 
@@ -84,7 +83,7 @@ app.post('/login', async (req, res) => {
   if(!result.length){
     // no document
 
-    // TODO: 確認
+    // 確認
     console.log('no document');
 
     // make and save ARmarkerf
@@ -210,8 +209,6 @@ app.get('/profile', async (req, res) => {
     const birthday = user.birthday;
     const markerURL = user.markerURL;
 
-    // TODO: insert to html's textbox by ejs
-
     res.render('profile', {
       // aタグ(キャンセルボタン)のリンク先をマイページ画面に設定
       cancel_link_url: '/my_page',
@@ -235,8 +232,6 @@ app.post('/profile', async (req, res) => {
   user.userName = userName;
   user.birthday = birthday;
 
-  // TODO: throw datas for update
-
   const result = dao.updateDoc('user_detail', user.uid, user);
 
   if(result.hasOwnProperty('err')){
@@ -251,7 +246,7 @@ app.post('/profile', async (req, res) => {
   // ユーザーをセッションに保存
   res.cookie('__session', json);
 
-  // TODO: データベースから所属クランリストを取得
+  // 所属クランリストを取得
   const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
 
   res.render('my-page', {
@@ -264,7 +259,7 @@ app.post('/profile', async (req, res) => {
 
 // get help
 app.get('/help', async (req, res) => {
-  // TODO: cookieの確認
+  // cookieの確認
   const user = await confirmUser(req);
 
   console.log(`user => ${user}`);
@@ -343,7 +338,7 @@ app.post('/object_selected', async (req, res) => {
 
 // post clan_selected
 app.post('/clan_selected', async (req, res) => {
-  // TODO: 選択されたクランのマーカーリストを取得する
+  // 選択されたクランのマーカーリストを取得する
   // ユーザーを取得
   const user = await confirmUser(req);
 
@@ -612,7 +607,6 @@ app.get('/clan', async (req, res) => {
 
 // post clan_make
 app.post('/clan_make', async (req, res) => {
-  // TODO: send clanName for make clan
 
   // ユーザーを取得
   const user = await confirmUser(req);
