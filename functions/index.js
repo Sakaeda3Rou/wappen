@@ -309,11 +309,13 @@ app.get('/camera', async (req, res) => {
 
       if (query.type == 0) {
         // オブジェクトが切り替えられた
+        console.log('object selected');
         // 取得したパターンリストを使用
         patternList = query.patternList;
 
       } else if (query.type == 1) {
         // クランが切り替えられた
+        console.log('clan selected');
         // クランのパターンリストを取得
         patternList = await dao.selectMarkerList(user.uid, query.clanId);
 
