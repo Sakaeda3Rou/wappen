@@ -28,6 +28,9 @@
           </a-scene>
 
         </div>
+
+        <form id="camera_form" action="/camera" method="get"></form>
+
         <!-- </section> -->
         <div class="btns">
             <!-- クラン選択を表示するmodalを表示するボタン -->
@@ -151,26 +154,43 @@
         }
         console.log(`clanId => ${clanId}`);
 
-        // 選択されたクランのマーカーリストを取得
-        let xhr = new XMLHttpRequest();
+        // cameraページを更新
+        // フォームを取得
+        const form_element = document.getElementById('camera_form');
 
-        // サーバーに送信
-        xhr.open('post', '/clan_selected');
-        xhr.send(JSON.stringify({clanId: clanId}));
+        // リクエストボディを作成
+        const request_body = {type: 1, clanId: clanId}
 
-        // サーバーの応答を検知
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4 && xhr.status === 200){
-                // パターンリストを取得
-                patternList = JSON.parse(xhr.responseText);
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
 
-                console.log(`patternList => ${patternList}`);
-                console.dir(patternList);
+        // フォームを送信
+        form_element.submit();
 
-                // マーカーをセット
-                setPattern(patternList);
-            }
-        };
+        // // 選択されたクランのマーカーリストを取得
+        // let xhr = new XMLHttpRequest();
+        //
+        // // サーバーに送信
+        // xhr.open('post', '/clan_selected');
+        // xhr.send(JSON.stringify({clanId: clanId}));
+        //
+        // // サーバーの応答を検知
+        // xhr.onreadystatechange = function () {
+        //     if(xhr.readyState === 4 && xhr.status === 200){
+        //         // パターンリストを取得
+        //         patternList = JSON.parse(xhr.responseText);
+        //
+        //         console.log(`patternList => ${patternList}`);
+        //         console.dir(patternList);
+        //
+        //         // マーカーをセット
+        //         setPattern(patternList);
+        //     }
+        // };
       }
 
       // オブジェクトが選択された時
@@ -184,7 +204,6 @@
         // パターンリストの自分のオブジェクトURLを差し替える
         for (let pattern of patternList) {
 
-          console.log(`1: ${pattern.userId} == 2: ${userId}`);
           if (pattern.userId == userId) {
             console.log('userId true')
             pattern.objectURL = objectList[index].objectURL
@@ -200,7 +219,7 @@
         console.dir(patternList);
 
         // パターンの更新
-        setPattern(patternList)
+        // setPattern(patternList)
 
         const xhr = new XMLHttpRequest();
 
@@ -214,6 +233,23 @@
             if(xhr.readyState === 4 && xhr.status === 200){
             }
         };
+
+        // cameraページを更新
+        // フォームを取得
+        const form_element = document.getElementById('camera_form');
+
+        // リクエストボディを作成
+        const request_body = {type: 0, patternList: patternList}
+
+        // text要素を作成
+        const text_element = document.createElement('input');
+        text_element.hidden = true;
+        text_element.setAttribute('name', '_request_body');
+        text_element.setAttribute('value', JSON.stringify(request_body));
+        form_element.appendChild(text_element);
+
+        // フォームを送信
+        form_element.submit();
 
       }
 

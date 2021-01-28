@@ -282,6 +282,7 @@ app.get('/camera', async (req, res) => {
     // get parameter and prepare camera session
     const camera = require('./static/model/camera.js');
 
+
     // 所属クランを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan', 'clan');
 
@@ -296,16 +297,37 @@ app.get('/camera', async (req, res) => {
     // ユーザーのパターンURLを取得
     const patternURL = await sao.getPattUrl(user.uid);
 
-    // 初期パターンリスト
-    const patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
-    // const patternList = []
+    // パターンリストを作成
+    let patternList = null;
+
+    // queryを取得
+    if (req.query._request_body != undefined) {
+      query = JSON.parse(req.query._request_body);
+
+      console.log('query =>');
+      console.dir(query);
+
+      if (query.type == 0) {
+        // オブジェクトが切り替えられた
+        // 取得したパターンリストを使用
+        patternList = query.patternList;
+
+      } else if (query.type == 1) {
+        // クランが切り替えられた
+        // クランのパターンリストを取得
+        patternList = await dao.selectMarkerList(user.uid, query.clanId);
+
+      } else {
+        console.log('query error');
+      }
+    } else {
+      console.log('no query')
+
+      patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
+    }
+
     console.log('patternList');
     console.dir(patternList);
-
-    console.log(`patternURL: `)
-    console.log(patternURL);
-    console.log('objectURL: ')
-    console.log(objectURL)
 
     res.render('camera', {
       userId: user.uid,
