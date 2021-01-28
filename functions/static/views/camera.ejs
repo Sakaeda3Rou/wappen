@@ -271,6 +271,31 @@
           marker_area_element.appendChild(marker_element);
 
         }
+
+        // TODO: hiroマーカーを追加
+        // imgタグを作成
+        const image_element = document.createElement('img');
+        image_element.hidden = true;
+        image_element.setAttribute('id', 'hiro');
+        image_element.setAttribute('src', 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/object_images%2Fq5GsxMu8h2OAkmqxEY6prVzWAVj20?generation=1610522618769245&alt=media');
+        image_element.setAttribute('crossorigin', 'anonymous');
+
+        // assets領域に追加
+        assets_element.appendChild(image_element);
+
+        // a-markerタグを作成
+        const marker_element = document.createElement('a-marker');
+        marker_element.setAttribute('preset', 'hiro');
+
+        // a-planeタグを作成
+        const plane_element = document.createElement('a-plane');
+        plane_element.setAttribute('position', '0 0 0');
+        plane_element.setAttribute('rotation', '-90 0 0');
+        plane_element.setAttribute('material', 'src: #hiro');
+
+        // マーカーリスト領域に追加
+        marker_element.appendChild(plane_element);
+        marker_area_element.appendChild(marker_element);
       }
 
     </script>

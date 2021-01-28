@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="views/css/reset.css">
+    <link rel="stylesheet" href="views/css/style.css">
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/3.1.0/three.js/build/ar.js"></script>
@@ -268,7 +268,7 @@
 
         // use micFlag and videoFlag to get userMedia
         async function openUserMedia(objectURL, patternURL){
-            // get stream if you don't need AR 
+            // get stream if you don't need AR
             // const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
             // document.querySelector('#localVideo').srcObject = stream;
 
@@ -281,7 +281,7 @@
             // renderer style setting
 
             // insert to dom
-            
+
             // scene and camera
             const scene = new twoVideoChatPrepare.Scene();
             scene.visible = false;
@@ -294,7 +294,7 @@
             });
 
             // init wait 2 seconds to resize
-            
+
             // create arToolkitContext
             const arToolkitContext = new THREEx.ArToolkitContext({
                 cameraParametersUrl: 'data/camera_para.dat',
@@ -312,7 +312,7 @@
 
             // create stream from dom
 
-            
+
         }
     </script>
 </body>

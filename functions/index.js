@@ -84,7 +84,7 @@ app.post('/login', async (req, res) => {
     // no document
 
     // 確認
-    console.log('no document');
+    console.log('first login user');
 
     // make and save ARmarkerf
     const orient = require('./static/model/orient_devil.js');
@@ -171,7 +171,7 @@ app.post('/resist_user', async (req, res) => {
 // get my page
 app.get('/my_page', async (req, res) => {
 
-  // cookieからユーザーを取得
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -197,7 +197,7 @@ app.get('/my_page', async (req, res) => {
 // get profile
 app.get('/profile', async (req, res) => {
 
-  // cookieからユーザーを取得
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   console.log(`user => ${user}`)
@@ -221,8 +221,8 @@ app.get('/profile', async (req, res) => {
 // update profile
 app.post('/profile', async (req, res) => {
 
-  // cookieからユーザーを取得
-  let user = JSON.parse(cookie.parse(req.headers.cookie).__session).user
+  // ユーザーを取得
+  const user = await confirmUser(req);
 
   let userName = req.body._name;
   let birthday = req.body._date.split('-');
@@ -259,7 +259,7 @@ app.post('/profile', async (req, res) => {
 
 // get help
 app.get('/help', async (req, res) => {
-  // cookieの確認
+  // cookieからユーザーを取得
   const user = await confirmUser(req);
 
   console.log(`user => ${user}`);
@@ -273,7 +273,7 @@ app.get('/help', async (req, res) => {
 
 // get camera
 app.get('/camera', async (req, res) => {
-  // cookieからユーザーを取得
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -318,7 +318,7 @@ app.get('/camera', async (req, res) => {
 
 // post object_selected
 app.post('/object_selected', async (req, res) => {
-  // ユーザー認証
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -376,7 +376,7 @@ app.post('/containment_clan', async (req, res) => {
 
 // get my_object
 app.get('/my_object', async (req, res) => {
-  // userIdを取得
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -574,7 +574,7 @@ app.post('/object_shared', async (req, res) => {
 });
 
 app.post('/append_my_object', async (req, res) => {
-  // ユーザー認証
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -595,7 +595,7 @@ app.post('/append_my_object', async (req, res) => {
 //get clan
 app.get('/clan', async (req, res) => {
 
-  // ユーザー認証
+  // ユーザーを取得
   const user = await confirmUser(req);
 
   if (!user) {
@@ -677,6 +677,11 @@ app.post('/clan_search', async (req, res) => {
   // 取得したリストを返す
   res.write(`${JSON.stringify(clanList)}`);
   res.end();
+});
+
+// ビデオ通話
+app.get('/video', async (req, res) => {
+  res.render('video');
 });
 
 // TODO: test
