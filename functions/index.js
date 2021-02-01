@@ -329,6 +329,31 @@ app.get('/camera', async (req, res) => {
               patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-nikoniko.patt?generation=1612146304159112&alt=media',
               objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-nikoniko.png?generation=1612146313401223&alt=media',
             },
+            {
+              userId: 'aaas02',
+              patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-hoshiboshi.patt?generation=1612156633941630&alt=media',
+              objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fhoshiboshi.png?generation=1612156641643128&alt=media',
+            },
+            {
+              userId: 'aaas03',
+              patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-wakuwaku.patt?generation=1612156661394514&alt=media',
+              objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fwakuwaku.png?generation=1612156667285266&alt=media',
+            },
+            {
+              userId: 'aaas04',
+              patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-togetoge.patt?generation=1612156927255228&alt=media',
+              objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Ftogetoge.png?generation=1612156928269385&alt=media',
+            },
+            {
+              userId: 'aaas05',
+              patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-Tetaumatawhakatangihangakoauaotamateaurehaeatu.patt?generation=1612157250551524&alt=media',
+              objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2FTetaumatawhakatangihangakoauaotamateaurehaeatu.png?generation=1612157251275749&alt=media',
+            },
+            // {
+            //   userId: 'aaas06',
+            //   patternURL: '',
+            //   objectURL: '',
+            // },
           ]
         }
 
@@ -773,15 +798,15 @@ app.get('/test', async (req, res) => {
 
 app.get('/aaas-test', async (req, res) => {
   // urlを取得
-  const pattname = 'pattern-nikoniko.patt';
-  const patturl = await sao.getaaasUrl(pattname);
+  const pattname1 = 'pattern-hoshiboshi.patt';
+  const patturl1 = await sao.getaaasUrl(pattname1);
 
-  console.log(`${pattname}: ${patturl}`);
+  console.log(`${pattname1}: ${patturl1}`);
 
-  const objectname = 'pattern-nikoniko.png';
-  const objecturl = await sao.getaaasUrl(objectname);
+  const objectname1 = 'hoshiboshi.png';
+  const objecturl1 = await sao.getaaasUrl(objectname1);
 
-  console.log(`${objectname}: ${objecturl}`);
+  console.log(`${objectname1}: ${objecturl1}`);
 
   res.end();
 });
