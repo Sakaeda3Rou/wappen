@@ -84,3 +84,15 @@ exports.getObjectUrl = async (file_name) => {
 
   return file_url;
 };
+
+// パターンファイルのURLを取得
+exports.getaaasUrl = async (file_name) => {
+
+  // 指定ファイルのメタデータを取得
+  const file = await bucket.file(`aaas-images/${file_name}`).getMetadata();
+
+  // メタデータからメディアURLを取得
+  const file_url = file[0].mediaLink
+
+  return file_url;
+};

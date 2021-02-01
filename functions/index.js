@@ -181,7 +181,6 @@ app.get('/my_page', async (req, res) => {
     const birthday = user.birthday;
     const markerURL = user.markerURL;
 
-
     // データベースから所属クランリストを取得
     const clanList = await dao.selectDoubleTable(user.uid, 'containment_to_clan',  'clan');
 
@@ -316,14 +315,28 @@ app.get('/camera', async (req, res) => {
       } else if (query.type == 1) {
         // クランが切り替えられた
         console.log('clan selected');
-        // クランのパターンリストを取得
-        patternList = await dao.selectMarkerList(user.uid, query.clanId);
+
+        if (query.clanId != 'K1yA6HLR93mUXajENeAk') {
+          // クランのパターンリストを取得
+          patternList = await dao.selectMarkerList(user.uid, query.clanId);
+
+        } else {
+          // TODO: aaasクランが選択された、固定のパターンリストを作成
+          patternList = [
+            {userId: user.uid, patternURL: patternURL, objectURL: objectURL},
+            {
+              userId: 'aaas01',
+              patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-nikoniko.patt?generation=1612146304159112&alt=media',
+              objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-nikoniko.png?generation=1612146313401223&alt=media',
+            },
+          ]
+        }
 
       } else {
         console.log('query error');
       }
     } else {
-      console.log('no query')
+      console.log('no query');
 
       patternList = [{userId: user.uid, patternURL: patternURL, objectURL: objectURL}];
     }
@@ -754,6 +767,21 @@ app.get('/test', async (req, res) => {
   console.log(`result =>`);
   console.dir(result);
   // console.log(result);
+
+  res.end();
+});
+
+app.get('/aaas-test', async (req, res) => {
+  // urlを取得
+  const pattname = 'pattern-nikoniko.patt';
+  const patturl = await sao.getaaasUrl(pattname);
+
+  console.log(`${pattname}: ${patturl}`);
+
+  const objectname = 'pattern-nikoniko.png';
+  const objecturl = await sao.getaaasUrl(objectname);
+
+  console.log(`${objectname}: ${objecturl}`);
 
   res.end();
 });

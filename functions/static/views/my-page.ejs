@@ -132,14 +132,17 @@
           div_element.setAttribute('id', `${clan.clanId}`);
 
           // inputタグを作成
-          const input_element = document.createElement('input');
-          input_element.setAttribute('class', 'main-btn out-btn');
-          input_element.setAttribute('type', 'button');
-          input_element.setAttribute('value', '脱退');
-          input_element.setAttribute('onclick', `outTOClan("${clan.clanId}")`);
+          // TODO: defaultクランは脱退ボタンを作成しない
+          if (clan.clanId != 'B6wI5YBTHV5S5WBbQNEs') {
+            const input_element = document.createElement('input');
+            input_element.setAttribute('class', 'main-btn out-btn');
+            input_element.setAttribute('type', 'button');
+            input_element.setAttribute('value', '脱退');
+            input_element.setAttribute('onclick', `outTOClan("${clan.clanId}")`);
+            div_element.appendChild(input_element);
+          }
 
           // divに追加
-          div_element.appendChild(input_element);
           div_element.insertAdjacentHTML('afterbegin', `${clan.clanName}`);
           clan_div_element.appendChild(div_element)
         }
