@@ -330,6 +330,9 @@ exports.selectDoubleTable = async(userId, firstCollectionName, secondCollectionN
   });
 
   if(Array.isArray(first)){
+    if(first.length == 0){
+      return first;
+    }
     const second = await secondRef.where(admin.firestore.FieldPath.documentId(), 'in', first).get().then(snapshot => {
       let returnArray = [];
 
