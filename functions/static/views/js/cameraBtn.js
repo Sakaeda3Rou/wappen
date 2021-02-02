@@ -11,6 +11,8 @@ cameraBtns.forEach(btn => {
       modalList.innerHTML = '';
       modalTitle.innerText = '表示するクランを選択';
 
+      const modalClans = document.createElement('div');
+      modalClans.classList.add('my-object-list__clans');
       for (let [index, clan] of clanList.entries()) {
         const clan_li_element = document.createElement('li');
         clan_li_element.classList.add('my-object-list__clan');
@@ -23,8 +25,9 @@ cameraBtns.forEach(btn => {
         clan_li_element.appendChild(label);
         label.appendChild(check);
         label.appendChild(document.createTextNode(clan.clanName));
-        modalList.appendChild(clan_li_element);
+        modalClans.appendChild(clan_li_element);
       }
+      modalList.appendChild(modalClans);
 
       const div = document.createElement('div');
       div.classList.add('main-btn');
