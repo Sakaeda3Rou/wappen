@@ -131,7 +131,15 @@
             openUserMedia();
         });
 
+        let userWidth = "48%";
         window.onload = function () {
+            // iphoneかipadかその他かを確認
+            const model = navigator.platform;
+            if (model.indexOf("iPhone") != -1) {
+                userWidth = "39vh";
+            } if (model.indexOf("iPad") != -1) {
+                userWidth = "42vh";
+            }
             //getパラメータを取得
             var params = (new URL(document.location)).searchParams;
             var queryValue = params.get('people');
@@ -154,7 +162,7 @@
                         user.style.height = '100%';
                     } else {
                         user.style.width = '100%';
-                        user.style.height = '48%';
+                        user.style.height = userWidth;
                     };
 
                     const userDisplay = document.createElement('div');
@@ -170,7 +178,7 @@
                     user.classList.add('user');
                     user.id = userName;
                     user.style.width = '48%';
-                    user.style.height = '48%';
+                    user.style.height = userWidth;
 
                     const userDisplay = document.createElement('div');
                     userDisplay.classList.add('user__name');
@@ -186,17 +194,51 @@
             openUserMedia();
         };
 
-        //マイオブジェクト一覧を表示
-        const items = document.querySelectorAll('.my-object-list__item');
-        const categoryMyObject = document.querySelector('.category__my-object');
-        const myObjectListItems = document.querySelector('.my-object-list__items');
-        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const modalList = document.querySelector('.my-object-list__items');
+        const modalTitle = document.querySelector('.my-object-list__title');
+        const addBtn = document.querySelector('.js-btn');
         const categorySubmit = document.querySelector('.my-object-list__submit');
-        //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
-        items.forEach(item => {
-            item.addEventListener('click', () => {
-                categoryMyObject.classList.toggle('category-open');
-                myObjectListItems.classList.toggle('my-object-list__items--close');
+        const myObjectListItems = document.querySelector('.my-object-list__items');
+        const categoryMyObject = document.querySelector('.category__my-object');
+        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
+
+        //プラスボタンをクリックしたときにマイオブジェクト一覧を動的に生成する。
+        addBtn.addEventListener('click', () => {
+            modalList.innerHTML = '';
+            modalTitle.innerText = 'マイオブジェクトから選択';
+            objects.forEach(object => {
+                const li = document.createElement('li');
+
+                li.classList.add('my-object-list__item');
+                //li.appendChild(document.createTextNode(object));
+                modalList.appendChild(li);
+            });
+            //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
+            const items = document.querySelectorAll('.my-object-list__item');
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    categoryMyObject.classList.toggle('category-open');
+                    myObjectListItems.classList.toggle('my-object-list__items--close');
+
+                    if (categoryMyObject.classList.contains('category-open')) {
+                        categoryMyObject.style.height = '80%';
+                    } else {
+                        categoryMyObject.style.height = 0;
+                    }
+
+                    if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                        myObjectListItems.style.height = 0;
+                    } else {
+                        myObjectListItems.style.height = '80%';
+                    }
+                });
+            });
+            //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
+            categoryCansel.addEventListener('click', () => {
+                categoryMyObject.classList.remove('category-open');
+                myObjectListItems.classList.remove('my-object-list__items--close');
 
                 if (categoryMyObject.classList.contains('category-open')) {
                     categoryMyObject.style.height = '80%';
@@ -210,23 +252,17 @@
                     myObjectListItems.style.height = '80%';
                 }
             });
+            //マイオブジェクト一覧の"マイオブジェクトを共有する"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
+            categorySubmit.addEventListener('click', () => {
+                modal.classList.remove('open');
+                categoryCansel.click();
+            });
         });
-        //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
-        categoryCansel.addEventListener('click', () => {
-            categoryMyObject.classList.toggle('category-open');
-            myObjectListItems.classList.toggle('my-object-list__items--close');
 
-            if (categoryMyObject.classList.contains('category-open')) {
-                categoryMyObject.style.height = '80%';
-            } else {
-                categoryMyObject.style.height = 0;
-            }
-
-            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                myObjectListItems.style.height = 0;
-            } else {
-                myObjectListItems.style.height = '80%';
-            }
+        //マイオブジェクト一覧の"マイオブジェクトを選択"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
+        categorySubmit.addEventListener('click', () => {
+            modal.classList.remove('open');
+            categoryCansel.click();
         });
     </script>
 </body>

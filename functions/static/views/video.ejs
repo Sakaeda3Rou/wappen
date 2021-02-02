@@ -10,6 +10,9 @@
     <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/3.1.0/three.js/build/ar.js"></script>
+    <script src="/__/firebase/8.0.1/firebase-app.js"></script>
+    <script src="/__/firebase/8.0.1/firebase-firestore.js"></script>
+    <script src="/__/firebase/init.js"></script>
 </head>
 
 <body>
@@ -100,12 +103,21 @@
         const micBtn = document.querySelector('.video-menu__mic');
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
+        // ユーザー名を格納する配列
         const videoTwo = ['item1', 'item2'];
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
-        const videoStart = document.querySelector('.video-menu__start');
-        const videoForm = document.querySelector('.video-menu__form');
         let micFlag = true;
         let videoFlag = true;
+        let userWidth = "48%";
+        // iphoneかipadかその他かを確認
+        const model = navigator.platform;
+        if (model.indexOf("iPhone") != -1) {
+            userWidth = "39vh";
+        } if (model.indexOf("iPad") != -1) {
+            userWidth = "42vh";
+        }
+        // test userId
+        const userId = 'q5GsxMu8h2OAkmqxEY6prVzWAVj2';
 
         // TODO: think about necessary of user's video
         // if need : create <video> to insert localStream
@@ -148,10 +160,22 @@
             openUserMedia();
         });
 
-        btnTwo.addEventListener('click', () => {
+        btnTwo.addEventListener('click', (userId) => {
             videoMenu.style.display = 'flex';
             videoSelect.style.display = 'none';
             document.activeForm.people.value = 2;
+            // TODO: userIdを貰って使う
+            const preapreResult = twoVideoChatPrepare(userId);
+            if(preapreResult.hasOwnProperty('err')){
+                // has error
+            }else{
+                // hostUserId : ホストのユーザーID
+                // auth       : 'host' or 'member'
+                // hostName   : ホストのユーザー名
+                // memberName : メンバーのユーザー名
+                videoTwo[0] = preapreResult.hostName;
+                videoTwo[1] = preapreResult.userName;
+            }
             videoTwo.forEach(userName => {
                 const user = document.createElement('div');
                 user.classList.add('user');
@@ -161,7 +185,7 @@
                     user.style.height = '100%';
                 } else {
                     user.style.width = '100%';
-                    user.style.height = '48%';
+                    user.style.height = userWidth;
                 };
                 const userDisplay = document.createElement('div');
                 userDisplay.classList.add('user__name');
@@ -182,7 +206,7 @@
                 user.classList.add('user');
                 user.id = userName;
                 user.style.width = '48%';
-                user.style.height = '48%';
+                user.style.height = userWidth;
 
                 const userDisplay = document.createElement('div');
                 userDisplay.classList.add('user__name');
@@ -196,16 +220,51 @@
         });
 
         //マイオブジェクト一覧を表示
-        const items = document.querySelectorAll('.my-object-list__item');
-        const categoryMyObject = document.querySelector('.category__my-object');
-        const myObjectListItems = document.querySelector('.my-object-list__items');
-        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const modalList = document.querySelector('.my-object-list__items');
+        const modalTitle = document.querySelector('.my-object-list__title');
+        const addBtn = document.querySelector('.js-btn');
         const categorySubmit = document.querySelector('.my-object-list__submit');
-        // マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
-        items.forEach(item => {
-            item.addEventListener('click', () => {
-                categoryMyObject.classList.toggle('category-open');
-                myObjectListItems.classList.toggle('my-object-list__items--close');
+        const myObjectListItems = document.querySelector('.my-object-list__items');
+        const categoryMyObject = document.querySelector('.category__my-object');
+        const categoryCansel = document.querySelector('.my-object-list__cansel');
+        const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
+
+        //プラスボタンをクリックしたときにマイオブジェクト一覧を動的に生成する。
+        addBtn.addEventListener('click', () => {
+            modalList.innerHTML = '';
+            modalTitle.innerText = 'マイオブジェクトから選択';
+            objects.forEach(object => {
+                const li = document.createElement('li');
+
+                li.classList.add('my-object-list__item');
+                //li.appendChild(document.createTextNode(object));
+                modalList.appendChild(li);
+            });
+            //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
+            const items = document.querySelectorAll('.my-object-list__item');
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    categoryMyObject.classList.toggle('category-open');
+                    myObjectListItems.classList.toggle('my-object-list__items--close');
+
+                    if (categoryMyObject.classList.contains('category-open')) {
+                        categoryMyObject.style.height = '80%';
+                    } else {
+                        categoryMyObject.style.height = 0;
+                    }
+
+                    if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                        myObjectListItems.style.height = 0;
+                    } else {
+                        myObjectListItems.style.height = '80%';
+                    }
+                });
+            });
+            //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
+            categoryCansel.addEventListener('click', () => {
+                categoryMyObject.classList.remove('category-open');
+                myObjectListItems.classList.remove('my-object-list__items--close');
 
                 if (categoryMyObject.classList.contains('category-open')) {
                     categoryMyObject.style.height = '80%';
@@ -219,35 +278,11 @@
                     myObjectListItems.style.height = '80%';
                 }
             });
-        });
-        //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
-        categoryCansel.addEventListener('click', () => {
-            categoryMyObject.classList.toggle('category-open');
-            myObjectListItems.classList.toggle('my-object-list__items--close');
-
-            if (categoryMyObject.classList.contains('category-open')) {
-                categoryMyObject.style.height = '80%';
-            } else {
-                categoryMyObject.style.height = 0;
-            }
-
-            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                myObjectListItems.style.height = 0;
-            } else {
-                myObjectListItems.style.height = '80%';
-            }
-        });
-
-        //マイオブジェクトを選択した時に、フォームを消し、ポジションをstaticにする処理
-        btns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                videoStart.style.position = 'static';
-                videoForm.style.display = 'none';
+            //マイオブジェクト一覧の"マイオブジェクトを共有する"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
+            categorySubmit.addEventListener('click', () => {
+                modal.classList.remove('open');
+                categoryCansel.click();
             });
-        });
-        bg.addEventListener('click', () => {
-            videoStart.style.position = 'relative';
-            videoForm.style.display = 'inline';
         });
 
         //マイオブジェクト一覧の"マイオブジェクトを選択"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）

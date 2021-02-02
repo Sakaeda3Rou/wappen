@@ -1,6 +1,4 @@
-const admin = require('firebase-admin');
-
-let db = admin.firestore();
+const db = firebase.firestore();
 
 // video chat prepare for two people
 async function twoVideoChatPrepare(userId){
@@ -63,10 +61,26 @@ async function twoVideoChatPrepare(userId){
         // update callee's matching
         await db.collection('matching').doc(calleeId[0]).update({hostUserId : userId});
 
+        const hostName = await db.collection('user_detail').doc(userId).get().then(doc => {
+          if(!doc.exists){
+            return '';
+          }
+
+          return doc.data().userName;
+        })
+
+        const memberName = await db.collection('user_detail').doc(calleeId[0]).get().then(doc => {
+          if(!doc.exists){
+            return '';
+          }
+
+          return doc.data().userName;
+        })
+
         // +---------------------------+
         // | return to video chat page |
         // +---------------------------+
-        return {hostUserId : userId, auth : 'host'};
+        return {hostUserId : userId, auth : 'host', hostName : hostName, memberName : memberName};
       }catch(err){
         // has error
         return {err : err};
@@ -94,10 +108,26 @@ async function twoVideoChatPrepare(userId){
       // update room_demo
       roomDemoData = await roomDemoRef.update({member : matching});
 
+      const hostName = await db.collection('user_detail').doc(hostUserId).get().then(doc => {
+        if(!doc.exists){
+          return '';
+        }
+
+        return doc.data().userName;
+      })
+
+      const memberName = await db.collection('user_detail').doc(userId).get().then(doc => {
+        if(!doc.exists){
+          return '';
+        }
+
+        return doc.data().userName;
+      })
+
       // +---------------------------+
       // | return to video chat page |
       // +---------------------------+ 
-      return {hostUserId : hostUserId, auth : 'member'};
+      return {hostUserId : hostUserId, auth : 'member', hostName : hostName, memberName : memberName};
     }catch(err){
       // has error
       return {err : err};
