@@ -12,7 +12,7 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/3.1.0/three.js/build/ar.js"></script>
     <script src="/__/firebase/8.0.1/firebase-app.js"></script>
     <script src="/__/firebase/8.0.1/firebase-firestore.js"></script>
-    <script src="/__/firebase/init.js"></script>
+    <script src="/__/firebase/init.js?useEmulator=true"></script>
 </head>
 
 <body>
@@ -92,8 +92,9 @@
 
     <script src="js/include.js"></script>
     <script src="js/modal.js"></script>
-    <script src="js/videoChat.js"></script>
     <script>
+        // for database access
+        const db = firebase.firestore();
         const btnTwo = document.getElementById('js-select-btn-two');
         const btnFour = document.getElementById('js-select-btn-four');
         const videoSelect = document.querySelector('.video-select');
@@ -104,10 +105,12 @@
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
         // ユーザー名を格納する配列
-        const videoTwo = ['item1', 'item2'];
-        const videoFour = ['item1', 'item2', 'item3', 'item4'];
+        let videoTwo = ['item1', 'item2'];
+        let videoFour = ['item1', 'item2', 'item3', 'item4'];
         let micFlag = true;
         let videoFlag = true;
+        let hostName = null;
+        let memberName = null;
         let userWidth = "48%";
         // iphoneかipadかその他かを確認
         const model = navigator.platform;
@@ -160,21 +163,33 @@
             openUserMedia();
         });
 
-        btnTwo.addEventListener('click', (userId) => {
+        btnTwo.addEventListener('click', async() => {
             videoMenu.style.display = 'flex';
             videoSelect.style.display = 'none';
             document.activeForm.people.value = 2;
+
+            // test print
+            console.log(`userId => ${userId}`);
+
             // TODO: userIdを貰って使う
-            const preapreResult = twoVideoChatPrepare(userId);
-            if(preapreResult.hasOwnProperty('err')){
+            const prepareResult = await twoVideoChatPrepare(userId);
+            if(prepareResult.hasOwnProperty('err')){
                 // has error
-            }else{
-                // hostUserId : ホストのユーザーID
-                // auth       : 'host' or 'member'
-                // hostName   : ホストのユーザー名
-                // memberName : メンバーのユーザー名
-                videoTwo[0] = preapreResult.hostName;
-                videoTwo[1] = preapreResult.userName;
+                console.log(`Error => ${prepareResult.err}`);
+            }else if(prepareResult.auth == 'host'){
+                // +--------+
+                // |  host  |
+                // +--------+
+                console.log('!!!!!!host!!!!!!');
+                console.log(`hostName => ${prepareResult.hostName}`);
+                console.log(`memberName => ${prepareResult.memberName}`);
+            }else if(prepareResult.auth == 'member'){
+                // +--------+
+                // | member |
+                // +--------+
+                console.log('!!!!!!member!!!!!!');
+                console.log(`hostName => ${prepareResult.hostName}`);
+                console.log(`memberName => ${prepareResult.memberName}`);
             }
             videoTwo.forEach(userName => {
                 const user = document.createElement('div');
@@ -349,6 +364,121 @@
             // create stream from dom
 
 
+        }
+
+        async function twoVideoChatPrepare(userId){
+            // create nextValRef
+            const nextValRef = db.collection('next_numbers').doc('forMatching');
+            let myVal = null;
+            try{
+                // transaction for get and update nextVal
+                myVal = await db.runTransaction(async (t) => {
+                    // get nextVal
+                    const doc = await t.get(nextValRef);
+                    const nextVal = doc.data().nextVal;
+                    // increment and update nextVal
+                    await t.update(nextValRef, {nextVal : nextVal + 1});
+                    // return nextVal
+                    return nextVal;
+                })
+            }catch(err){
+                // has error
+                return {err : err};
+            }
+            // create matching
+            const matching = {
+                userId : userId,
+                number : myVal
+            };
+            await db.collection('matching').doc(String(myVal)).set(matching);
+            let roomDemoData = null;
+            let roomId = null;
+            let hostId = null;
+            let memberId = null;
+            let hostName = null;
+            let memberName = null;
+            let flag = false;
+            if(myVal % 2 == 0){
+                // +---------------------------------+
+                // |              host               |
+                // +---------------------------------+
+                roomId = String(myVal);
+                hostId = userId;
+                try{
+                    // create room_demo
+                    roomDemoData = await db.collection('room_demo').doc(roomId).set({host : matching});
+                    hostName = await db.collection('user_detail').doc(hostId).get().then(doc => {
+                        if(!doc.exists){
+                            return '';
+                        }
+                        return doc.data().userName;
+                    })
+                    // create listener
+                    const listener = db.collection('room_demo').doc(roomId).onSnapshot(async snapshot => {
+                        const data = snapshot.data();
+                        if(data.member){
+                            memberId = data.member.userId;
+                            flag = true;
+                        }
+                    })
+                    while(flag == false){
+                        // 1s = 1000
+                        await sleep(3000);
+                        console.log('!!!retry!!!');
+                    }
+                    memberName = await db.collection('user_detail').doc(memberId).get().then(doc => {
+                        if(!doc.exists){
+                            return '';
+                        }
+                        return doc.data().userName;
+                    })
+                }catch(err){
+                    // has error
+                    return {err : err};
+                }
+                // return to page
+                return {roomId : roomId, auth : 'host', hostName : hostName, memberName : memberName};
+            }else{
+                // +--------------------------------+
+                // |             member             |
+                // +--------------------------------+
+                // create roomId
+                roomId = String(myVal - 1);
+                memberId = userId;
+                try{
+                    // join room_demo
+                    roomDemoData = await db.collection('room_demo').doc(roomId).update({member : matching});
+                    memberName = await db.collection('user_detail').doc(memberId).get().then(doc => {
+                        if(!doc.exists){
+                            return '';
+                        }
+                        return doc.data().userName;
+                    })
+                    hostId = await db.collection('room_demo').doc(roomId).get().then(doc => {
+                        if(!doc.exists){
+                            return '';
+                        }
+                        return doc.data().host.userId;
+                    })
+                    hostName = await db.collection('user_detail').doc(hostId).get().then(doc => {
+                        if(!doc.exists){
+                            return '';
+                        }
+                        return doc.data().userName;
+                    })
+                }catch(err){
+                    // has error
+                    return {err : err};
+                }
+                // return to page
+                return {roomId : roomId, auth : 'member', hostName : hostName, memberName : memberName};
+            }
+        }
+
+        function sleep(msec) {
+            return new Promise(function(resolve) {           
+                setTimeout(function() {resolve()}, msec);
+            })
         }
     </script>
 </body>
