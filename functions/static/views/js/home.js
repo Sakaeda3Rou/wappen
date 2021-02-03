@@ -150,11 +150,12 @@ else {
   });
 }
 
-const homeBtn = document.querySelector('.fancy-button');
-homeBtn.addEventListener('click', () => {
-    homeBtn.classList.add('active');
-});
+//削除 2021.02.03
+// const homeBtn = document.querySelector('.fancy-button');
+// homeBtn.addEventListener('click', () => {
+//     homeBtn.classList.add('active');
+// });
 
-homeBtn.addEventListener('animationend', () => {
-    homeBtn.classList.remove('active');
-});
+// homeBtn.addEventListener('animationend', () => {
+//     homeBtn.classList.remove('active');
+// });

@@ -2420,7 +2420,6 @@ main {
 }
 
 .home-header__title {
-  font-family: 'Mv Boli';
   color: white;
   font-size: 1.2rem;
 }
@@ -2448,7 +2447,7 @@ main {
 
 .home__title {
   height: 100%;
-  background-color: hotpink;
+  background-color: #FFB3A7;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2469,7 +2468,8 @@ main {
 }
 
 .home__title .title-phrase {
-  font-family: 'Carter One', cursive;
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
   font-size: 2.6rem;
   margin-bottom: 2rem;
 }
@@ -2498,7 +2498,7 @@ main {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  background-color: blue;
+  background-color: #6C9BD2;
 }
 
 .home__tutorial .tutorial {
@@ -2527,7 +2527,7 @@ main {
 }
 
 .home__aboutme {
-  background-color: #ecd318;
+  background-color: #FEF263;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2554,6 +2554,39 @@ main {
 @media screen and (min-width: 1000px) {
   .home__aboutme .aboutme {
     width: 60%;
+  }
+}
+
+.home__aboutme .aboutme__main {
+  font-size: 0.9rem;
+}
+
+@media screen and (min-width: 768px) {
+  .home__aboutme .aboutme__main {
+    font-size: 1.2rem;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .home__aboutme .aboutme__main {
+    font-size: 1.5rem;
+  }
+}
+
+.home__aboutme .aboutme__sub {
+  width: 70%;
+  font-size: 0.6rem;
+}
+
+@media screen and (min-width: 768px) {
+  .home__aboutme .aboutme__sub {
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .home__aboutme .aboutme__sub {
+    font-size: 1rem;
   }
 }
 
@@ -2694,8 +2727,8 @@ main {
 .btn-circle-border {
   display: inline-block;
   text-decoration: none;
-  background: #8cd460;
-  color: rgba(255, 255, 255, 0.47);
+  background: #c23a1e;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: bold;
   width: 120px;
   height: 60px;
@@ -2703,8 +2736,8 @@ main {
   border-radius: 10%;
   text-align: center;
   overflow: hidden;
-  -webkit-box-shadow: 0px 0px 0px 5px #8cd460;
-          box-shadow: 0px 0px 0px 5px #8cd460;
+  -webkit-box-shadow: 0px 0px 0px 5px #c23a1e;
+          box-shadow: 0px 0px 0px 5px #c23a1e;
   border: solid 2px rgba(255, 255, 255, 0.47);
   -webkit-transition: .4s;
   transition: .4s;
@@ -2716,6 +2749,7 @@ main {
 
 #ityped {
   font-size: 1.5rem;
+  font-weight: 500;
 }
 
 .ityped-cursor {
