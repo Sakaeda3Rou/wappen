@@ -183,6 +183,8 @@
                 console.log('!!!!!!host!!!!!!');
                 console.log(`hostName => ${prepareResult.hostName}`);
                 console.log(`memberName => ${prepareResult.memberName}`);
+                videoTwo[0] = prepareResult.hostName;
+                videoTwo[1] = prepareResult.memberName;
             }else if(prepareResult.auth == 'member'){
                 // +--------+
                 // | member |
@@ -190,6 +192,10 @@
                 console.log('!!!!!!member!!!!!!');
                 console.log(`hostName => ${prepareResult.hostName}`);
                 console.log(`memberName => ${prepareResult.memberName}`);
+                videoTwo[0] = prepareResult.memberName;
+                videoTwo[1] = prepareResult.hostName;
+            }else{
+                // ?????
             }
             videoTwo.forEach(userName => {
                 const user = document.createElement('div');
