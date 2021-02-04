@@ -1,138 +1,114 @@
-const db = firebase.firestore();
-
-// video chat prepare for two people
 async function twoVideoChatPrepare(userId){
   // create nextValRef
   const nextValRef = db.collection('next_numbers').doc('forMatching');
+  let myVal = null;
   try{
-    // transaction for get and update nextVal
-    const myVal = await db.runTransaction(async t => {
-      // get nextVal
-      const doc = t.get(nextValRef);
-      const nextVal = doc.data().nextVal;
-
-      // increment and update nextVal
-      await t.update(nextValRef, {nextVal : nextVal + 1});
-
-      // return nextVal
-      return nextVal;
-    })
+      // transaction for get and update nextVal
+      myVal = await db.runTransaction(async (t) => {
+          // get nextVal
+          const doc = await t.get(nextValRef);
+          const nextVal = doc.data().nextVal;
+          // increment and update nextVal
+          await t.update(nextValRef, {nextVal : nextVal + 1});
+          // return nextVal
+          return nextVal;
+      })
   }catch(err){
-    // has error
-    return {err : err};
+      // has error
+      return {err : err};
   }
-  
   // create matching
   const matching = {
-    userId : userId,
-    number : myVal
+      userId : userId,
+      number : myVal
   };
-  
-  await db.collection('matching').doc(userId).set(matching);
-  const roomDemoData = null;
-  
-  if(myVal % 2 == 1){
-    // create room_demo
-    roomDemoData = db.collection('room_demo').doc(userId).set({host : matching});
-
-    // get calleeId
-    const calleeId = db.collection('matching').orderBy('number', 'desc').startAfter(myVal).limit(1).get().then(snapshot => {
-      // create resultArray
-      let resultArray = [];
-
-      if(snapshot.empty){
-        return resultArray;
-      }
-
-      snapshot.forEach(doc => {
-        // push userId
-        resultArray.push(doc.data().userId);
-      })
-
-      // return to calleeId
-      return resultArray;
-    }).catch(err => {
-      // has error
-      return {err : err};
-    })
-
-    if(Array.isArray(calleeId)){
+  await db.collection('matching').doc(String(myVal)).set(matching);
+  let roomDemoData = null;
+  let roomId = null;
+  let hostId = null;
+  let memberId = null;
+  let hostName = null;
+  let memberName = null;
+  let flag = false;
+  if(myVal % 2 == 0){
+      // +---------------------------------+
+      // |              host               |
+      // +---------------------------------+
+      roomId = String(myVal);
+      hostId = userId;
       try{
-        // update callee's matching
-        await db.collection('matching').doc(calleeId[0]).update({hostUserId : userId});
-
-        const hostName = await db.collection('user_detail').doc(userId).get().then(doc => {
-          if(!doc.exists){
-            return '';
+          // create room_demo
+          roomDemoData = await db.collection('room_demo').doc(roomId).set({host : matching});
+          hostName = await db.collection('user_detail').doc(hostId).get().then(doc => {
+              if(!doc.exists){
+                  return '';
+              }
+              return doc.data().userName;
+          })
+          // create listener
+          const listener = db.collection('room_demo').doc(roomId).onSnapshot(async snapshot => {
+              const data = snapshot.data();
+              if(data.member){
+                  memberId = data.member.userId;
+                  flag = true;
+              }
+          })
+          while(flag == false){
+              // 1s = 1000
+              await sleep(3000);
+              console.log('!!!retry!!!');
           }
-
-          return doc.data().userName;
-        })
-
-        const memberName = await db.collection('user_detail').doc(calleeId[0]).get().then(doc => {
-          if(!doc.exists){
-            return '';
-          }
-
-          return doc.data().userName;
-        })
-
-        // +---------------------------+
-        // | return to video chat page |
-        // +---------------------------+
-        return {hostUserId : userId, auth : 'host', hostName : hostName, memberName : memberName};
+          memberName = await db.collection('user_detail').doc(memberId).get().then(doc => {
+              if(!doc.exists){
+                  return '';
+              }
+              return doc.data().userName;
+          })
       }catch(err){
-        // has error
-        return {err : err};
+          // has error
+          return {err : err};
       }
-    }else{
-      // error in create calleeId
-      return calleeId;
-    }
+      // return to page
+      return {roomId : roomId, auth : 'host', hostName : hostName, memberName : memberName};
   }else{
-    // get host's userId
-    // listen update for my matching
-    const hostUserId = db.collection('matching').doc(userId).onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if(change.type === 'modified'){
-          // return hostUserId
-          return change.doc.data().hostUserId;
-        }
-      })
-    })
-
-    // create roomDemoRef
-    const roomDemoRef = db.collection('room_demo').doc(hostUserId);
-
-    try{
-      // update room_demo
-      roomDemoData = await roomDemoRef.update({member : matching});
-
-      const hostName = await db.collection('user_detail').doc(hostUserId).get().then(doc => {
-        if(!doc.exists){
-          return '';
-        }
-
-        return doc.data().userName;
-      })
-
-      const memberName = await db.collection('user_detail').doc(userId).get().then(doc => {
-        if(!doc.exists){
-          return '';
-        }
-
-        return doc.data().userName;
-      })
-
-      // +---------------------------+
-      // | return to video chat page |
-      // +---------------------------+ 
-      return {hostUserId : hostUserId, auth : 'member', hostName : hostName, memberName : memberName};
-    }catch(err){
-      // has error
-      return {err : err};
-    }
+      // +--------------------------------+
+      // |             member             |
+      // +--------------------------------+
+      // create roomId
+      roomId = String(myVal - 1);
+      memberId = userId;
+      try{
+          // join room_demo
+          roomDemoData = await db.collection('room_demo').doc(roomId).update({member : matching});
+          memberName = await db.collection('user_detail').doc(memberId).get().then(doc => {
+              if(!doc.exists){
+                  return '';
+              }
+              return doc.data().userName;
+          })
+          hostId = await db.collection('room_demo').doc(roomId).get().then(doc => {
+              if(!doc.exists){
+                  return '';
+              }
+              return doc.data().host.userId;
+          })
+          hostName = await db.collection('user_detail').doc(hostId).get().then(doc => {
+              if(!doc.exists){
+                  return '';
+              }
+              return doc.data().userName;
+          })
+      }catch(err){
+          // has error
+          return {err : err};
+      }
+      // return to page
+      return {roomId : roomId, auth : 'member', hostName : hostName, memberName : memberName};
   }
 }
 
-// TODO: think about necessary of peerConnection on here
+function sleep(msec) {
+  return new Promise(function(resolve) {           
+      setTimeout(function() {resolve()}, msec);
+  })
+}
