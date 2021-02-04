@@ -743,7 +743,26 @@ app.post('/clan_search', async (req, res) => {
 
 // ビデオ通話
 app.get('/video', async (req, res) => {
-  res.render('video');
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  if (!user) {
+    res.redirect('/');
+  } else {
+
+    // ユーザーの初期オブジェクトのURLを取得
+    const result = await dao.selectMyObject(user.uid);
+    const objectURL = result[0].objectURL;
+
+    // ユーザーのパターンURLを取得
+    const patternURL = await sao.getPattUrl(user.uid);
+
+    res.render('video', {
+      userId: user.uid,
+      objectURL: objectURL,
+      patternURL: patternURL,
+    });
+  }
 });
 
 // TODO: test
