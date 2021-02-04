@@ -212,7 +212,9 @@
                 userDisplay.classList.add('user__name');
                 userDisplay.appendChild(document.createTextNode(userName));
                 user.appendChild(userDisplay);
-
+                const canvas = document.createElement('canvas');
+                canvas.id = 'localVideo';
+                user.appendChild(canvas);
                 videoArea.appendChild(user);
                 videoArea.style.display = 'flex';
             });
@@ -233,8 +235,6 @@
                 userDisplay.classList.add('user__name');
                 userDisplay.appendChild(document.createTextNode(userName));
                 user.appendChild(userDisplay);
-                user.appendChild(userDisplay);
-
                 videoArea.appendChild(user);
                 videoArea.style.display = 'flex';
             });
@@ -329,6 +329,9 @@
             // const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
             // document.querySelector('#localVideo').srcObject = stream;
 
+            // initial camera
+            var videoElement = document.get
+
             // TODO: AR code
             const renderer = new twoVideoChatPrepare.WebGLRenderer({
                 antialias: true,
@@ -336,6 +339,7 @@
             });
 
             // renderer style setting
+            renderer.set
 
             // insert to dom
 
