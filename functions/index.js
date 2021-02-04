@@ -349,11 +349,6 @@ app.get('/camera', async (req, res) => {
               patternURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2Fpattern-Tetaumatawhakatangihangakoauaotamateaurehaeatu.patt?generation=1612157250551524&alt=media',
               objectURL: 'https://storage.googleapis.com/download/storage/v1/b/wappen-3876c.appspot.com/o/aaas-images%2FTetaumatawhakatangihangakoauaotamateaurehaeatu.png?generation=1612157251275749&alt=media',
             },
-            // {
-            //   userId: 'aaas06',
-            //   patternURL: '',
-            //   objectURL: '',
-            // },
           ]
         }
 
@@ -750,6 +745,10 @@ app.get('/video', async (req, res) => {
     res.redirect('/');
   } else {
 
+    // オブジェクトリストを取得
+    const my_result = await dao.searchMyObject(user.uid, null, 1);
+    const objectList = my_result.objectList;
+
     // ユーザーの初期オブジェクトのURLを取得
     const result = await dao.selectMyObject(user.uid);
     const objectURL = result[0].objectURL;
@@ -759,10 +758,18 @@ app.get('/video', async (req, res) => {
 
     res.render('video', {
       userId: user.uid,
+      objectList: objectList,
       objectURL: objectURL,
       patternURL: patternURL,
     });
   }
+});
+
+app.get('/video-active', async (req, res) => {
+  // ユーザーを取得
+  const user = await confirmUser(req);
+
+  res.render('video-active');
 });
 
 // TODO: test

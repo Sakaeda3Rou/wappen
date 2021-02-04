@@ -70,13 +70,13 @@
         <div class="video-menu__object js-btn"><i class="fas fa-images fa-2x"></i>オブジェクト</div>
         <div class="video-menu__mic"><i class="fas fa-microphone-slash fa-2x icon-mic"></i>マイク</div>
         <div class="video-menu__video"><i class="fas fa-video-slash fa-2x icon-video"></i>ビデオ</div>
-        <div class="video-menu__end"><a href="video.html"><i class="fas fa-sign-out-alt fa-2x"></i>退室</a></div>
+        <div class="video-menu__end"><a href="/video"><i class="fas fa-sign-out-alt fa-2x"></i>退室</a></div>
     </section>
     <footer id="footer" style="display: none;"></footer>
 
-    <script src="js/include.js"></script>
-    <script src="js/modal.js"></script>
-    <script src="js/videoActive.js"></script>
+    <script src="views.js/include.js"></script>
+    <script src="views/js/modal.js"></script>
+    <script src="views/js/videoActive.js"></script>
     <script>
         const videoArea = document.querySelector('.video-area');
         const videoMenu = document.querySelector('.video-menu');
@@ -88,8 +88,8 @@
         const videoTwo = ['item1', 'item2'];
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
         let people = videoFour;
-        let micFlag = true;
-        let videoFlag = true;
+        let micFlag = false;
+        let videoFlag = false;
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
@@ -97,10 +97,9 @@
             iconVideo.classList.toggle('fa-video');
             iconVideo.classList.toggle('fa-video-slash');
 
-            // videoを切るように設定されていた場合
-            if(iconVideo.classList.contains('fa-video-slash')){
-                videoFlag = false;
-            }
+            // on/off 切り替え
+            videoFlag = !videoFlag;
+            console.log(`video switch => ${videoFlag}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
@@ -116,10 +115,8 @@
             iconMic.classList.toggle('fa-microphone');
             iconMic.classList.toggle('fa-microphone-slash');
 
-            // videoを切るように設定されていた場合
-            if(iconMic.classList.contains('fa-microphone-slash')){
-                micFlag = false;
-            }
+            micFlag = !micFlag
+            console.log(`mic switch => ${micFlag}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
