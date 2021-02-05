@@ -134,10 +134,10 @@
             console.log(`video switch => ${videoFlag}`);
 
             // stream を一時中断
-            // const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            // tracks.forEach(track => {
-            //     track.stop();
-            // })
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
 
             // stream を設定通りに再開
             openUserMedia();
@@ -152,10 +152,10 @@
             console.log(`mic switch => ${micFlag}`);
 
             // stream を一時中断
-            // const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            // tracks.forEach(track => {
-            //     track.stop();
-            // })
+            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            })
 
             // stream を設定通りに再開
             openUserMedia();
@@ -183,7 +183,6 @@
                 const user = document.createElement('div');
                 user.classList.add('user');
                 user.id = userName;
-                user.zIndex = 1;
                 if (window.matchMedia('(min-width: 1000px)').matches) {
                     user.style.width = '48%';
                     user.style.height = '100%';
@@ -200,7 +199,10 @@
                 // canvas.z-index = 100;
                 const video = document.createElement('video');
                 video.id = 'localVideo';
-                video.zIndex = 100;
+                // video.style.backgroundColor = 'white';
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.autoplay = true;
                 // user.appendChild(canvas);
                 user.appendChild(video);
                 videoArea.appendChild(user);
@@ -319,6 +321,7 @@
             // get stream if you don't need AR
             const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
             document.querySelector('#localVideo').srcObject = stream;
+            console.log(document.querySelector('#localVideo').srcObject);
 
             // get video element
             // var videoElement = document.querySelector('#myVideo');
