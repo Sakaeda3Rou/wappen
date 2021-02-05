@@ -12,6 +12,23 @@
 
 <body>
     <nav id="set-hamburger"></nav>
+    <div class="global-nav">
+        <ul class="global-nav__list">
+            <li class="global-nav__item"><a href="/my_object">マイオブジェクト</a></li>
+            <li class="global-nav__item"><a href="/object_share">オブジェクト共有</a></li>
+            <li class="global-nav__item"><a href="/camera">カメラ</a></li>
+            <li class="global-nav__item"><a href="/my_page">マイページ</a></li>
+            <li class="global-nav__item"><a href="/clan">クラン</a></li>
+            <li class="global-nav__item"><a href="/video">ビデオ通話</a></li>
+        </ul>
+        <a href="/logout" class="global-nav__logout">ログアウト</a>
+    </div>
+    <div class="hamburger" id="js-hamburger" onclick="hamburgerMove()">
+        <div class="hamburger__line hamburger__line--1"></div>
+        <div class="hamburger__line hamburger__line--2"></div>
+        <div class="hamburger__line hamburger__line--3"></div>
+    </div>
+    <div class="black-bg" id="js-black-bg" onclick="hamburgerBgRemove()"></div>
     <header class="header">
         <div class="header__title">My Object</div>
     </header>
@@ -98,7 +115,7 @@
         </div>
     </main>
     <footer id="footer"></footer>
-    <script src="views/js/include.js"></script>
+    <script src="views/js/hamburger.js"></script>
     <script src="views/js/modal.js"></script>
     <script src="views/js/myObjectUpload.js"></script>
     <script>
