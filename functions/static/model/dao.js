@@ -1199,6 +1199,56 @@ exports.deleteMyObject = async(userId, objectId) => {
   return true;
 }
 
+// when you use : for prepare videochat
+// need user's id array as 'userIds'
+exports.prepareVideoChat = async(userIds) => {
+  let anyonePattern = null;
+  let anyoneObjectId = null;
+  let anyoneObjectURL = null;
+  let anyOneMarkerList = [];
+  for(const userId of userIds){
+    try{
+      anyonePattern = await db.collection('my_pattern').where('userId', '==', userId).get().then(snapshot => {
+        let patternURL = null;
+        if(snapshot.empty){
+          return resultArray;
+        }
+        snapshot.forEach(doc => {
+          patternURL = doc.data().patternURL;
+        })
+        return patternURL;
+      })
+  
+      anyoneObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+        let resultArray = [];
+        if(snapshot.empty){
+          return resultArray;
+        }
+        snapshot.forEach(doc => {
+          resultArray.push(doc.data().objectId);
+        })
+        return resultArray;
+      })
+
+      anyoneObjectURL = await db.collection('object').doc(anyoneObjectId[0]).get().then(doc => {
+        if(!doc.exists){
+          return resultArray;
+        }
+        
+        return doc.data().objectURL;
+      })
+
+      anyOneMarkerList.push({userId : userId, patternURL : anyonePattern, objectURL : anyoneObjectURL});
+    }catch(err){
+      // has error
+      return {err : err};
+    }
+  }
+
+  // success
+  return anyOneMarkerList;
+}
+
 // when you use : for increment numberOfAdd
 // need object's id as 'objectId'
 exports.incrementNumberOfAdd = async(objectId) => {
