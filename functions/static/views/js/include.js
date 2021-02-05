@@ -7,9 +7,9 @@ const includeHamburger = () => {
 
     xhr.open(method, url, true);
     xhr.onreadystatechange = function () {
-        if(xhr.readyState === 4 && xhr.status === 200){
+        if (xhr.readyState === 4 && xhr.status === 200) {
             let restxt = xhr.responseText;
-            hamburger.innerHTML= restxt;
+            hamburger.innerHTML = restxt;
         }
     };
     xhr.send();
@@ -27,7 +27,7 @@ const includeFooter = () => {
 
     xhr.open(method, url, true);
     xhr.onreadystatechange = function () {
-        if(xhr.readyState === 4 && xhr.status === 200){
+        if (xhr.readyState === 4 && xhr.status === 200) {
             let restxt = xhr.responseText;
             footer.innerHTML = restxt;
         }
