@@ -1,3 +1,5 @@
+const db = firebase.firestore();
+
 async function twoVideoChatPrepare(userId){
   // create nextValRef
   const nextValRef = db.collection('next_numbers').doc('forMatching');
@@ -69,6 +71,7 @@ async function twoVideoChatPrepare(userId){
           return {err : err};
       }
       // return to page
+      // console.log(`memberName : ${memberName}`);
       return {roomId : roomId, auth : 'host', hostName : hostName, memberName : memberName};
   }else{
       // +--------------------------------+
@@ -103,6 +106,7 @@ async function twoVideoChatPrepare(userId){
           return {err : err};
       }
       // return to page
+      // console.log(`memberName : ${memberName}`);
       return {roomId : roomId, auth : 'member', hostName : hostName, memberName : memberName};
   }
 }

@@ -116,6 +116,9 @@
         } if (model.indexOf("iPad") != -1) {
             userWidth = "42vh";
         }
+        let width;
+        let height;
+
         // test userId
         const userId = 'q5GsxMu8h2OAkmqxEY6prVzWAVj2';
 
@@ -131,10 +134,10 @@
             console.log(`video switch => ${videoFlag}`);
 
             // stream を一時中断
-            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop();
-            })
+            // const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            // tracks.forEach(track => {
+            //     track.stop();
+            // })
 
             // stream を設定通りに再開
             openUserMedia();
@@ -149,21 +152,21 @@
             console.log(`mic switch => ${micFlag}`);
 
             // stream を一時中断
-            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop();
-            })
+            // const tracks = document.querySelector('#localVideo').srcObject.getTracks();
+            // tracks.forEach(track => {
+            //     track.stop();
+            // })
 
             // stream を設定通りに再開
             openUserMedia();
         });
 
-        btnTwo.addEventListener('click', (userId) => {
+        btnTwo.addEventListener('click', async() => {
             videoMenu.style.display = 'flex';
             videoSelect.style.display = 'none';
             document.activeForm.people.value = 2;
             // TODO: userIdを貰って使う
-            const preapreResult = twoVideoChatPrepare(userId);
+            const preapreResult = await twoVideoChatPrepare(userId);
             if(preapreResult.hasOwnProperty('err')){
                 // has error
             }else{
@@ -171,8 +174,10 @@
                 // auth       : 'host' or 'member'
                 // hostName   : ホストのユーザー名
                 // memberName : メンバーのユーザー名
+                // console.log(`page hostName : ${preapreResult.hostName}`);
+                // console.log(`page memberName : ${preapreResult.memberName}`);
                 videoTwo[0] = preapreResult.hostName;
-                videoTwo[1] = preapreResult.userName;
+                videoTwo[1] = preapreResult.memberName;
             }
             videoTwo.forEach(userName => {
                 const user = document.createElement('div');
@@ -191,10 +196,16 @@
                 user.appendChild(userDisplay);
                 const canvas = document.createElement('canvas');
                 canvas.id = 'localVideo';
+                const video = document.createElement('video');
+                video.id = 'myVideo';
                 user.appendChild(canvas);
+                user.appendChild(video);
                 videoArea.appendChild(user);
                 videoArea.style.display = 'flex';
+                width = user.style.width;
+                height = user.style.height;
             });
+            openUserMedia();
         });
 
         btnFour.addEventListener('click', () => {
@@ -306,50 +317,89 @@
             // const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
             // document.querySelector('#localVideo').srcObject = stream;
 
+            // get video element
+            var videoElement = document.querySelector('#myVideo');
+
+            // create constraints 
+            constraints = {
+                video : videoFlag,
+                audio : micFlag
+            };
+
+            // pattern : getUserMedia success
+            var onOpenStream = function(stream){
+                videoElement.srcObject = stream;
+                InitCanvas();
+            }
+
             // initial camera
-            var videoElement = document.get
+            if(navigator.mediaDevices.getUserMedia != null){
+                navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
+                    onOpenStream(stream)
+                }).catch(function(err){
+                    // has error
+                });
+            }else{
+                // cannot access camera
+            }
 
-            // TODO: AR code
-            const renderer = new twoVideoChatPrepare.WebGLRenderer({
-                antialias: true,
-                alpha: true
-            });
+            var InitCanvas = function(){
+                // initial canvas
+                var canvasElement = document = document.querySelector('#localVideo');
 
-            // renderer style setting
-            renderer.set
+                var renderer = new THREE.WebGLRenderer({
+                    canvas : canvasElement,
+                    antialias : true,
+                    alpha : true
+                });
+                renderer.setClearColor(new THREE.Color('black'), 0)
+                renderer.setPixelRatio(window.devicePixelRatio);
+                
+                // initial scene
+                var scene = new THREE.Scene();
 
-            // insert to dom
+                // initial ar
+                var arToolkitContext = new THREEx.ArToolkitContext({
+                    cameraParametersUrl: '',
+                    detectionMode: 'color_and_matrix'
+                })
+                arToolkitContext.init(function onCompleted(){
 
-            // scene and camera
-            const scene = new twoVideoChatPrepare.Scene();
-            scene.visible = false;
-            const camera = new twoVideoChatPrepare.Camera();
-            scene.add(camera);
+                })
 
-            // select source for AR
-            const arToolkitSource = new THREE.ArToolkitSource({
-                sourceType: 'webcam'
-            });
+                // XXX: help me IORI
+                var markerRoot = new THREE.Group();
+                scene.add(markerRoot);
+                var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+                    type : 'pattern',
+                    patternUrl : patternURL,
+                    changeMatrixMode : 'modelViewMatrix',
+                    minConfidence : 0.50
+                })
 
-            // init wait 2 seconds to resize
+                const user = document.querySelector('user')
+                const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
 
-            // create arToolkitContext
-            const arToolkitContext = new THREEx.ArToolkitContext({
-                cameraParametersUrl: 'data/camera_para.dat',
-                detectionMode: 'mono'
-            });
+                const geometry = new THREE.planeGeometry();
+                const objectUrl = objectURL;
+                const material = new THREE.MeshStandaredMaterial({
+                    map : texture
+                });
 
-            arToolkitContext.init(() => {
-                camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-            });
+                const mesh = new THREE.Mesh(geometry, material);
 
-            // create arMarkerControls to use patternURL
-            // TODO: ask iori for use patternURL
+                markerRoot.add(mesh);
+                
+                drawFrame();
 
-            // insert to dom
+                function drawFrame(){
+                    arToolkitContext.update(videoElement);
 
-            // create stream from dom
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(drawFrame);
+                }
 
+            }
 
         }
     </script>
