@@ -77,8 +77,8 @@
     </main>
     <section class="video-menu">
         <div class="video-menu__object js-btn"><i class="fas fa-images fa-2x"></i>オブジェクト</div>
-        <div class="video-menu__mic"><i class="fas fa-microphone-slash fa-2x icon-mic"></i>マイク</div>
-        <div class="video-menu__video"><i class="fas fa-video-slash fa-2x icon-video"></i>ビデオ</div>
+        <div class="video-menu__mic"><i class="fas fa-microphone fa-2x icon-mic"></i>マイク</div>
+        <div class="video-menu__video"><i class="fas fa-video fa-2x icon-video"></i>ビデオ</div>
         <!-- <a href="video-active.html"><i class="far fa-comment-dots fa-2x"></i>通話を開始</a> -->
         <div class="video-menu__start">
             <i class="far fa-comment-dots fa-2x"></i>通話を開始
@@ -106,8 +106,8 @@
         // ユーザー名を格納する配列
         const videoTwo = ['item1', 'item2'];
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
-        let micFlag = false;
-        let videoFlag = false;
+        let micFlag = true;
+        let videoFlag = true;
         let userWidth = "48%";
         // iphoneかipadかその他かを確認
         const model = navigator.platform;
@@ -183,6 +183,7 @@
                 const user = document.createElement('div');
                 user.classList.add('user');
                 user.id = userName;
+                user.zIndex = 1;
                 if (window.matchMedia('(min-width: 1000px)').matches) {
                     user.style.width = '48%';
                     user.style.height = '100%';
@@ -194,11 +195,13 @@
                 userDisplay.classList.add('user__name');
                 userDisplay.appendChild(document.createTextNode(userName));
                 user.appendChild(userDisplay);
-                const canvas = document.createElement('canvas');
-                canvas.id = 'localVideo';
+                // const canvas = document.createElement('canvas');
+                // canvas.id = 'localVideo';
+                // canvas.z-index = 100;
                 const video = document.createElement('video');
-                video.id = 'myVideo';
-                user.appendChild(canvas);
+                video.id = 'localVideo';
+                video.zIndex = 100;
+                // user.appendChild(canvas);
                 user.appendChild(video);
                 videoArea.appendChild(user);
                 videoArea.style.display = 'flex';
@@ -314,92 +317,92 @@
         // use micFlag and videoFlag to get userMedia
         async function openUserMedia(objectURL, patternURL){
             // get stream if you don't need AR
-            // const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
-            // document.querySelector('#localVideo').srcObject = stream;
+            const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
+            document.querySelector('#localVideo').srcObject = stream;
 
             // get video element
-            var videoElement = document.querySelector('#myVideo');
+            // var videoElement = document.querySelector('#myVideo');
 
-            // create constraints 
-            constraints = {
-                video : videoFlag,
-                audio : micFlag
-            };
+            // // create constraints 
+            // constraints = {
+            //     video : videoFlag,
+            //     audio : micFlag
+            // };
 
-            // pattern : getUserMedia success
-            var onOpenStream = function(stream){
-                videoElement.srcObject = stream;
-                InitCanvas();
-            }
+            // // pattern : getUserMedia success
+            // var onOpenStream = function(stream){
+            //     videoElement.srcObject = stream;
+            //     InitCanvas();
+            // }
 
-            // initial camera
-            if(navigator.mediaDevices.getUserMedia != null){
-                navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
-                    onOpenStream(stream)
-                }).catch(function(err){
-                    // has error
-                });
-            }else{
-                // cannot access camera
-            }
+            // // initial camera
+            // if(navigator.mediaDevices.getUserMedia != null){
+            //     navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
+            //         onOpenStream(stream)
+            //     }).catch(function(err){
+            //         // has error
+            //     });
+            // }else{
+            //     // cannot access camera
+            // }
 
-            var InitCanvas = function(){
-                // initial canvas
-                var canvasElement = document = document.querySelector('#localVideo');
+            // var InitCanvas = function(){
+            //     // initial canvas
+            //     var canvasElement = document = document.querySelector('#localVideo');
 
-                var renderer = new THREE.WebGLRenderer({
-                    canvas : canvasElement,
-                    antialias : true,
-                    alpha : true
-                });
-                renderer.setClearColor(new THREE.Color('black'), 0)
-                renderer.setPixelRatio(window.devicePixelRatio);
+            //     var renderer = new THREE.WebGLRenderer({
+            //         canvas : canvasElement,
+            //         antialias : true,
+            //         alpha : true
+            //     });
+            //     renderer.setClearColor(new THREE.Color('black'), 0)
+            //     renderer.setPixelRatio(window.devicePixelRatio);
                 
-                // initial scene
-                var scene = new THREE.Scene();
+            //     // initial scene
+            //     var scene = new THREE.Scene();
 
-                // initial ar
-                var arToolkitContext = new THREEx.ArToolkitContext({
-                    cameraParametersUrl: '',
-                    detectionMode: 'color_and_matrix'
-                })
-                arToolkitContext.init(function onCompleted(){
+            //     // initial ar
+            //     var arToolkitContext = new THREEx.ArToolkitContext({
+            //         cameraParametersUrl: '',
+            //         detectionMode: 'color_and_matrix'
+            //     })
+            //     arToolkitContext.init(function onCompleted(){
 
-                })
+            //     })
 
-                // XXX: help me IORI
-                var markerRoot = new THREE.Group();
-                scene.add(markerRoot);
-                var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-                    type : 'pattern',
-                    patternUrl : patternURL,
-                    changeMatrixMode : 'modelViewMatrix',
-                    minConfidence : 0.50
-                })
+            //     // XXX: help me IORI
+            //     var markerRoot = new THREE.Group();
+            //     scene.add(markerRoot);
+            //     var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            //         type : 'pattern',
+            //         patternUrl : patternURL,
+            //         changeMatrixMode : 'modelViewMatrix',
+            //         minConfidence : 0.50
+            //     })
 
-                const user = document.querySelector('user')
-                const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
+            //     const user = document.querySelector('user')
+            //     const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
 
-                const geometry = new THREE.planeGeometry();
-                const objectUrl = objectURL;
-                const material = new THREE.MeshStandaredMaterial({
-                    map : texture
-                });
+            //     const geometry = new THREE.planeGeometry();
+            //     const objectUrl = objectURL;
+            //     const material = new THREE.MeshStandaredMaterial({
+            //         map : texture
+            //     });
 
-                const mesh = new THREE.Mesh(geometry, material);
+            //     const mesh = new THREE.Mesh(geometry, material);
 
-                markerRoot.add(mesh);
+            //     markerRoot.add(mesh);
                 
-                drawFrame();
+            //     drawFrame();
 
-                function drawFrame(){
-                    arToolkitContext.update(videoElement);
+            //     function drawFrame(){
+            //         arToolkitContext.update(videoElement);
 
-                    renderer.render(scene, camera);
-                    requestAnimationFrame(drawFrame);
-                }
+            //         renderer.render(scene, camera);
+            //         requestAnimationFrame(drawFrame);
+            //     }
 
-            }
+            // }
 
         }
     </script>
