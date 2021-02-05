@@ -8,10 +8,6 @@
         <link rel="stylesheet" href="views/css/reset.css">
         <link rel="stylesheet" href="views/css/style.css">
         <script src="https://kit.fontawesome.com/7a89e754ee.js" crossorigin="anonymous"></script>
-        <!-- firebase -->
-        <script src="/__/firebase/8.0.1/firebase-app.js"></script>
-        <script defer src="/__/firebase/8.0.1/firebase-functions.js"></script>
-        <script src="/__/firebase/init.js?useEmulator=true"></script>
 
     </head>
 
@@ -134,15 +130,6 @@
                 </div>
             </div>
         </main>
-        <script>
-          // TODO: test
-
-          firebase.initializeApp(firebaseConfig);
-
-          console.dir(firebase)
-
-          console.log(`mailaddress => ${functions.config().someservice.address}`)
-        </script>
         <footer id="footer"></footer>
         <script src="views/js/hamburger.js"></script>
     </body>

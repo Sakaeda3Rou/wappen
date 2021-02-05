@@ -765,7 +765,7 @@ app.get('/video', async (req, res) => {
   }
 });
 
-app.get('/video-active', async (req, res) => {
+app.post('/video-active', async (req, res) => {
   // ユーザーを取得
   const user = await confirmUser(req);
 
