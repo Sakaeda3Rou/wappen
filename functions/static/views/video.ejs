@@ -114,7 +114,7 @@
         }
         let myName = 'userName';
         let people = 0;
-        let anyOneId = null;
+        let anyOneIds = null;
         let auth = null;
         let roomId = null;
 
@@ -173,9 +173,9 @@
                 // roomId : ROOMのID
                 // auth   : 'host' or 'member'
                 // myName : 自分の名前
-                // anyOneId : 相手のID
+                // anyOneIds : 相手のIDが入った配列
                 myName = preapreResult.myName
-                anyOneId = preapreResult.anyOneId;
+                anyOneIds = preapreResult.anyOneIds;
                 auth = preapreResult.auth;
                 roomId = preapreResult.roomId;
             }
@@ -366,7 +366,7 @@
             // create request_body
             const request_body = {
                 people : people,
-                anyOneId : anyOneId,
+                anyOneIds : anyOneIds,
                 auth : auth,
                 roomId : roomId,
                 micFlag : micFlag,

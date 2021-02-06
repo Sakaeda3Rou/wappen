@@ -27,7 +27,7 @@ async function twoVideoChatPrepare(userId){
     await db.collection('matching').doc(String(myVal)).set(matching);
     let roomDemoData = null;
     let roomId = null;
-    let anyOneId = null;
+    let anyOneIds = null;
     const myName = await db.collection('user_detail').doc(userId).get().then(doc => {
         if(!doc.exists){
             return '';
@@ -77,7 +77,7 @@ async function twoVideoChatPrepare(userId){
         }
         // return to page
         // console.log(`memberName : ${memberName}`);
-        return {roomId : roomId, auth : 'host', myName : myName, anyOneId : anyOneId};
+        return {roomId : roomId, auth : 'host', myName : myName, anyOneIds : [anyOneId]};
     }else{
         // +--------------------------------+
         // |             member             |
@@ -101,7 +101,7 @@ async function twoVideoChatPrepare(userId){
         }
         // return to page
         // console.log(`memberName : ${memberName}`);
-        return {roomId : roomId, auth : 'member', myName : myName, anyOneId : anyOneId};
+        return {roomId : roomId, auth : 'member', myName : myName, anyOneIds : [anyOneId]};
     }
 }
 
