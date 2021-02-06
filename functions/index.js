@@ -785,7 +785,7 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = null;
+  const category = ['aaj'];
 
   // const objectId = 'kXK3nIvG6QBxvEhpG22G';
   // const objectId = 'BDVQ4Ruj9LNb4unuNKO4';
@@ -795,7 +795,7 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  // result = await dao.searchObject(category, user.uid, 1)
+  result = await dao.searchObject(category, user.uid, 1);
 
   // マーカーリスト取得
   const clanId = "sWuyRFv3Co7I23VoAwTZ";
@@ -817,7 +817,7 @@ app.get('/test', async (req, res) => {
   // result = await dao.changeSelected(user.uid, objectId);
 
   // prepareVideoChat test
-  result = await dao.prepareVideoChat(userIds);
+  // result = await dao.prepareVideoChat(userIds);
 
   console.log(`result =>`);
   console.dir(result);
