@@ -822,6 +822,27 @@ app.get('/test', async (req, res) => {
   res.end();
 });
 
+app.get('/create_marker', async (req, res) => {
+
+  const uid = '1BTQ18cYGtNunhhiFERfuOh7VMy1';
+
+  // マーカーを作成
+  const orient = require('orient_devil');
+
+  // マーカーの作成
+  const markerURL = await orient.createImage(uid);
+
+  console.log(`markerURL => ${markerURL}`);
+
+  // パターンファイルURLを取得
+  const patternURL = await sao.getPattUrl(uid);
+
+  console.log(`patternURL => ${patternURL}`);
+
+  res.end();
+
+});
+
 app.get('/aaas-test', async (req, res) => {
   // urlを取得
   const pattname1 = 'pattern-hoshiboshi.patt';
