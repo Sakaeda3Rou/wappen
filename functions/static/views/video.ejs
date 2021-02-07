@@ -82,9 +82,8 @@
         <!-- <a href="video-active.html"><i class="far fa-comment-dots fa-2x"></i>通話を開始</a> -->
         <div class="video-menu__start">
             <i class="far fa-comment-dots fa-2x"></i>通話を開始
-            <form class="video-menu__form" action="/video-active" name="activeForm" method="get">
-                <input name="people" type="hidden" name="nin" value=4>
-                <input class="video-menu__submit" type="submit" value="">
+            <form class="video-menu__form" action="/video-active" name="activeForm" method="post">
+
             </form>
         </div>
     </section>
@@ -103,9 +102,6 @@
         const micBtn = document.querySelector('.video-menu__mic');
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
-        // ユーザー名を格納する配列
-        const videoTwo = ['item1', 'item2'];
-        const videoFour = ['item1', 'item2', 'item3', 'item4'];
         let micFlag = true;
         let videoFlag = true;
         let userWidth = "48%";
@@ -116,8 +112,11 @@
         } if (model.indexOf("iPad") != -1) {
             userWidth = "42vh";
         }
-        let width;
-        let height;
+        let myName = 'userName';
+        let people = 0;
+        let anyOneIds = null;
+        let auth = null;
+        let roomId = null;
 
         // test userId
         const userId = 'q5GsxMu8h2OAkmqxEY6prVzWAVj2';
@@ -164,73 +163,108 @@
         btnTwo.addEventListener('click', async() => {
             videoMenu.style.display = 'flex';
             videoSelect.style.display = 'none';
-            document.activeForm.people.value = 2;
+            people = 2;
             // TODO: userIdを貰って使う
             const preapreResult = await twoVideoChatPrepare(userId);
             if(preapreResult.hasOwnProperty('err')){
                 // has error
+                console.log(preapreResult.err);
             }else{
-                // hostUserId : ホストのユーザーID
-                // auth       : 'host' or 'member'
-                // hostName   : ホストのユーザー名
-                // memberName : メンバーのユーザー名
-                // console.log(`page hostName : ${preapreResult.hostName}`);
-                // console.log(`page memberName : ${preapreResult.memberName}`);
-                videoTwo[0] = preapreResult.hostName;
-                videoTwo[1] = preapreResult.memberName;
+                // roomId : ROOMのID
+                // auth   : 'host' or 'member'
+                // myName : 自分の名前
+                // anyOneIds : 相手のIDが入った配列
+                myName = preapreResult.myName
+                anyOneIds = preapreResult.anyOneIds;
+                auth = preapreResult.auth;
+                roomId = preapreResult.roomId;
             }
-            videoTwo.forEach(userName => {
-                const user = document.createElement('div');
-                user.classList.add('user');
-                user.id = userName;
-                if (window.matchMedia('(min-width: 1000px)').matches) {
-                    user.style.width = '48%';
-                    user.style.height = '100%';
-                } else {
-                    user.style.width = '100%';
-                    user.style.height = userWidth;
-                };
-                const userDisplay = document.createElement('div');
-                userDisplay.classList.add('user__name');
-                userDisplay.appendChild(document.createTextNode(userName));
-                user.appendChild(userDisplay);
-                // const canvas = document.createElement('canvas');
-                // canvas.id = 'localVideo';
-                // canvas.z-index = 100;
-                const video = document.createElement('video');
-                video.id = 'localVideo';
-                // video.style.backgroundColor = 'white';
-                video.style.width = '100%';
-                video.style.height = '100%';
-                video.autoplay = true;
-                // user.appendChild(canvas);
-                user.appendChild(video);
-                videoArea.appendChild(user);
-                videoArea.style.display = 'flex';
-                width = user.style.width;
-                height = user.style.height;
-            });
+            // div要素の作成
+            const user = document.createElement('div');
+            user.classList.add('user');
+            user.id = userId;
+            user.style.width = '100%';
+            user.style.height = '100%';
+            user.style.position = 'relative';
+
+            // userDisplay要素の作成
+            const userDisplay = document.createElement('div');
+            userDisplay.classList.add('user__name');
+            userDisplay.style.position = 'absolute';
+            userDisplay.appendChild(document.createTextNode(myName));
+
+            // userDisplayをuserの子要素に
+            user.appendChild(userDisplay);
+
+            // video要素の作成
+            const video = document.createElement('video');
+            video.id = 'localVideo';
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.autoplay = true;
+            video.style.position = 'absolute';
+
+            // videoをuserの子要素に
+            user.appendChild(video);
+
+            // userをvideoAreaの子要素に
+            videoArea.appendChild(user);
+            videoArea.style.display = 'flex';
             openUserMedia();
         });
 
         btnFour.addEventListener('click', () => {
             videoMenu.style.display = 'flex';
             videoSelect.style.display = 'none';
-            document.activeForm.people.value = 4;
-            videoFour.forEach(userName => {
-                const user = document.createElement('div');
-                user.classList.add('user');
-                user.id = userName;
-                user.style.width = '48%';
-                user.style.height = userWidth;
+            people = 4;
+            // TODO: userIdを貰って使う
+            // TODO: 4人用を書く
+            // const preapreResult = await twoVideoChatPrepare(userId);
+            // if(preapreResult.hasOwnProperty('err')){
+            //     // has error
+            //     console.log(preapreResult.err);
+            // }else{
+            //     // roomId : ROOMのID
+            //     // auth   : 'host' or 'member'
+            //     // myName : 自分の名前
+            //     // anyOneId : 相手のID
+            //     myName = preapreResult.myName
+            //     anyOneId = preapreResult.anyOneId;
+            //     auth = preapreResult.auth;
+            //     roomId = preapreResult.roomId;
+            // }
+            // // div要素の作成
+            // const user = document.createElement('div');
+            // user.classList.add('user');
+            // user.id = videoTwo[0];
+            // user.style.width = '100%';
+            // user.style.height = '100%';
+            // user.style.position = 'relative';
 
-                const userDisplay = document.createElement('div');
-                userDisplay.classList.add('user__name');
-                userDisplay.appendChild(document.createTextNode(userName));
-                user.appendChild(userDisplay);
-                videoArea.appendChild(user);
-                videoArea.style.display = 'flex';
-            });
+            // // userDisplay要素の作成
+            // const userDisplay = document.createElement('div');
+            // userDisplay.classList.add('user__name');
+            // userDisplay.style.position = 'absolute';
+            // userDisplay.appendChild(document.createTextNode(myName));
+
+            // // userDisplayをuserの子要素に
+            // user.appendChild(userDisplay);
+
+            // // video要素の作成
+            // const video = document.createElement('video');
+            // video.id = 'localVideo';
+            // video.style.width = '100%';
+            // video.style.height = '100%';
+            // video.autoplay = true;
+            // video.style.position = 'absolute';
+
+            // // videoをuserの子要素に
+            // user.appendChild(video);
+
+            // // userをvideoAreaの子要素に
+            // videoArea.appendChild(user);
+            // videoArea.style.display = 'flex';
+            // openUserMedia();
         });
 
         //マイオブジェクト一覧を表示
@@ -322,92 +356,35 @@
             const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
             document.querySelector('#localVideo').srcObject = stream;
             console.log(document.querySelector('#localVideo').srcObject);
-
-            // get video element
-            // var videoElement = document.querySelector('#myVideo');
-
-            // // create constraints 
-            // constraints = {
-            //     video : videoFlag,
-            //     audio : micFlag
-            // };
-
-            // // pattern : getUserMedia success
-            // var onOpenStream = function(stream){
-            //     videoElement.srcObject = stream;
-            //     InitCanvas();
-            // }
-
-            // // initial camera
-            // if(navigator.mediaDevices.getUserMedia != null){
-            //     navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
-            //         onOpenStream(stream)
-            //     }).catch(function(err){
-            //         // has error
-            //     });
-            // }else{
-            //     // cannot access camera
-            // }
-
-            // var InitCanvas = function(){
-            //     // initial canvas
-            //     var canvasElement = document = document.querySelector('#localVideo');
-
-            //     var renderer = new THREE.WebGLRenderer({
-            //         canvas : canvasElement,
-            //         antialias : true,
-            //         alpha : true
-            //     });
-            //     renderer.setClearColor(new THREE.Color('black'), 0)
-            //     renderer.setPixelRatio(window.devicePixelRatio);
-                
-            //     // initial scene
-            //     var scene = new THREE.Scene();
-
-            //     // initial ar
-            //     var arToolkitContext = new THREEx.ArToolkitContext({
-            //         cameraParametersUrl: '',
-            //         detectionMode: 'color_and_matrix'
-            //     })
-            //     arToolkitContext.init(function onCompleted(){
-
-            //     })
-
-            //     // XXX: help me IORI
-            //     var markerRoot = new THREE.Group();
-            //     scene.add(markerRoot);
-            //     var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-            //         type : 'pattern',
-            //         patternUrl : patternURL,
-            //         changeMatrixMode : 'modelViewMatrix',
-            //         minConfidence : 0.50
-            //     })
-
-            //     const user = document.querySelector('user')
-            //     const camera = new THREE.PerspectiveCamera(60, width / height, 0.01, 100);
-
-            //     const geometry = new THREE.planeGeometry();
-            //     const objectUrl = objectURL;
-            //     const material = new THREE.MeshStandaredMaterial({
-            //         map : texture
-            //     });
-
-            //     const mesh = new THREE.Mesh(geometry, material);
-
-            //     markerRoot.add(mesh);
-                
-            //     drawFrame();
-
-            //     function drawFrame(){
-            //         arToolkitContext.update(videoElement);
-
-            //         renderer.render(scene, camera);
-            //         requestAnimationFrame(drawFrame);
-            //     }
-
-            // }
-
         }
+
+        const formArea = document.querySelector(".video-menu__start");
+        formArea.addEventListener('click', () => {
+            // get form
+            const form = document.querySelector('.video-menu__form');
+
+            // create request_body
+            const request_body = {
+                people : people,
+                anyOneIds : anyOneIds,
+                auth : auth,
+                roomId : roomId,
+                micFlag : micFlag,
+                videoFlag : videoFlag
+            };
+
+            // create input
+            const body_element = document.createElement('input');
+            body_element.hidden = true;
+            body_element.setAttribute('name', '_request_body');
+            body_element.setAttribute('value', JSON.stringify(request_body));
+            
+            // body_elementをformの子要素に
+            form.appendChild(body_element);
+
+            // submit form
+            form.submit();
+        })
     </script>
 </body>
 

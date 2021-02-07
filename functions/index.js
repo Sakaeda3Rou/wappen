@@ -777,6 +777,7 @@ app.get('/test', async (req, res) => {
   // userId
   const user = {uid: "q5GsxMu8h2OAkmqxEY6prVzWAVj2"};
   // const user = {uid: "15ZJMpLO1zbJejmCnSJ9RCGRf632"};
+  const userIds = ['15ZJMpLO1zbJejmCnSJ9RCGRf632', 'q5GsxMu8h2OAkmqxEY6prVzWAVj2'];
 
 
   // 所属クランを取得
@@ -784,7 +785,7 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = null;
+  const category = ['aaj'];
 
   // const objectId = 'kXK3nIvG6QBxvEhpG22G';
   // const objectId = 'BDVQ4Ruj9LNb4unuNKO4';
@@ -794,11 +795,11 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  // result = await dao.searchObject(category, user.uid, 1)
+  result = await dao.searchObject(category, user.uid, 1);
 
   // マーカーリスト取得
   const clanId = "sWuyRFv3Co7I23VoAwTZ";
-  result = await dao.selectMarkerList(user.uid, clanId);
+  // result = await dao.selectMarkerList(user.uid, clanId);
 
   // マーカーURL取得
   // result = await sao.getMarkerUrl(`${user.uid}.png`);
@@ -813,7 +814,10 @@ app.get('/test', async (req, res) => {
   // result = await dao.deleteMyObject(user.uid, objectId);
 
   // change Selected test
-  result = await dao.changeSelected(user.uid, objectId);
+  // result = await dao.changeSelected(user.uid, objectId);
+
+  // prepareVideoChat test
+  // result = await dao.prepareVideoChat(userIds);
 
   console.log(`result =>`);
   console.dir(result);

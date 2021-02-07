@@ -737,7 +737,8 @@ exports.searchObject = async(category, userId, page) => {
       return {err : err};
     })
   
-    if(Array.isArray(userObject) && Array.isArray(categoryObject)){
+    // if(Array.isArray(userObject) && Array.isArray(categoryObject)){
+    if(Array.isArray(categoryObject)){
       // if result = []
       if(categoryObject.length == 0){
         return [{
@@ -748,22 +749,22 @@ exports.searchObject = async(category, userId, page) => {
       }
   
       // create objectIds
-      let objectIds = [];
+      // let objectIds = [];
       // not user's but match category
-      for(const byCategory of categoryObject){
-        var flag = false;
-        for(var i = 0; i < userObject.length && flag == false; i++){
-          // console.log(`i => ${i}`);
-          if(byCategory == userObject[i]){
-            flag = true
-          }
-        }
+      // for(const byCategory of categoryObject){
+      //   var flag = false;
+      //   for(var i = 0; i < userObject.length && flag == false; i++){
+      //     // console.log(`i => ${i}`);
+      //     if(byCategory == userObject[i]){
+      //       flag = true
+      //     }
+      //   }
   
-        if(flag != true){
-          // console.log(`push => ${byCategory}`);
-          objectIds.push(byCategory);
-        }
-      }
+      //   if(flag != true){
+      //     // console.log(`push => ${byCategory}`);
+      //     objectIds.push(byCategory);
+      //   }
+      // }
 
       // console.dir(`userObject => ${userObject}`);
 
@@ -774,15 +775,16 @@ exports.searchObject = async(category, userId, page) => {
       let result = null;
       let resultArray = [];
 
-      if(objectIds.length == 0){
-        return [{
-          total : userLength,
-          searchResultLength : objectIds.length,
-          objectList : []
-        }];
-      }
+      // if(objectIds.length == 0){
+      //   return [{
+      //     total : userLength,
+      //     searchResultLength : objectIds.length,
+      //     objectList : []
+      //   }];
+      // }
 
-      for (const objectId of objectIds){
+      // for (const objectId of objectIds){
+      for (const objectId of categoryObject){
         result = await db.collection('object').doc(objectId).get().then(doc => {
           let document = doc.data();
           document['id'] = doc.id;
@@ -840,18 +842,21 @@ exports.searchObject = async(category, userId, page) => {
       snapshot.forEach(doc => {
         document = doc.data();
 
-        flag = false;
-        for(var i = 0; i < userObject.length && flag == false; i++){
-          if(doc.id == userObject[i]){
-            // console.log('!!!!!!!!!true!!!!!!!!!')
-            flag = true;
-          }
-        }
+        // flag = false;
+        // for(var i = 0; i < userObject.length && flag == false; i++){
+        //   if(doc.id == userObject[i]){
+        //     // console.log('!!!!!!!!!true!!!!!!!!!')
+        //     flag = true;
+        //   }
+        // }
 
-        if(flag != true){
-          document['id'] = doc.id;
-          resultArray.push(document);
-        }
+        // if(flag != true){
+        //   document['id'] = doc.id;
+        //   resultArray.push(document);
+        // }
+
+        document['id'] = doc.id;
+        resultArray.push(document);
       })
 
       objectsLength = resultArray.length;
@@ -1197,6 +1202,56 @@ exports.deleteMyObject = async(userId, objectId) => {
 
   // success
   return true;
+}
+
+// when you use : for prepare videochat
+// need user's id array as 'userIds'
+exports.prepareVideoChat = async(userIds) => {
+  let anyonePattern = null;
+  let anyoneObjectId = null;
+  let anyoneObjectURL = null;
+  let anyOneMarkerList = [];
+  for(const userId of userIds){
+    try{
+      anyonePattern = await db.collection('my_pattern').where('userId', '==', userId).get().then(snapshot => {
+        let patternURL = null;
+        if(snapshot.empty){
+          return resultArray;
+        }
+        snapshot.forEach(doc => {
+          patternURL = doc.data().patternURL;
+        })
+        return patternURL;
+      })
+  
+      anyoneObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
+        let resultArray = [];
+        if(snapshot.empty){
+          return resultArray;
+        }
+        snapshot.forEach(doc => {
+          resultArray.push(doc.data().objectId);
+        })
+        return resultArray;
+      })
+
+      anyoneObjectURL = await db.collection('object').doc(anyoneObjectId[0]).get().then(doc => {
+        if(!doc.exists){
+          return resultArray;
+        }
+        
+        return doc.data().objectURL;
+      })
+
+      anyOneMarkerList.push({userId : userId, patternURL : anyonePattern, objectURL : anyoneObjectURL});
+    }catch(err){
+      // has error
+      return {err : err};
+    }
+  }
+
+  // success
+  return anyOneMarkerList;
 }
 
 // when you use : for increment numberOfAdd
