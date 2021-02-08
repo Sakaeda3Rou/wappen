@@ -22,127 +22,152 @@ let remoteStream = null;
 
 let roomDialog = null;
 
-const admin = require('firebase-admin');
+let roomId = null;
 
-let db = admin.firestore();
+const db = firebase.firestore();
 
-async function videoActive(auth, hostUserId){
-    // create peerConnection
-    peerConnection = new RTCPeerConnection(configuration);
-  
-    registerPeerConnectionListeners();
-    
-    const roomRef = db.collection('rooms').doc(hostUserId);
-    const roomSnapshot = await roomRef.get();
+// if auth is 'host'
+async function createRoom(roomId){
+  this.roomId = roomId;
+  const roomRef = await db.collection('rooms').doc(roomId);
 
-    if(roomSnapshot.exists){
-      if(auth == 'host'){
-        // create offer
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
+  // create peerConnection with configuration
+  peerConnection = new RTCPeerConnection(configuration);
 
-        // insert offer to roomRef
-        await roomRef.add({offer : {type : offer.type, sdp : offer.sdp}});
+  registerPeerConnectionListeners();
 
-        // get localStream and add Tracks to peerConnection
-        localStream.getTracks().forEach(track => {
-          peerConnection.addTrack(track, localStream);
-        })
+  // localStream add to peerConnection
+  localStream.getTracks().forEach(track => {
+    peerConnection.addTrack(track, localStream);
+  });
 
-        // create caller ICE candidates
-        const callerCandidatesCollection = roomRef.collection('callerCandidates');
+  const callerCandidatesCollection = roomRef.collection('callerCandidates');
 
-        // add EventListener to peerConnection for find ICE difference
-        peerConnection.addEventListener('icecandidate', event => {
-          if(!event.candidate){
-            return;
-          }
-
-          // insert callerCandidatesCollection
-          callerCandidatesCollection.add(event.candidate.toJSON());
-        });
-
-        // add EventListener to listen remoteStream
-        peerConnection.addEventListener('track', event => {
-          // get remoteStream
-          event.streams[0].getTracks().forEach(track => {
-            // insert remoteStream
-            remoteStream.addTrack(track);
-          })
-        })
-
-        // listen roomRef to get answer
-        roomRef.onSnapshot(async snapshot => {
-          const data = snapshot.data();
-          if(!peerConnection.currentRemoteDescription && data.answer){
-            const answer = new RTCSessionDescription(data.answer);
-            await peerConnection.setRemoteDescription(answer);
-          }
-        });
-
-        // listen to calleeCandidates(remote ICE candidates)
-        roomRef.collection('calleeCandidates').onSnapshot(snapshot => {
-          snapshot.docChanges().forEach(async change => {
-            if(change.type === 'added'){
-              let data = change.doc.data();
-
-              await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-            }
-          });
-        });
-      }else if(auth == 'member'){
-        // listen roomRef
-        // get localstream for addTrack
-        localStream.getTracks().forEach(track => {
-          peerConnection.addTrack(track, localStream);
-        });
-
-        // create calleeCandidatesCollection and insert
-        const calleeCandidatesCollection = roomRef.collection('calleeCandidates');
-
-        peerConnection.addEventListener('icecandidate', event => {
-          if(!event.candidate){
-            return;
-          }
-
-          // insert
-          calleeCandidatesCollection.add(event.candidate.toJSON());
-        });
-
-        // get offer to create answer
-        const offer = roomSnapshot.data().offer;
-
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-        const answer = await peerConnection.createAnswer();
-
-        await peerConnection.setLocalDescription(answer);
-
-        await roomRef.add({answer : {type : answer.type, sdp : answer.sdp}});
-
-        // listen callerCandidatesCollection and update
-        roomRef.collection('callerCandidates').onSnapshot(snapshot => {
-          snapshot.docChanges().forEach(async change => {
-            if(change.type === 'added'){
-              let data = change.doc.data();
-
-              await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-            }
-          })
-        })
-      }else{
-        // ??????????        
-      }
-    }else{
-      // ??????????
+  // listen my icecandidate
+  // if it has change candidate add collection
+  peerConnection.addEventListener('icecandidate', event => {
+    if(!event.candidate){
+      return ;
     }
+    callerCandidatesCollection.add(event.candidate.toJSON());
+  });
+
+  // create offer and set localdescription
+  const offer = await peerConnection.createOffer();
+  await peerConnection.setLocalDescription(offer);
+
+  const roomWithOffer = {
+    'offer' : {
+      type : offer.type,
+      sdp : offer.sdp
+    }
+  };
+
+  // offer add to rooms
+  await roomRef.set(roomWithOffer);
+
+  // listen track
+  // if remoteStream has change add to my stream
+  peerConnection.addEventListener('track', event => {
+    event.streams[0].getTracks().forEach(track => {
+      remoteStream.addTrack(track);
+    });
+  });
+
+  // listen room
+  // if create answer it set to remoteDescription
+  roomRef.onSnapshot(async snapshot => {
+    const data = snapshot.data();
+    if(!peerConnection.currentRemoteDescription && data && data.answer){
+      const rtcSessionDescription = new RTCSessionDescription(data.answer);
+      await peerConnection.setRemoteDescription(rtcSessionDescription);
+    }
+  });
+
+  // listen anyone icecandidate
+  // if it has change candidate add peerconnection
+  roomRef.collection('calleeCandidates').onSnapshot(snapshot => {
+    snapshot.docChanges().forEach(async change => {
+      if(change.type === 'added'){
+        let data = change.doc.data();
+
+        await peerConnection.addIceCandidate(new RTCIceCandidate(data));
+      }
+    });
+  });
+}
+
+// if auth is 'member'
+async function joinRoomById(roomId){
+  this.roomId = roomId;
+  const roomRef = db.collection('rooms').doc(roomId);
+  const roomSnapshot = await roomRef.get();
+
+  if(roomSnapshot.exists){
+    // create peerconnection with configuration
+    peerConnection = new RTCPeerConnection(configuration);
+
+    registerPeerConnectionListeners();
+
+    // localstream add to peerConnection
+    localStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, localStream);
+    });
+    
+    // listen my icecandidate
+    // if it has change candidate add to collection
+    const calleeCandidatesCollection = roomRef.collection('calleeCandidates');
+    peerConnection.addEventListener('icecandidate', event => {
+      if(!event.candidate){
+        return ;
+      }
+      calleeCandidatesCollection.add(event.cadidate.toJSON());
+    });
+    
+    // listen remotestream
+    // if it has change track add to stream
+    peerConnection.addEventListener('track', event => {
+      event.streams[0].getTracks().forEach(track => {
+        remoteStream.addTrack(track);
+      });
+    });
+    
+    // get offer from room and create answer
+    const offer = roomSnapshot.data().offer;
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    
+    const roomWithAnswer = {
+      'answer' : {
+        type : answer.type,
+        sdp : answer.sdp
+      }
+    };
+    
+    // answer add to rooms
+    await roomRef.update(roomWithAnswer);
+    
+    // listen anyone icecandidate
+    // if it has change candidate add to peerconnection
+    roomRef.collection('callerCandidates').onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(async change => {
+        if(change.type === 'added'){
+          let data = change.doc.data();
+          
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data));
+        }
+      });
+    });
+  }
 }
 
 // get userMedia and AR to localStream
 // use micFlag and videoFlag to get userMedia
-async function openUserMedia(arStream){
+async function openUserMedia(videoFlag, micFlag){
   const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
   document.querySelector('#localVideo').srcObject = stream;
+  localStream = stream;
   remoteStream = new MediaStream();
   document.querySelector('#remoteVideo').srcObject = remoteStream;
 }
@@ -164,15 +189,9 @@ async function hangUp(e) {
 
   document.querySelector('#localVideo').srcObject = null;
   document.querySelector('#remoteVideo').srcObject = null;
-  document.querySelector('#cameraBtn').disabled = false;
-  document.querySelector('#joinBtn').disabled = true;
-  document.querySelector('#createBtn').disabled = true;
-  document.querySelector('#hangupBtn').disabled = true;
-  document.querySelector('#currentRoom').innerText = '';
 
   // Delete room on hangup
   if (roomId) {
-    const db = firebase.firestore();
     const roomRef = db.collection('rooms').doc(roomId);
     const calleeCandidates = await roomRef.collection('calleeCandidates').get();
     calleeCandidates.forEach(async candidate => {
