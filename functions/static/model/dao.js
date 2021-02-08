@@ -60,7 +60,7 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
     return objectResult;
   }
 
-  const oldObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', 'true').get().then(snapshot => {
+  const oldObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
     let returnId = null;
     snapshot.forEach(doc => {
       let document = doc.data();
@@ -108,10 +108,10 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
     result = await _this.saveWithoutId('object_in_category', objectInCategoryData);
   }
 
-  if(result.hasOwnProperty('err')){
-    return result;
-  }else{
+  if(Array.isArray(result)){
     return true;
+  }else{
+    return result;
   }
 }
 

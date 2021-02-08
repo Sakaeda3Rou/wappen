@@ -795,7 +795,7 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  result = await dao.searchObject(category, user.uid, 1);
+  // result = await dao.searchObject(category, user.uid, 1);
 
   // マーカーリスト取得
   const clanId = "sWuyRFv3Co7I23VoAwTZ";
@@ -818,6 +818,8 @@ app.get('/test', async (req, res) => {
 
   // prepareVideoChat test
   // result = await dao.prepareVideoChat(userIds);
+
+  // saveObject
 
   console.log(`result =>`);
   console.dir(result);
