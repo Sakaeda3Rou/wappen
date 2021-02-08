@@ -455,7 +455,7 @@ app.get('/my_object', async (req, res) => {
 
     // マイオブジェクトリストを取得
     const result = await dao.searchMyObject(user.uid, category, 1);
-    console.log('result=>');
+    console.log('result =>');
     console.dir(result);
 
     if (result.objectList == undefined) {
@@ -510,6 +510,9 @@ app.post('/object_upload', async (req, res) => {
     const number = body.number;
     const image = body.image;
     const categoryList = body.uploadCategoryList;
+
+    console.log(`categoryList =>`);
+    console.dir(categoryList);
 
     // オブジェクトの位置を設定
     const locationX = 0;
@@ -765,7 +768,7 @@ app.get('/video', async (req, res) => {
   }
 });
 
-app.get('/video-active', async (req, res) => {
+app.post('/video-active', async (req, res) => {
   // ユーザーを取得
   const user = await confirmUser(req);
 
@@ -826,6 +829,27 @@ app.get('/test', async (req, res) => {
   // console.log(result);
 
   res.end();
+});
+
+app.get('/create_marker', async (req, res) => {
+
+  const uid = '1BTQ18cYGtNunhhiFERfuOh7VMy1';
+
+  // マーカーを作成
+  const orient = require('orient_devil');
+
+  // マーカーの作成
+  const markerURL = await orient.createImage(uid);
+
+  console.log(`markerURL => ${markerURL}`);
+
+  // パターンファイルURLを取得
+  const patternURL = await sao.getPattUrl(uid);
+
+  console.log(`patternURL => ${patternURL}`);
+
+  res.end();
+
 });
 
 app.get('/aaas-test', async (req, res) => {
