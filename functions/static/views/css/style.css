@@ -2474,9 +2474,16 @@ main {
   margin-bottom: 2rem;
 }
 
-@media screen and (min-width: 1000px) {
+@media screen and (min-width: 768px) {
   .home__title .title-phrase {
     font-size: 5rem;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .home__title .title-phrase {
+    font-size: 4rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -2503,12 +2510,18 @@ main {
 
 .home__tutorial .tutorial {
   width: 100%;
-  padding: 0 2rem;
+  padding: 0 2.5rem;
+}
+
+@media screen and (min-width: 768px) {
+  .home__tutorial .tutorial {
+    width: 80%;
+  }
 }
 
 @media screen and (min-width: 1000px) {
   .home__tutorial .tutorial {
-    width: 60%;
+    width: 55%;
   }
 }
 
@@ -2558,7 +2571,7 @@ main {
 }
 
 .home__aboutme .aboutme__main {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 @media screen and (min-width: 768px) {
@@ -2569,24 +2582,25 @@ main {
 
 @media screen and (min-width: 1000px) {
   .home__aboutme .aboutme__main {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 }
 
 .home__aboutme .aboutme__sub {
-  width: 70%;
-  font-size: 0.6rem;
+  width: 100%;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
 }
 
 @media screen and (min-width: 768px) {
   .home__aboutme .aboutme__sub {
-    font-size: 0.8rem;
+    font-size: 1.2rem;
   }
 }
 
 @media screen and (min-width: 1000px) {
   .home__aboutme .aboutme__sub {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
 }
 
@@ -2728,7 +2742,7 @@ main {
   display: inline-block;
   text-decoration: none;
   background: #c23a1e;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.47);
   font-weight: bold;
   width: 120px;
   height: 60px;
