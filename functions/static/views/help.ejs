@@ -92,37 +92,41 @@
 
                         <script type="text/javascript">
                           function Aemail(){
+
+                            // TODO: アラートを表示
+                            window.alert("この機能は未実装です。アップデートをお待ち下さい。");
+
                                 console.log("お問い合わせ送信");
 
                                 var mail1 = document.getElementById('email1').value;
                                 var mail2 = document.getElementById('email2').value;
                                 var body = document.getElementById('body').value;
-                              if (mail1 == null || mail1 == "") {
-
-                                  alert("メールアドレスを入力してください")
-
-                              }else if(mail1 == mail2){
-
-                                   var address = encodeURIComponent(functions.config().someservice.address);
-                                   var pass  = encodeURIComponent(functions.config().someservice.pass);
-                                   Email.send({
-                                        Host : "smtp.elasticemail.com",
-                                        Username : address,
-                                        Password : pass,
-                                        To : address,
-                                        From : address,
-                                        Subject : "テスト",
-
-                                        Body : "  "+mail1+"  "+body
-
-                                    }).then(
-                                      message => alert(message)
-                                    );
-                              }else{
-
-                                alert("メールアドレスが一致しません")
-
-                              }
+                              // if (mail1 == null || mail1 == "") {
+                              //
+                              //     alert("メールアドレスを入力してください")
+                              //
+                              // }else if(mail1 == mail2){
+                              //
+                              //      var address = encodeURIComponent(functions.config().someservice.address);
+                              //      var pass  = encodeURIComponent(functions.config().someservice.pass);
+                              //      Email.send({
+                              //           Host : "smtp.elasticemail.com",
+                              //           Username : address,
+                              //           Password : pass,
+                              //           To : address,
+                              //           From : address,
+                              //           Subject : "テスト",
+                              //
+                              //           Body : "  "+mail1+"  "+body
+                              //
+                              //       }).then(
+                              //         message => alert(message)
+                              //       );
+                              // }else{
+                              //
+                              //   alert("メールアドレスが一致しません")
+                              //
+                              // }
                             }
 
                       </script>

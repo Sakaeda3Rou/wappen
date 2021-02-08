@@ -455,7 +455,7 @@ app.get('/my_object', async (req, res) => {
 
     // マイオブジェクトリストを取得
     const result = await dao.searchMyObject(user.uid, category, 1);
-    console.log('result=>');
+    console.log('result =>');
     console.dir(result);
 
     if (result.objectList == undefined) {
@@ -510,6 +510,9 @@ app.post('/object_upload', async (req, res) => {
     const number = body.number;
     const image = body.image;
     const categoryList = body.uploadCategoryList;
+
+    console.log(`categoryList =>`);
+    console.dir(categoryList);
 
     // オブジェクトの位置を設定
     const locationX = 0;
