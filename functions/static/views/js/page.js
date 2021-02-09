@@ -46,10 +46,10 @@ function createPage() {
     let start = null;
     let end = null;
 
-    if (now <= 3) {
+    if (nowPage <= 3) {
       start = 1;
     } else {
-      start = now-2;
+      start = nowPage-2;
     }
 
     if (start + 5 > maxPage) {
