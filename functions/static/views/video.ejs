@@ -414,6 +414,7 @@
 
         const formArea = document.querySelector(".video-menu__start");
         formArea.addEventListener('click', () => {
+            console.log('click form area');
             // get form
             const form = document.querySelector('.video-menu__form');
 
@@ -432,6 +433,8 @@
             body_element.hidden = true;
             body_element.setAttribute('name', '_request_body');
             body_element.setAttribute('value', JSON.stringify(request_body));
+
+            console.log(JSON.stringify(request_body));
             
             // body_elementをformの子要素に
             form.appendChild(body_element);

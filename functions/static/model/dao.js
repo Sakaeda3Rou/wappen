@@ -1,5 +1,6 @@
 var _this = this;
 const admin = require('firebase-admin');
+const { user } = require('firebase-functions/lib/providers/auth');
 
 let db = admin.firestore();
 
@@ -873,6 +874,114 @@ exports.searchObject = async(category, userId, page) => {
 
     // return to controller
     return data;
+  }
+}
+// when you use : select object
+// need category as 'category' (ex: ['kawaii', 'kimoi'])
+//      page's number as 'page'
+//      user's id as 'userId'
+exports.searchObject2 = async(category, userId, page) => {
+  // create for start and end to use slice
+  let start = 0;
+  let end = 20;
+  
+  if(page > 1){
+    start = (20 * (page - 1))-1;
+    end = page * 20;
+  }
+
+  try{
+    // resultArray.slice(start, end);
+    const userLength = await db.collection('my_object').where('userId', '==', userId).get().then(snapshot => {
+      if(snapshot.empty){
+        return 0;
+      }
+
+      return snapshot.size
+    })
+
+    let searchResult = [];
+    if(category){
+      let categoryForSearch = [];
+      if(category.length > 10){
+        // console.log('hoooo!!!!');
+        const categoryData = await _this.selectAll('category');
+
+        for(const i of categoryData){
+          // console.log(i.id);
+          if(category.includes(i.id) == false){
+            categoryForSearch.push(i.id);
+          }
+        }
+
+        let not = [];
+        for(const c of categoryForSearch){
+          await db.collection('object').where('category', 'array-contains', c).orderBy('objectName', 'desc').get().then(snapshot => {
+            let resultArray = [];
+      
+            if(snapshot.empty){
+              return resultArray;
+            }
+      
+            snapshot.forEach(doc => {
+              not.push(doc.id);
+            })
+          });
+        }
+
+        const all = await _this.selectAll('object');
+
+        // const result = words.filter(word => word.length > 6);
+        searchResult = all.filter(object => not.includes(object.id) == false);
+      }else{
+        searchResult = await db.collection('object').where('category', 'array-contains-any', category).orderBy('objectName', 'desc').get().then(snapshot => {
+          let resultArray = [];
+    
+          if(snapshot.empty){
+            return resultArray;
+          }
+    
+          snapshot.forEach(doc => {
+            let document = doc.data();
+    
+            document['id'] = doc.id;
+    
+            resultArray.push(document);
+          })
+    
+          return resultArray;
+        })
+      }
+    }else{
+      searchResult = await db.collection('object').orderBy('objectName', 'desc').get().then(snapshot => {
+        let resultArray = [];
+
+        if(snapshot.empty){
+          return resultArray;
+        }
+
+        snapshot.forEach(doc => {
+          let document = doc.data();
+
+          document['id'] = doc.id;
+
+          resultArray.push(document);
+        })
+
+        return resultArray;
+      })
+    }
+
+    const data = {
+      total : userLength,
+      searchResultLength : searchResult.length,
+      objectList : searchResult.slice(start, end)
+    };
+
+    return data;
+  }catch(err){
+    console.log('error!!!!!!!!!!');
+    return {err : err};
   }
 }
 

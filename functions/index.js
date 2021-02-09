@@ -535,6 +535,7 @@ app.post('/object_upload', async (req, res) => {
 
 // get share_object
 app.get('/object_share', async (req, res) => {
+  // console.log('!!!!!!!!!!!!*****search*****!!!!!!!!!!!!!');
   // ユーザーを取得
   const user = await confirmUser(req);
 
@@ -570,7 +571,7 @@ app.get('/object_share', async (req, res) => {
     }
 
     // シェアオブジェクトリストを取得
-    const share_result = await dao.searchObject(category, user.uid, page);
+    const share_result = await dao.searchObject2(category, user.uid, page);
     console.log('share result =>')
     console.dir(share_result);
 
@@ -770,9 +771,33 @@ app.get('/video', async (req, res) => {
 
 app.post('/video-active', async (req, res) => {
   // ユーザーを取得
+  console.log('video-active post');
   const user = await confirmUser(req);
+  const body = JSON.parse(req.body);
+  const anyOneIds = body.anyOneIds;
 
-  res.render('video-active');
+  console.dir(body);
+
+  
+  if (!user) {
+    res.redirect('/');
+  } else {
+    const anyOneMarkerList = await dao.prepareVideoChat(anyOneIds);
+
+    if(!Array.isArray(anyOneMarkerList)){
+      console.log(anyOneMarkerList.err);
+    }
+
+    res.render('video-active', {
+      userId: user.uid,
+      people: body.people,
+      anyOneMarkerList: anyOneMarkerList,
+      auth: body.auth,
+      roomId: body.roomId,
+      micFlag: body.micFlag,
+      videoFlag: body.videoFlag
+    });
+  }
 });
 
 // TODO: test
@@ -788,7 +813,7 @@ app.get('/test', async (req, res) => {
 
   let result = null
 
-  const category = ['aaj'];
+  const category = ['aaj', 'aah', 'aai'];
 
   // const objectId = 'kXK3nIvG6QBxvEhpG22G';
   // const objectId = 'BDVQ4Ruj9LNb4unuNKO4';
@@ -798,7 +823,7 @@ app.get('/test', async (req, res) => {
   // result = await dao.searchMyObject(user.uid, category, 1);
 
   // シェアオブジェクト取得
-  // result = await dao.searchObject(category, user.uid, 1);
+  result = await dao.searchObject2(category, user.uid, 1);
 
   // マーカーリスト取得
   const clanId = "sWuyRFv3Co7I23VoAwTZ";
