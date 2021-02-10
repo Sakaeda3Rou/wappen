@@ -91,8 +91,8 @@
         const videoTwo = ['item1', 'item2'];
         const videoFour = ['item1', 'item2', 'item3', 'item4'];
         let people = videoFour;
-        let micFlag = false;
-        let videoFlag = false;
+        let micFlag = <%micFlag%>;
+        let videoFlag = <%videoFlag%>;
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
@@ -142,8 +142,9 @@
                 userWidth = "42vh";
             }
             //getパラメータを取得
-            var params = (new URL(document.location)).searchParams;
-            var queryValue = params.get('people');
+            // var params = (new URL(document.location)).searchParams;
+            // var queryValue = params.get('people');
+            const queryValue = <%people%>;
             if (queryValue == 4) {
                 people = videoFour;
             } else if (queryValue == 2) {

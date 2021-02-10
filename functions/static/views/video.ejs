@@ -43,10 +43,10 @@
                     <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
                     <div class="category__my-object">
                         <!-- 選択中の画像を表示 -->
-                        <div class="my-object-list__select my-object-list__select--video"></div>
+                        <div class="my-object-list__select my-object-list__select--video" id="select_image"></div>
                         <!-- 選択するボタン -->
                         <div class="my-object-list__decision">
-                            <input type="submit" value="マイオブジェクトを選択" class="main-btn my-object-list__submit">
+                            <input type="submit" value="マイオブジェクトを選択" class="main-btn my-object-list__submit" id="submitButton">
                             <input type="reset" value="キャンセル" class="sub-btn my-object-list__cansel"
                                 id="js-category-cansel">
                         </div>
@@ -54,22 +54,7 @@
 
                     <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
                     <ul class="my-object-list__items">
-                        <li class="my-object-list__item" id="my-object-list__item1"></li>
-                        <li class="my-object-list__item" id="my-object-list__item2"></li>
-                        <li class="my-object-list__item" id="my-object-list__item3"></li>
-                        <li class="my-object-list__item" id="my-object-list__item4"></li>
-                        <li class="my-object-list__item" id="my-object-list__item5"></li>
-                        <li class="my-object-list__item" id="my-object-list__item6"></li>
-                        <li class="my-object-list__item" id="my-object-list__item7"></li>
-                        <li class="my-object-list__item" id="my-object-list__item8"></li>
-                        <li class="my-object-list__item" id="my-object-list__item9"></li>
-                        <li class="my-object-list__item" id="my-object-list__item10"></li>
-                        <li class="my-object-list__item" id="my-object-list__item11"></li>
-                        <li class="my-object-list__item" id="my-object-list__item12"></li>
-                        <li class="my-object-list__item" id="my-object-list__item13"></li>
-                        <li class="my-object-list__item" id="my-object-list__item14"></li>
-                        <li class="my-object-list__item" id="my-object-list__item15"></li>
-                        <li class="my-object-list__item" id="my-object-list__item16"></li>
+                        <!--<li class="my-object-list__item" id="my-object-list__item1"></li>-->
                     </ul>
                 </div>
             </div>
@@ -119,7 +104,22 @@
         let roomId = null;
 
         // test userId
-        const userId = 'q5GsxMu8h2OAkmqxEY6prVzWAVj2';
+        const userId = '<%= userId%>';
+
+        let objectList = [];
+
+        <% objectList.forEach((object) => { %>
+            // urlを整形
+            var url = "<%= object.objectURL %>";
+            url = url.replace('amp;', '')
+
+            objectList.push({
+                objectId: "<%= object.id %>",
+                objectName: "<%= object.objectName %>",
+                objectURL: url,
+                objectSelected: "<%= object.objectSelected %>"
+            });
+        <% }); %>
 
         // TODO: think about necessary of user's video
         // if need : create <video> to insert localStream
@@ -275,40 +275,51 @@
         const myObjectListItems = document.querySelector('.my-object-list__items');
         const categoryMyObject = document.querySelector('.category__my-object');
         const categoryCansel = document.querySelector('.my-object-list__cansel');
-        const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
+        // const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
 
-        //プラスボタンをクリックしたときにマイオブジェクト一覧を動的に生成する。
+        // プラスボタンをクリックしたときにマイオブジェクト一覧を動的に生成する。
         addBtn.addEventListener('click', () => {
             modalList.innerHTML = '';
             modalTitle.innerText = 'マイオブジェクトから選択';
-            objects.forEach(object => {
+            // objectList.forEach(object => {
+            //     const li = document.createElement('li');
+
+            //     li.classList.add('my-object-list__item');
+            //     li.style.backgroundImage = `url(${object.objectURL})`;
+            //     modalList.appendChild(li);
+            // });
+            for(let [index, object] of objectList.entries()){
                 const li = document.createElement('li');
 
+                console.log(`objectURL => ${object.objectURL}`);
+                console.log(`index => ${index}`);
+
                 li.classList.add('my-object-list__item');
-                //li.appendChild(document.createTextNode(object));
+                li.style.backgroundImage = `url(${object.objectURL})`;
+                li.setAttribute('onClick', `setMyModal(${index})`);
                 modalList.appendChild(li);
-            });
+            }
             //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
-            const items = document.querySelectorAll('.my-object-list__item');
+            // const items = document.querySelectorAll('.my-object-list__item');
 
-            items.forEach(item => {
-                item.addEventListener('click', () => {
-                    categoryMyObject.classList.toggle('category-open');
-                    myObjectListItems.classList.toggle('my-object-list__items--close');
+            // items.forEach(item => {
+            //     item.addEventListener('click', () => {
+            //         categoryMyObject.classList.toggle('category-open');
+            //         myObjectListItems.classList.toggle('my-object-list__items--close');
 
-                    if (categoryMyObject.classList.contains('category-open')) {
-                        categoryMyObject.style.height = '80%';
-                    } else {
-                        categoryMyObject.style.height = 0;
-                    }
+            //         if (categoryMyObject.classList.contains('category-open')) {
+            //             categoryMyObject.style.height = '80%';
+            //         } else {
+            //             categoryMyObject.style.height = 0;
+            //         }
 
-                    if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                        myObjectListItems.style.height = 0;
-                    } else {
-                        myObjectListItems.style.height = '80%';
-                    }
-                });
-            });
+            //         if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+            //             myObjectListItems.style.height = 0;
+            //         } else {
+            //             myObjectListItems.style.height = '80%';
+            //         }
+            //     });
+            // });
             //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
             categoryCansel.addEventListener('click', () => {
                 categoryMyObject.classList.remove('category-open');
@@ -358,8 +369,52 @@
             console.log(document.querySelector('#localVideo').srcObject);
         }
 
+        function setMyModal(index){
+            console.log(`welcome to setMyModal => ${index}`);
+            const myObjectListItems = document.querySelector('.my-object-list__items');
+            const categoryMyObject = document.querySelector('.category__my-object');
+
+             categoryMyObject.classList.toggle('category-open');
+            myObjectListItems.classList.toggle('my-object-list__items--close');
+
+            if (categoryMyObject.classList.contains('category-open')) {
+                categoryMyObject.style.height = '80%';
+            } else {
+                categoryMyObject.style.height = 0;
+            }
+
+            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                myObjectListItems.style.height = 0;
+            } else {
+                myObjectListItems.style.height = '80%';
+            }
+
+            const image_div_element = document.getElementById('select_image');
+
+            image_div_element.style.backgroundImage = `url(${objectList[index].objectURL})`;
+
+            const submitButton = document.getElementById('submitButton');
+
+            submitButton.setAttribute('onClick', `selectedObject(${index})`);;
+        }
+
+        function selectedObject(index){
+            const objectId = objectList[index].objectId;
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('post', '/object_selected');
+            xhr.send(JSON.stringify({'objectId' : objectId}));
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState === 4 && xhr.status === 200){
+
+                }
+            }
+        }
+
         const formArea = document.querySelector(".video-menu__start");
         formArea.addEventListener('click', () => {
+            console.log('click form area');
             // get form
             const form = document.querySelector('.video-menu__form');
 
@@ -378,6 +433,8 @@
             body_element.hidden = true;
             body_element.setAttribute('name', '_request_body');
             body_element.setAttribute('value', JSON.stringify(request_body));
+
+            console.log(JSON.stringify(request_body));
             
             // body_elementをformの子要素に
             form.appendChild(body_element);

@@ -27,7 +27,6 @@ async function twoVideoChatPrepare(userId){
     await db.collection('matching').doc(String(myVal)).set(matching);
     let roomDemoData = null;
     let roomId = null;
-    let anyOneIds = null;
     const myName = await db.collection('user_detail').doc(userId).get().then(doc => {
         if(!doc.exists){
             return '';
