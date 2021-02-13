@@ -67,7 +67,7 @@
         <!-- <a href="video-active.html"><i class="far fa-comment-dots fa-2x"></i>通話を開始</a> -->
         <div class="video-menu__start">
             <i class="far fa-comment-dots fa-2x"></i>通話を開始
-            <form class="video-menu__form" action="/video-active" name="activeForm" method="post">
+            <form id="post_form" class="video-menu__form" action="/video-active" name="activeForm" method="post">
 
             </form>
         </div>
@@ -281,7 +281,7 @@
         addBtn.addEventListener('click', () => {
             modalList.innerHTML = '';
             modalTitle.innerText = 'マイオブジェクトから選択';
-            // objectList.forEach(object => {
+            // objects.forEach(object => {
             //     const li = document.createElement('li');
 
             //     li.classList.add('my-object-list__item');
@@ -414,9 +414,9 @@
 
         const formArea = document.querySelector(".video-menu__start");
         formArea.addEventListener('click', () => {
-            console.log('click form area');
+            // console.log('click form area');
             // get form
-            const form = document.querySelector('.video-menu__form');
+            const form = document.getElementById('post_form');
 
             // create request_body
             const request_body = {
@@ -434,7 +434,7 @@
             body_element.setAttribute('name', '_request_body');
             body_element.setAttribute('value', JSON.stringify(request_body));
 
-            console.log(JSON.stringify(request_body));
+            // console.log(`requestBody => ${JSON.stringify(request_body)}`);
             
             // body_elementをformの子要素に
             form.appendChild(body_element);

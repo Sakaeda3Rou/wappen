@@ -48,22 +48,7 @@
 
                     <!-- サーバーから取得したマイオブジェクト一覧の画像 -->
                     <ul class="my-object-list__items">
-                        <li class="my-object-list__item" id="my-object-list__item1"></li>
-                        <li class="my-object-list__item" id="my-object-list__item2"></li>
-                        <li class="my-object-list__item" id="my-object-list__item3"></li>
-                        <li class="my-object-list__item" id="my-object-list__item4"></li>
-                        <li class="my-object-list__item" id="my-object-list__item5"></li>
-                        <li class="my-object-list__item" id="my-object-list__item6"></li>
-                        <li class="my-object-list__item" id="my-object-list__item7"></li>
-                        <li class="my-object-list__item" id="my-object-list__item8"></li>
-                        <li class="my-object-list__item" id="my-object-list__item9"></li>
-                        <li class="my-object-list__item" id="my-object-list__item10"></li>
-                        <li class="my-object-list__item" id="my-object-list__item11"></li>
-                        <li class="my-object-list__item" id="my-object-list__item12"></li>
-                        <li class="my-object-list__item" id="my-object-list__item13"></li>
-                        <li class="my-object-list__item" id="my-object-list__item14"></li>
-                        <li class="my-object-list__item" id="my-object-list__item15"></li>
-                        <li class="my-object-list__item" id="my-object-list__item16"></li>
+                        <!--<li class="my-object-list__item" id="my-object-list__item1"></li>-->
                     </ul>
                 </div>
             </div>
@@ -77,22 +62,17 @@
     </section>
     <footer id="footer" style="display: none;"></footer>
 
-    <script src="views.js/include.js"></script>
+    <script src="views/js/include.js"></script>
     <script src="views/js/modal.js"></script>
     <script src="views/js/videoActive.js"></script>
     <script>
+        <%console.dir(anyOneMarkerObject);%>
         const videoArea = document.querySelector('.video-area');
         const videoMenu = document.querySelector('.video-menu');
         const videoBtn = document.querySelector('.video-menu__video');
         const micBtn = document.querySelector('.video-menu__mic');
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
-
-        const videoTwo = ['item1', 'item2'];
-        const videoFour = ['item1', 'item2', 'item3', 'item4'];
-        let people = videoFour;
-        let micFlag = <%micFlag%>;
-        let videoFlag = <%videoFlag%>;
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
@@ -101,8 +81,8 @@
             iconVideo.classList.toggle('fa-video-slash');
 
             // on/off 切り替え
-            videoFlag = !videoFlag;
-            console.log(`video switch => ${videoFlag}`);
+            <%videoFlag = !videoFlag;%>
+            console.log(`video switch => ${<%=videoFlag%>}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
@@ -111,7 +91,7 @@
             })
 
             // stream を設定通りに再開
-            openUserMedia();
+            openUserMedia(<%=micFlag%>, <%=videoFlag%>);
         });
 
         micBtn.addEventListener('click', () => {
@@ -119,8 +99,8 @@
             iconMic.classList.toggle('fa-microphone-slash');
 
             // on/off 切り替え
-            micFlag = !micFlag
-            console.log(`mic switch => ${micFlag}`);
+            <%micFlag = !micFlag;%>
+            console.log(`mic switch => ${<%=micFlag%>}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
@@ -129,7 +109,7 @@
             })
 
             // stream を設定通りに再開
-            openUserMedia();
+            openUserMedia(<%=micFlag%>, <%=videoFlag%>);
         });
 
         let userWidth = "48%";
@@ -144,21 +124,19 @@
             //getパラメータを取得
             // var params = (new URL(document.location)).searchParams;
             // var queryValue = params.get('people');
-            const queryValue = <%people%>;
-            if (queryValue == 4) {
-                people = videoFour;
-            } else if (queryValue == 2) {
-                people = videoTwo;
-            }
 
             // 表示する場所を生成
             videoMenu.style.display = 'flex';
+            let user = null;
+            let userDisplay = null;
+            let video = null;
 
-            if (people === videoTwo) {
-                videoTwo.forEach(userName => {
-                    const user = document.createElement('div');
+            <%if (people == anyOneMarkerObject.names.length) {%>
+                <%anyOneMarkerObject.names.forEach(userName => {%>
+                    user = document.createElement('div');
                     user.classList.add('user');
-                    user.id = userName;
+                    user.style.position = 'relative';
+                    user.id = "<%=userName%>";
                     if (window.matchMedia('(min-width: 1000px)').matches) {
                         user.style.width = '48%';
                         user.style.height = '100%';
@@ -167,33 +145,55 @@
                         user.style.height = userWidth;
                     };
 
-                    const userDisplay = document.createElement('div');
+                    userDisplay = document.createElement('div');
                     userDisplay.classList.add('user__name');
-                    userDisplay.appendChild(document.createTextNode(userName));
+                    userDisplay.appendChild(document.createTextNode("<%=userName%>"));
                     user.appendChild(userDisplay);
+
+                    video = document.createElement('video');
+                    <%if(userName == anyOneMarkerObject.names[0]){%>
+                        video.id = 'localVideo';
+                    <%}else{%>
+                        video.id = 'remoteVideo';
+                    <%}%>
+
+                    video.style.width = '100%';
+                    video.style.height = '100%';
+                    video.autoplay = true;
+                    video.style.position = 'absolute';
+
+                    user.appendChild(video);
+
                     videoArea.appendChild(user);
                     videoArea.style.display = 'flex';
-                });
-            } else {
-                people.forEach(userName => {
-                    const user = document.createElement('div');
-                    user.classList.add('user');
-                    user.id = userName;
-                    user.style.width = '48%';
-                    user.style.height = userWidth;
+                <%})%>
+            <%} else {%>
+                // people.forEach(userName => {
+                //     const user = document.createElement('div');
+                //     user.classList.add('user');
+                //     user.id = userName;
+                //     user.style.width = '48%';
+                //     user.style.height = userWidth;
 
-                    const userDisplay = document.createElement('div');
-                    userDisplay.classList.add('user__name');
-                    userDisplay.appendChild(document.createTextNode(userName));
-                    user.appendChild(userDisplay);
-                    user.appendChild(userDisplay);
+                //     const userDisplay = document.createElement('div');
+                //     userDisplay.classList.add('user__name');
+                //     userDisplay.appendChild(document.createTextNode(userName));
+                //     user.appendChild(userDisplay);
+                //     user.appendChild(userDisplay);
 
-                    videoArea.appendChild(user);
-                    videoArea.style.display = 'flex';
-                });
-            }
+                //     videoArea.appendChild(user);
+                //     videoArea.style.display = 'flex';
+                // });
+                // ???????????????
+            <%}%>
 
-            openUserMedia();
+            openUserMedia(<%=micFlag%>, <%=videoFlag%>);
+
+            <%if(auth == "host"){%>
+                await createRoom(<%=roomId%>);
+            <%}else{%>
+                await joinRoom(<%=roomId%>);
+            <%}%>
         };
 
         const modalList = document.querySelector('.my-object-list__items');
@@ -203,19 +203,19 @@
         const myObjectListItems = document.querySelector('.my-object-list__items');
         const categoryMyObject = document.querySelector('.category__my-object');
         const categoryCansel = document.querySelector('.my-object-list__cansel');
-        const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
+        // const objects = ['オブジェクト1', 'オブジェクト2', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8', 'オブジェクト3', 'オブジェクト4', 'オブジェクト5', 'オブジェクト6', 'オブジェクト7', 'オブジェクト8'];
 
         //プラスボタンをクリックしたときにマイオブジェクト一覧を動的に生成する。
         addBtn.addEventListener('click', () => {
             modalList.innerHTML = '';
             modalTitle.innerText = 'マイオブジェクトから選択';
-            objects.forEach(object => {
-                const li = document.createElement('li');
+            // objects.forEach(object => {
+            //     const li = document.createElement('li');
 
-                li.classList.add('my-object-list__item');
-                //li.appendChild(document.createTextNode(object));
-                modalList.appendChild(li);
-            });
+            //     li.classList.add('my-object-list__item');
+            //     //li.appendChild(document.createTextNode(object));
+            //     modalList.appendChild(li);
+            // });
             //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
             const items = document.querySelectorAll('.my-object-list__item');
 
@@ -266,6 +266,8 @@
             modal.classList.remove('open');
             categoryCansel.click();
         });
+
+
     </script>
 </body>
 
