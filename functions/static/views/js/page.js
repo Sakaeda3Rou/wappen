@@ -63,7 +63,7 @@ function createPage() {
 
       // ボタンの設定
       let isDisabled = false
-      if (start == nowPage) {
+      if (i == nowPage) {
         isDisabled = true
       }
 

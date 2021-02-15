@@ -610,7 +610,7 @@ app.get('/object_share', async (req, res) => {
       myObjectList: my_result.objectList,
       shareObjectList: share_result.objectList,
       total: my_result.total,
-      nowPage: 1,
+      nowPage: page,
       maxPage: maxPage,
     });
   };
@@ -785,7 +785,7 @@ app.post('/video-active', async (req, res) => {
 
   console.dir(body);
 
-  
+
   if (!user) {
     res.redirect('/');
   } else {
@@ -863,41 +863,41 @@ app.get('/test', async (req, res) => {
   res.end();
 });
 
-app.get('/create_marker', async (req, res) => {
+// app.get('/create_marker', async (req, res) => {
+//
+//   const uid = '1BTQ18cYGtNunhhiFERfuOh7VMy1';
+//
+//   // マーカーを作成
+//   const orient = require('orient_devil');
+//
+//   // マーカーの作成
+//   const markerURL = await orient.createImage(uid);
+//
+//   console.log(`markerURL => ${markerURL}`);
+//
+//   // パターンファイルURLを取得
+//   const patternURL = await sao.getPattUrl(uid);
+//
+//   console.log(`patternURL => ${patternURL}`);
+//
+//   res.end();
+//
+// });
 
-  const uid = '1BTQ18cYGtNunhhiFERfuOh7VMy1';
-
-  // マーカーを作成
-  const orient = require('orient_devil');
-
-  // マーカーの作成
-  const markerURL = await orient.createImage(uid);
-
-  console.log(`markerURL => ${markerURL}`);
-
-  // パターンファイルURLを取得
-  const patternURL = await sao.getPattUrl(uid);
-
-  console.log(`patternURL => ${patternURL}`);
-
-  res.end();
-
-});
-
-app.get('/aaas-test', async (req, res) => {
-  // urlを取得
-  const pattname1 = 'pattern-hoshiboshi.patt';
-  const patturl1 = await sao.getaaasUrl(pattname1);
-
-  console.log(`${pattname1}: ${patturl1}`);
-
-  const objectname1 = 'hoshiboshi.png';
-  const objecturl1 = await sao.getaaasUrl(objectname1);
-
-  console.log(`${objectname1}: ${objecturl1}`);
-
-  res.end();
-});
+// app.get('/aaas-test', async (req, res) => {
+//   // urlを取得
+//   const pattname1 = 'pattern-hoshiboshi.patt';
+//   const patturl1 = await sao.getaaasUrl(pattname1);
+//
+//   console.log(`${pattname1}: ${patturl1}`);
+//
+//   const objectname1 = 'hoshiboshi.png';
+//   const objecturl1 = await sao.getaaasUrl(objectname1);
+//
+//   console.log(`${objectname1}: ${objecturl1}`);
+//
+//   res.end();
+// });
 
 // stylesheet
 exports.style = functions.https.onRequest((req, res) => {

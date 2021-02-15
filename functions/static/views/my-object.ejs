@@ -114,7 +114,7 @@
             </div>
         </div>
     </main>
-    <footer id="footer"></footer>
+    <footer id="footer"><%- include('partials/footer'); %></footer>
     <script src="views/js/hamburger.js"></script>
     <script src="views/js/modal.js"></script>
     <script src="views/js/myObjectUpload.js"></script>
@@ -259,6 +259,12 @@
           if (category.isAddObjectSelected) {
             uploadCategoryList.push(category.categoryId);
           }
+        }
+
+        // カテゴリーが空の場合、アラートを表示
+        if (uploadCategoryList.length == 0) {
+          window.alert('カテゴリーを1つ以上選択してください。')
+          return false;
         }
 
         // リクエストボディを作成

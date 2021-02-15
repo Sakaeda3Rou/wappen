@@ -70,7 +70,9 @@
         const videoArea = document.querySelector('.video-area');
         const videoMenu = document.querySelector('.video-menu');
         const videoBtn = document.querySelector('.video-menu__video');
+        const videoFlag = Boolean(<%= videoFlag %>)
         const micBtn = document.querySelector('.video-menu__mic');
+        const micFlag = Boolean(<%= micFlag %>)
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
         let userWidth = "48%";
@@ -86,13 +88,20 @@
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
+        videoBtn.addEventListener('load', () => {
+          if (videoFlag) {
+            iconVideo.classList.toggle('fa-video');
+            iconVideo.classList.toggle('fa-video-slash');
+          }
+        });
+
         videoBtn.addEventListener('click', () => {
             iconVideo.classList.toggle('fa-video');
             iconVideo.classList.toggle('fa-video-slash');
 
             // on/off 切り替え
-            <%videoFlag = !videoFlag;%>
-            console.log(`video switch => ${<%=videoFlag%>}`);
+            videoFlag = !videoFlag;
+            console.log(`video switch => ${videoFlag}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
@@ -101,7 +110,14 @@
             })
 
             // stream を設定通りに再開
-            openUserMedia(<%=micFlag%>, <%=videoFlag%>);
+            openUserMedia(micFlag, videoFlag);
+        });
+
+        micBtn.addEventListener('load', () => {
+          if (micFlag) {
+            iconMic.classList.toggle('fa-microphone');
+            iconMic.classList.toggle('fa-microphone-slash');
+          }
         });
 
         micBtn.addEventListener('click', () => {
@@ -109,8 +125,8 @@
             iconMic.classList.toggle('fa-microphone-slash');
 
             // on/off 切り替え
-            <%micFlag = !micFlag;%>
-            console.log(`mic switch => ${<%=micFlag%>}`);
+            micFlag = !micFlag;
+            console.log(`mic switch => ${micFlag}`);
 
             // stream を一時中断
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
@@ -119,7 +135,7 @@
             })
 
             // stream を設定通りに再開
-            openUserMedia(<%=micFlag%>, <%=videoFlag%>);
+            openUserMedia(micFlag, videoFlag);
         });
 
         window.onload = async function () {
@@ -197,7 +213,7 @@
                 // ???????????????
             <%}%>
 
-            await openUserMedia(<%=micFlag%>, <%=videoFlag%>);
+            await openUserMedia(micFlag, videoFlag);
 
             <%if(auth == "host"){%>
                 createRoom(<%=roomId%>);
@@ -394,7 +410,7 @@
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
                 });
-                
+
                 // listen my icecandidate
                 // if it has change candidate add to collection
                 const calleeCandidatesCollection = roomRef.collection('calleeCandidates');
@@ -404,7 +420,7 @@
                     }
                     calleeCandidatesCollection.add(event.cadidate.toJSON());
                 });
-            
+
                 // listen remotestream
                 // if it has change track add to stream
                 peerConnection.addEventListener('track', event => {
@@ -412,30 +428,30 @@
                         remoteStream.addTrack(track);
                     })
                 });
-            
+
                 // get offer from room and create answer
                 const offer = roomSnapshot.data().offer;
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
-                
+
                 const roomWithAnswer = {
                     'answer' : {
                         type : answer.type,
                         sdp : answer.sdp
                     }
                 };
-            
+
                 // answer add to rooms
                 await roomRef.update(roomWithAnswer);
-                
+
                 // listen anyone icecandidate
                 // if it has change candidate add to peerconnection
                 roomRef.collection('callerCandidates').onSnapshot(snapshot => {
                     snapshot.docChanges().forEach(async change => {
                         if(change.type === 'added'){
                             let data = change.doc.data();
-                            
+
                             await peerConnection.addIceCandidate(new RTCIceCandidate(data));
                         }
                     })
