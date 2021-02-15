@@ -88,12 +88,17 @@
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
-        videoBtn.addEventListener('load', () => {
-          if (videoFlag) {
-            iconVideo.classList.toggle('fa-video');
-            iconVideo.classList.toggle('fa-video-slash');
-          }
-        });
+        if (videoFlag) {
+          iconVideo.classList.add('fa-video');
+        } else {
+          iconVideo.classList.add('fa-video-slash');
+        }
+
+        if (micFlag) {
+          iconMic.classList.add('fa-microphone');
+        } else {
+          iconMic.classList.add('fa-microphone-slash');
+        }
 
         videoBtn.addEventListener('click', () => {
             iconVideo.classList.toggle('fa-video');
@@ -111,13 +116,6 @@
 
             // stream を設定通りに再開
             openUserMedia(micFlag, videoFlag);
-        });
-
-        micBtn.addEventListener('load', () => {
-          if (micFlag) {
-            iconMic.classList.toggle('fa-microphone');
-            iconMic.classList.toggle('fa-microphone-slash');
-          }
         });
 
         micBtn.addEventListener('click', () => {
