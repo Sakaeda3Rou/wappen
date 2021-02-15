@@ -603,7 +603,7 @@ app.get('/object_share', async (req, res) => {
       myObjectList: my_result.objectList,
       shareObjectList: share_result.objectList,
       total: my_result.total,
-      nowPage: 1,
+      nowPage: page,
       maxPage: maxPage,
     });
   };
@@ -778,7 +778,7 @@ app.post('/video-active', async (req, res) => {
 
   console.dir(body);
 
-  
+
   if (!user) {
     res.redirect('/');
   } else {
