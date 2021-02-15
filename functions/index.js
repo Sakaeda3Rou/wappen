@@ -96,6 +96,9 @@ app.post('/login', async (req, res) => {
     // markerURLをfirestoreに保存
     dao.saveWithoutId('my_pattern', {userId: uid, patternURL: patternURL});
 
+    // next_numbersにデータを作成
+    await dao.setNextNumber(uid);
+
     // markerURLをセッションに追加
     __session.user.markerURL = markerURL;
 
@@ -528,6 +531,10 @@ app.post('/object_upload', async (req, res) => {
     // オブジェクトコレクションに登録
     const result = await dao.saveObject(user.uid, objectURL, categoryList, locationX, locationY, locationZ, false, objectName);
 
+    if(!Array.isArray(result)){
+      console.dir(result);
+    }
+
     // マイオブジェクト画面にリダイレクト
     res.redirect('/my_object');
   }
@@ -773,7 +780,7 @@ app.post('/video-active', async (req, res) => {
   // ユーザーを取得
   console.log('video-active post');
   const user = await confirmUser(req);
-  const body = JSON.parse(req.body);
+  const body = JSON.parse(req.body._request_body);
   const anyOneIds = body.anyOneIds;
 
   console.dir(body);
@@ -782,16 +789,16 @@ app.post('/video-active', async (req, res) => {
   if (!user) {
     res.redirect('/');
   } else {
-    const anyOneMarkerList = await dao.prepareVideoChat(anyOneIds);
+    const anyOneMarkerObject = await dao.prepareVideoChat(user.uid, anyOneIds);
 
-    if(!Array.isArray(anyOneMarkerList)){
-      console.log(anyOneMarkerList.err);
+    if(anyOneMarkerObject.hasOwnProperty('err')){
+      console.log(anyOneMarkerObject.err);
     }
 
     res.render('video-active', {
       userId: user.uid,
       people: body.people,
-      anyOneMarkerList: anyOneMarkerList,
+      anyOneMarkerObject: anyOneMarkerObject,
       auth: body.auth,
       roomId: body.roomId,
       micFlag: body.micFlag,

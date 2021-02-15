@@ -22,14 +22,14 @@ let remoteStream = null;
 
 let roomDialog = null;
 
-let roomId = null;
+let roomsId = null;
 
 const db = firebase.firestore();
 
 // if auth is 'host'
-async function createRoom(roomId){
-  this.roomId = roomId;
-  const roomRef = await db.collection('rooms').doc(roomId);
+async function createRoom(roomsId){
+  this.roomsId = roomsId;
+  const roomRef = await db.collection('rooms').doc(roomsId);
 
   // create peerConnection with configuration
   peerConnection = new RTCPeerConnection(configuration);
@@ -71,7 +71,7 @@ async function createRoom(roomId){
   peerConnection.addEventListener('track', event => {
     event.streams[0].getTracks().forEach(track => {
       remoteStream.addTrack(track);
-    });
+    })
   });
 
   // listen room
@@ -93,14 +93,14 @@ async function createRoom(roomId){
 
         await peerConnection.addIceCandidate(new RTCIceCandidate(data));
       }
-    });
+    })
   });
 }
 
 // if auth is 'member'
-async function joinRoomById(roomId){
-  this.roomId = roomId;
-  const roomRef = db.collection('rooms').doc(roomId);
+async function joinRoomById(roomsId){
+  this.roomsId = roomsId;
+  const roomRef = db.collection('rooms').doc(roomsId);
   const roomSnapshot = await roomRef.get();
 
   if(roomSnapshot.exists){
@@ -129,7 +129,7 @@ async function joinRoomById(roomId){
     peerConnection.addEventListener('track', event => {
       event.streams[0].getTracks().forEach(track => {
         remoteStream.addTrack(track);
-      });
+      })
     });
     
     // get offer from room and create answer
@@ -157,7 +157,7 @@ async function joinRoomById(roomId){
           
           await peerConnection.addIceCandidate(new RTCIceCandidate(data));
         }
-      });
+      })
     });
   }
 }
@@ -191,8 +191,8 @@ async function hangUp(e) {
   document.querySelector('#remoteVideo').srcObject = null;
 
   // Delete room on hangup
-  if (roomId) {
-    const roomRef = db.collection('rooms').doc(roomId);
+  if (this.roomsId) {
+    const roomRef = db.collection('rooms').doc(this.roomsId);
     const calleeCandidates = await roomRef.collection('calleeCandidates').get();
     calleeCandidates.forEach(async candidate => {
       await candidate.delete();

@@ -57,33 +57,30 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
 
   const objectResult = await _this.saveWithoutId('object', objectData);
 
-  const totalRef = db.collection('next_numbers').doc(userId);
-  await db.runTransaction(async (t) => {
-    // get total
-    const doc = await t.get(totalRef);
-    const total = doc.data().total;
-    // increment and update nextVal
-    await t.update(totalRef, {total : total + 1});
-  })
-
   if(objectResult.hasOwnProperty('err')){
     return objectResult;
   }
 
   const oldObjectId = await db.collection('my_object').where('userId', '==', userId).where('isSelected', '==', true).get().then(snapshot => {
-    let returnId = null;
+    let returnId = [];
     snapshot.forEach(doc => {
-      let document = doc.data();
-      returnId = document.objectId;
+      returnId.push(doc.id);
     })
 
     return returnId;
+  }).catch(err => {
+    return {err : err}
   })
 
-  const changeResult = await _this.updateDoc('my_object', oldObjectId, {isSelected : false});
-
-  if(changeResult.hasOwnProperty('err')){
-    return changeResult;
+  if(Array.isArray(oldObjectId)){
+    if(oldObjectId.length > 0){
+      const changeResult = await _this.updateDoc('my_object', oldObjectId[0], {isSelected : false});
+      if(changeResult.hasOwnProperty('err')){
+        return changeResult;
+      }
+    }
+  }else{
+    return {err : err};
   }
   
   // save my_object
@@ -106,7 +103,7 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
   }
 
   // save object_in_category
-  for(const categoryId of categoryList){
+  for await (const categoryId of categoryList){
     // create objectInCategoryData
     objectInCategoryData ={
       objectId : objectResult.id,
@@ -114,12 +111,28 @@ exports.saveObject = async(userId, objectURL, categoryList, locationX, locationY
     };
 
     result = await _this.saveWithoutId('object_in_category', objectInCategoryData);
+
+    if(result.hasOwnProperty('err')){
+      return result;
+    }
   }
 
-  if(Array.isArray(result)){
-    return true;
-  }else{
-    return result;
+  const totalRef = db.collection('next_numbers').doc(userId);
+  await db.runTransaction(async (t) => {
+    // get total
+    const doc = await t.get(totalRef);
+    const total = doc.data().total;
+    // increment and update nextVal
+    await t.update(totalRef, {total : total + 1});
+  })
+
+}
+
+exports.setNextNumber = async(userId) => {
+  try{
+    const res = await db.collection('next_numbers').doc(userId).set({total : 0});
+  }catch(err){
+    return {err : err};
   }
 }
 
@@ -935,7 +948,7 @@ exports.searchObject2 = async(category, userId, page) => {
           });
         }
 
-        const all = await db.collection('object').orderBy('objectName', 'desc').get().then(snapshot => {
+        const all = await db.collection('object').where('isShared', '==', true).orderBy('objectName', 'desc').get().then(snapshot => {
           let resultArray = [];
 
           if(resultArray.empty){
@@ -956,7 +969,7 @@ exports.searchObject2 = async(category, userId, page) => {
         // const result = words.filter(word => word.length > 6);
         searchResult = all.filter(object => not.includes(object.id) == false);
       }else{
-        searchResult = await db.collection('object').where('category', 'array-contains-any', category).orderBy('objectName', 'desc').get().then(snapshot => {
+        searchResult = await db.collection('object').where('category', 'array-contains-any', category).where('isShared', '==', true).orderBy('objectName', 'desc').get().then(snapshot => {
           let resultArray = [];
     
           if(snapshot.empty){
@@ -975,7 +988,7 @@ exports.searchObject2 = async(category, userId, page) => {
         })
       }
     }else{
-      searchResult = await db.collection('object').orderBy('objectName', 'desc').get().then(snapshot => {
+      searchResult = await db.collection('object').where('isShared', '==', true).orderBy('objectName', 'desc').get().then(snapshot => {
         let resultArray = [];
 
         if(snapshot.empty){
@@ -1253,13 +1266,22 @@ exports.deleteMyObject = async(userId, objectId) => {
 
 // when you use : for prepare videochat
 // need user's id array as 'userIds'
-exports.prepareVideoChat = async(userIds) => {
+exports.prepareVideoChat = async(myId, userIds) => {
   let anyonePattern = null;
   let anyoneObjectId = null;
   let anyoneObjectURL = null;
   let anyOneMarkerList = [];
-  for(const userId of userIds){
-    try{
+  let names = [];
+  let myName = null;
+  let anyoneName = null;
+
+  try{
+    myName = await db.collection('user_detail').doc(myId).get().then(doc => {
+      return doc.data().userName;
+    })
+
+    names.push(myName);
+    for(const userId of userIds){
       anyonePattern = await db.collection('my_pattern').where('userId', '==', userId).get().then(snapshot => {
         let patternURL = null;
         if(snapshot.empty){
@@ -1290,16 +1312,23 @@ exports.prepareVideoChat = async(userIds) => {
         return doc.data().objectURL;
       })
 
+      anyoneName = await db.collection('user_detail').doc(userId).get().then(doc => {
+        return doc.data().userName;
+      })
+
+      names.push(anyoneName);
       anyOneMarkerList.push({userId : userId, patternURL : anyonePattern, objectURL : anyoneObjectURL});
-    }catch(err){
-      // has error
-      return {err : err};
     }
+  }catch(err){
+    // has error
+    return {err : err};
   }
 
   // success
-  return anyOneMarkerList;
+  return {anyOneMarkerList : anyOneMarkerList, names : names};
 }
+
+// when you use : for get any
 
 // when you use : for increment numberOfAdd
 // need object's id as 'objectId'
