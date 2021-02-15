@@ -94,8 +94,10 @@
         const model = navigator.platform;
         if (model.indexOf("iPhone") != -1) {
             userWidth = "39vh";
-        } if (model.indexOf("iPad") != -1) {
+        } else if (model.indexOf("iPad") != -1) {
             userWidth = "42vh";
+        } else {
+            
         }
         let myName = 'userName';
         let people = 0;
@@ -441,7 +443,7 @@
 
             // submit form
             form.submit();
-        })
+        }) 
     </script>
 </body>
 
