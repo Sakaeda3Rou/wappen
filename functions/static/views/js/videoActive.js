@@ -22,14 +22,15 @@ let remoteStream = null;
 
 let roomDialog = null;
 
-let roomsId = null;
+let GlobalRoomsId = null;
 
 const db = firebase.firestore();
 
 // if auth is 'host'
 async function createRoom(roomsId){
-  this.roomsId = roomsId;
-  const roomRef = await db.collection('rooms').doc(roomsId);
+  console.log(`roomsId in createRoom => ${roomsId}`);
+  GlobalRoomsId = roomsId;
+  const roomRef = await db.collection('rooms').doc(String(roomsId));
 
   // create peerConnection with configuration
   peerConnection = new RTCPeerConnection(configuration);
@@ -99,8 +100,9 @@ async function createRoom(roomsId){
 
 // if auth is 'member'
 async function joinRoomById(roomsId){
-  this.roomsId = roomsId;
-  const roomRef = db.collection('rooms').doc(roomsId);
+  console.log(`roomsId in joinRoomById => ${roomsId}`);
+  GlobalRoomsId = roomsId;
+  const roomRef = db.collection('rooms').doc(String(roomsId));
   const roomSnapshot = await roomRef.get();
 
   if(roomSnapshot.exists){
@@ -165,6 +167,8 @@ async function joinRoomById(roomsId){
 // get userMedia and AR to localStream
 // use micFlag and videoFlag to get userMedia
 async function openUserMedia(videoFlag, micFlag){
+  console.log(`micFlag in openUserMedia => ${micFlag}`)
+  console.log(`videoFlag in openUserMedia => ${videoFlag}`)
   const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
   document.querySelector('#localVideo').srcObject = stream;
   localStream = stream;
@@ -191,7 +195,7 @@ async function hangUp(e) {
   document.querySelector('#remoteVideo').srcObject = null;
 
   // Delete room on hangup
-  if (this.roomsId) {
+  if (GlobalRoomsId) {
     const roomRef = db.collection('rooms').doc(this.roomsId);
     const calleeCandidates = await roomRef.collection('calleeCandidates').get();
     calleeCandidates.forEach(async candidate => {
