@@ -11,6 +11,8 @@
     <script src="/__/firebase/8.0.1/firebase-app.js"></script>
     <script src="/__/firebase/8.0.1/firebase-firestore.js"></script>
     <script src="/__/firebase/init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/3.1.0/three.js/build/ar.js"></script>
 </head>
 
 <body>
@@ -37,7 +39,7 @@
                     <!-- マイオブジェクト一覧で選択したときに表示するアコーディオン -->
                     <div class="category__my-object">
                         <!-- 選択中の画像を表示 -->
-                        <div class="my-object-list__select my-object-list__select--video"></div>
+                        <div class="my-object-list__select my-object-list__select--video" id="select_image"></div>
                         <!-- 選択するボタン -->
                         <div class="my-object-list__decision">
                             <input type="submit" value="マイオブジェクトを選択" class="main-btn my-object-list__submit">
@@ -58,7 +60,7 @@
         <div class="video-menu__object js-btn"><i class="fas fa-images fa-2x"></i>オブジェクト</div>
         <div class="video-menu__mic"><i class="fas fa-2x icon-mic"></i>マイク</div>
         <div class="video-menu__video"><i class="fas fa-2x icon-video"></i>ビデオ</div>
-        <div class="video-menu__end"><a href="/video"><i class="fas fa-sign-out-alt fa-2x"></i>退室</a></div>
+        <div class="video-menu__end"><form action="/video" method="get" id="hang_up"></form><i class="fas fa-sign-out-alt fa-2x"></i>退室</div>
     </section>
     <footer id="footer" style="display: none;"></footer>
 
@@ -66,13 +68,11 @@
     <script src="views/js/modal.js"></script>
     <!--<script src="views/js/videoActive.js"></script>-->
     <script>
-        <%console.dir(anyOneMarkerObject);%>
+        // <%console.dir(anyOneMarkerObject);%>
         const videoArea = document.querySelector('.video-area');
         const videoMenu = document.querySelector('.video-menu');
         const videoBtn = document.querySelector('.video-menu__video');
-        const videoFlag = Boolean(<%= videoFlag %>)
         const micBtn = document.querySelector('.video-menu__mic');
-        const micFlag = Boolean(<%= micFlag %>)
         const iconVideo = document.querySelector('.icon-video');
         const iconMic = document.querySelector('.icon-mic');
         let userWidth = "48%";
@@ -84,7 +84,32 @@
             userWidth = "42vh";
         } else {
 
-        }     
+        }
+
+        // 変数の作成 from ejs
+        let micFlag = Boolean(<%= micFlag %>)
+        let videoFlag = Boolean(<%= videoFlag %>)
+        const roomId = String(<%= roomId %>)
+        let patternURL = "<%= anyOneMarkerObject.anyOneMarkerList[0].patternURL %>";
+        patternURL = patternURL.replace('amp;', '');
+        let objectURL = "<%= anyOneMarkerObject.anyOneMarkerList[0].objectURL %>";
+        objectURL = objectURL.replace('amp;', '');
+
+        
+        let objectList = [];
+
+        <% objectList.forEach((object) => { %>
+            // urlを整形
+            var url = "<%= object.objectURL %>";
+            url = url.replace('amp;', '')
+
+            objectList.push({
+                objectId: "<%= object.id %>",
+                objectName: "<%= object.objectName %>",
+                objectURL: url,
+                objectSelected: "<%= object.objectSelected %>"
+            });
+        <% }); %>    
 
         // const people = videoFour; どこかのタイミングで選択された人数を見て判断（ここでは仮に４人としている）
 
@@ -100,6 +125,7 @@
           iconMic.classList.add('fa-microphone-slash');
         }
 
+        // ビデオボタンを押されたとき
         videoBtn.addEventListener('click', () => {
             iconVideo.classList.toggle('fa-video');
             iconVideo.classList.toggle('fa-video-slash');
@@ -108,16 +134,11 @@
             videoFlag = !videoFlag;
             console.log(`video switch => ${videoFlag}`);
 
-            // stream を一時中断
-            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop();
-            })
-
             // stream を設定通りに再開
-            openUserMedia(micFlag, videoFlag);
+            reOpenUserMedia(micFlag, videoFlag);
         });
 
+        // マイクボタンを押されたとき
         micBtn.addEventListener('click', () => {
             iconMic.classList.toggle('fa-microphone');
             iconMic.classList.toggle('fa-microphone-slash');
@@ -126,21 +147,11 @@
             micFlag = !micFlag;
             console.log(`mic switch => ${micFlag}`);
 
-            // stream を一時中断
-            const tracks = document.querySelector('#localVideo').srcObject.getTracks();
-            tracks.forEach(track => {
-                track.stop();
-            })
-
             // stream を設定通りに再開
-            openUserMedia(micFlag, videoFlag);
+            reOpenUserMedia(micFlag, videoFlag);
         });
 
         window.onload = async function () {
-            //getパラメータを取得
-            // var params = (new URL(document.location)).searchParams;
-            // var queryValue = params.get('people');
-
             // 表示する場所を生成
             videoMenu.style.display = 'flex';
             let user = null;
@@ -151,10 +162,12 @@
 
             <%if (people == anyOneMarkerObject.names.length) {%>
                 <%anyOneMarkerObject.names.forEach(userName => {%>
+                    // div要素の作成（user）
                     user = document.createElement('div');
                     user.classList.add('user');
                     user.style.position = 'relative';
-                    user.id = "<%=userName%>";
+                    user.style.zIndex = 0;
+                    user.id = `<%=userName%>${i}`;
                     if (window.matchMedia('(min-width: 1000px)').matches) {
                         user.style.width = '48%';
                         user.style.height = '100%';
@@ -163,11 +176,15 @@
                         user.style.height = userWidth;
                     };
 
+                    // div要素の作成（userDisplay）
                     userDisplay = document.createElement('div');
                     userDisplay.classList.add('user__name');
+                    userDisplay.style.position = 'absolute';
+                    userDisplay.style.zIndex = 10;
                     userDisplay.appendChild(document.createTextNode("<%=userName%>"));
                     user.appendChild(userDisplay);
 
+                    // video要素の作成（localVideo, remoteVideo）
                     video = document.createElement('video');
                     if(i == 0){
                         video.id = 'localVideo';
@@ -185,6 +202,7 @@
                     video.style.height = '100%';
                     video.autoplay = true;
                     video.style.position = 'absolute';
+                    video.style.zIndex = 100;
 
                     user.appendChild(video);
 
@@ -214,11 +232,90 @@
             await openUserMedia(micFlag, videoFlag);
 
             <%if(auth == "host"){%>
-                createRoom(<%=roomId%>);
+                createRoom(roomId);
             <%}else{%>
-                joinRoomById(<%=roomId%>);
+                joinRoomById(roomId);
             <%}%>
+
+            let scene = new THREE.Scene();
+            const videoDOM = document.querySelector('#remoteVideo');
+            let userDOM = document.querySelector('#<%=anyOneMarkerObject.names[1]%>1');
+
+            let renderer = new THREE.WebGLRenderer({alpha: true});
+            renderer.setClearColor(new THREE.Color("black"), 0);
+            renderer.setSize(videoWidth, videoHeight);
+            userDOM.appendChild(renderer.domElement);
+            renderer.domElement.style.zIndex = 200;
+            renderer.domElement.style.position = 'absolute';
+
+            let camera = new THREE.Camera();
+            scene.add(camera);
+
+            let light = new THREE.DirectionalLight(0xffffff);
+            light.position.set(0, 0, 2);
+            scene.add(light);
+
+            // let source = new THREEx.ArToolkitSource({sourceType: "video", sourceUrl: videoDOM.srcObject});
+
+            // function onResize(){
+            //     if(context.arController !== null){
+            //         source.copyElementSizeTo(context.arController.canvas);
+            //     }
+            // }
+
+            // source.init(function onReady(){
+            //     onResize();
+            // });
+
+            let context = new THREEx.ArToolkitContext({
+                canvasWidth: videoWidth,
+                canvasHeight: videoHeight,
+                detectionMode: "mono"
+            });
+
+            context.init(function onCompleted(){
+                camera.projectionMatrix.copy(context.getProjectionMatrix());
+            });
+
+            let group = new THREE.Group();
+
+            let controls = new THREEx.ArMarkerControls(context, group, {
+                type: "pattern",
+                patternUrl: patternURL
+            });
+
+            scene.add(group);
+
+            // geometry, material, mesh, mesh's position, mesh add to group
+            let geo = new THREE.PlaneGeometry(2, 2, 2);
+
+            const loader = new THREE.TextureLoader();
+            const texture = loader.load(objectURL);
+
+            let mat = new THREE.MeshStandardMaterial({map: texture});
+
+            let mesh1 = new THREE.Mesh(geo, mat);
+            mesh1.position.set(0, 0, 0);
+            mesh1.rotation.set(-90, 0, 0);
+
+            group.add(mesh1);
+
+            function renderScene(){
+                requestAnimationFrame(renderScene);
+
+                // if(source.ready === false){
+                //     console.log("can't ready!!");
+                //     return ;
+                // }
+
+                context.update(videoDOM);
+
+                renderer.render(scene, camera);
+            }
+
+            renderScene();
         };
+
 
         const modalList = document.querySelector('.my-object-list__items');
         const modalTitle = document.querySelector('.my-object-list__title');
@@ -240,27 +337,38 @@
             //     //li.appendChild(document.createTextNode(object));
             //     modalList.appendChild(li);
             // });
+            for(let [index, object] of objectList.entries()){
+                const li = document.createElement('li');
+
+                console.log(`objectURL => ${object.objectURL}`);
+                console.log(`index => ${index}`);
+
+                li.classList.add('my-object-list__item');
+                li.style.backgroundImage = `url(${object.objectURL})`;
+                li.setAttribute('onClick', `setMyModal(${index})`);
+                modalList.appendChild(li);
+            }
             //マイオブジェクト一覧のオブジェクトを選択したときにアコーディオンを表示する
-            const items = document.querySelectorAll('.my-object-list__item');
+            // const items = document.querySelectorAll('.my-object-list__item');
 
-            items.forEach(item => {
-                item.addEventListener('click', () => {
-                    categoryMyObject.classList.toggle('category-open');
-                    myObjectListItems.classList.toggle('my-object-list__items--close');
+            // items.forEach(item => {
+            //     item.addEventListener('click', () => {
+            //         categoryMyObject.classList.toggle('category-open');
+            //         myObjectListItems.classList.toggle('my-object-list__items--close');
 
-                    if (categoryMyObject.classList.contains('category-open')) {
-                        categoryMyObject.style.height = '80%';
-                    } else {
-                        categoryMyObject.style.height = 0;
-                    }
+            //         if (categoryMyObject.classList.contains('category-open')) {
+            //             categoryMyObject.style.height = '80%';
+            //         } else {
+            //             categoryMyObject.style.height = 0;
+            //         }
 
-                    if (myObjectListItems.classList.contains('my-object-list__items--close')) {
-                        myObjectListItems.style.height = 0;
-                    } else {
-                        myObjectListItems.style.height = '80%';
-                    }
-                });
-            });
+            //         if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+            //             myObjectListItems.style.height = 0;
+            //         } else {
+            //             myObjectListItems.style.height = '80%';
+            //         }
+            //     });
+            // });
             //マイオブジェクト一覧の"キャンセルボタン"を押したときの処理
             categoryCansel.addEventListener('click', () => {
                 categoryMyObject.classList.remove('category-open');
@@ -286,10 +394,56 @@
         });
 
         //マイオブジェクト一覧の"マイオブジェクトを選択"ボタンを押した時に起こる処理（サーバーに接続し、アップデート処理が必要）
-        categorySubmit.addEventListener('click', () => {
-            modal.classList.remove('open');
-            categoryCansel.click();
-        });
+        // categorySubmit.addEventListener('click', () => {
+        //     modal.classList.remove('open');
+        //     categoryCansel.click();
+        // });
+
+        function setMyModal(index){
+            console.log(`welcome to setMyModal => ${index}`);
+            const myObjectListItems = document.querySelector('.my-object-list__items');
+            const categoryMyObject = document.querySelector('.category__my-object');
+
+            categoryMyObject.classList.toggle('category-open');
+            myObjectListItems.classList.toggle('my-object-list__items--close');
+
+            if (categoryMyObject.classList.contains('category-open')) {
+                categoryMyObject.style.height = '80%';
+            } else {
+                categoryMyObject.style.height = 0;
+            }
+
+            if (myObjectListItems.classList.contains('my-object-list__items--close')) {
+                myObjectListItems.style.height = 0;
+            } else {
+                myObjectListItems.style.height = '80%';
+            }
+
+            const image_div_element = document.getElementById('select_image');
+
+            image_div_element.style.backgroundImage = `url(${objectList[index].objectURL})`;
+
+            const submitButton = document.getElementById('submitButton');
+
+            submitButton.setAttribute('onClick', `selectedObject(${index})`);;
+        }
+
+        function selectedObject(index){
+            const selectedURL = objectList[index].objectURL;
+
+            objectURL = selectedURL;
+        }
+
+        const leaveBtn = document.querySelector('.video-menu__end');
+
+        // 退室の処理
+        leaveBtn.addEventListener('click', async() => {
+            await hangUp();
+
+            const form = document.getElementById('hang_up');
+
+            form.submit();
+        })
 
         // default configuration
         const configuration = {
@@ -315,15 +469,12 @@
 
         let roomDialog = null;
 
-        let GlobalRoomsId = null;
-
         const db = firebase.firestore();
 
         // if auth is 'host'
         async function createRoom(roomsId){
-            console.log(`roomsId in createRoom => ${roomsId}`);
-            GlobalRoomsId = roomsId;
-            const roomRef = await db.collection('rooms').doc(String(roomsId));
+            // console.log(`roomsId in createRoom => ${roomsId}`);
+            const roomRef = await db.collection('rooms').doc(roomsId);
 
             // create peerConnection with configuration
             peerConnection = new RTCPeerConnection(configuration);
@@ -343,6 +494,7 @@
                 if(!event.candidate){
                     return ;
                 }
+                // console.dir(`event.candidate => ${event.candidate}`);
                 callerCandidatesCollection.add(event.candidate.toJSON());
             });
 
@@ -393,9 +545,8 @@
 
         // if auth is 'member'
         async function joinRoomById(roomsId){
-            console.log(`roomsId in joinRoomById => ${roomsId}`);
-            GlobalRoomsId = roomsId;
-            const roomRef = db.collection('rooms').doc(String(roomsId));
+            // console.log(`roomsId in joinRoomById => ${roomsId}`);
+            const roomRef = db.collection('rooms').doc(roomsId);
             const roomSnapshot = await roomRef.get();
 
             if(roomSnapshot.exists){
@@ -416,7 +567,8 @@
                     if(!event.candidate){
                         return ;
                     }
-                    calleeCandidatesCollection.add(event.cadidate.toJSON());
+                    console.log(`event.candidate => ${event.candidate}`);
+                    calleeCandidatesCollection.add(event.candidate.toJSON());
                 });
 
                 // listen remotestream
@@ -457,16 +609,44 @@
             }
         }
 
+        let videoWidth = null;
+        let videoHeight = null;
+
         // get userMedia and AR to localStream
         // use micFlag and videoFlag to get userMedia
-        async function openUserMedia(videoFlag, micFlag){
-            console.log(`micFlag in openUserMedia => ${micFlag}`)
-            console.log(`videoFlag in openUserMedia => ${videoFlag}`)
-            const stream = await navigator.mediaDevices.getUserMedia({video : videoFlag, audio : micFlag});
-            document.querySelector('#localVideo').srcObject = stream;
+        async function openUserMedia(micFlag, videoFlag){
+            // console.log(`micFlag in openUserMedia => ${micFlag}`)
+            // console.log(`videoFlag in openUserMedia => ${videoFlag}`)
+            const stream = await navigator.mediaDevices.getUserMedia({video : true, audio : true});
+            stream.getVideoTracks().forEach(track => {
+                // console.dir(track);
+                track.enabled = videoFlag;
+                videoWidth = track.getSettings().width;
+                videoHeight = track.getSettings().height;
+                console.log(`width => ${videoWidth} , height => ${videoHeight}`);
+            });
+            stream.getAudioTracks().forEach(track => {
+                // console.dir(track);
+                track.enabled = micFlag;
+            });
             localStream = stream;
+            // document.querySelector('#localVideo').src = window.URL.createObjectURL(stream);
+            document.querySelector('#localVideo').srcObject = stream;
             remoteStream = new MediaStream();
             document.querySelector('#remoteVideo').srcObject = remoteStream;
+        }
+
+        // get userMedia and AR to localStream
+        // use micFlag and videoFlag to get userMedia
+        async function reOpenUserMedia(micFlag, videoFlag){
+            localStream.getVideoTracks().forEach(track => {
+                // console.dir(track);
+                track.enabled = videoFlag;
+            });
+            localStream.getAudioTracks().forEach(track => {
+                // console.dir(track);
+                track.enabled = micFlag;
+            });
         }
 
         // hangup
@@ -474,13 +654,16 @@
             const tracks = document.querySelector('#localVideo').srcObject.getTracks();
             tracks.forEach(track => {
                 track.stop();
+                console.log('track stopped');
             });
 
             if (remoteStream) {
+                console.log('remote stopped');
                 remoteStream.getTracks().forEach(track => track.stop());
             }
 
             if (peerConnection) {
+                console.log('connection closed');
                 peerConnection.close();
             }
 
@@ -488,8 +671,8 @@
             document.querySelector('#remoteVideo').srcObject = null;
 
             // Delete room on hangup
-            if (GlobalRoomsId) {
-                const roomRef = db.collection('rooms').doc(this.roomsId);
+            if (roomId) {
+                const roomRef = db.collection('rooms').doc(roomId);
                 const calleeCandidates = await roomRef.collection('calleeCandidates').get();
                 calleeCandidates.forEach(async candidate => {
                     await candidate.delete();

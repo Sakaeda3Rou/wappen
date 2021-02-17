@@ -783,13 +783,19 @@ app.post('/video-active', async (req, res) => {
   const body = JSON.parse(req.body._request_body);
   const anyOneIds = body.anyOneIds;
 
-  console.dir(body);
+  // console.dir(body);
 
 
   if (!user) {
     res.redirect('/');
   } else {
+    // オブジェクトリストを取得
+    const my_result = await dao.searchMyObject(user.uid, null, 1);
+    const objectList = my_result.objectList;
+
     const anyOneMarkerObject = await dao.prepareVideoChat(user.uid, anyOneIds);
+
+    // console.dir(anyOneMarkerObject);
 
     if(anyOneMarkerObject.hasOwnProperty('err')){
       console.log(anyOneMarkerObject.err);
@@ -802,7 +808,8 @@ app.post('/video-active', async (req, res) => {
       auth: body.auth,
       roomId: body.roomId,
       micFlag: body.micFlag,
-      videoFlag: body.videoFlag
+      videoFlag: body.videoFlag,
+      objectList: objectList
     });
   }
 });
