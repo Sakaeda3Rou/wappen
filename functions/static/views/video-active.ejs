@@ -188,6 +188,7 @@
                     video = document.createElement('video');
                     if(i == 0){
                         video.id = 'localVideo';
+                        video.muted = true;
                         i = i + 1;
                     }else{
                         video.id = 'remoteVideo';
